@@ -2,10 +2,6 @@ import { useCartStore } from '@/lib/providers';
 
 import type { CartItem } from './cart.types';
 
-// ---------------------------------------------------------------------------
-// Selector hooks  —  thin wrappers so components subscribe to minimal slices
-// ---------------------------------------------------------------------------
-
 /** All items currently in the cart. */
 export function useCartItems(): CartItem[] {
   return useCartStore((s) => s.items);

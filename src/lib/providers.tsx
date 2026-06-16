@@ -1,8 +1,11 @@
 'use client';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createContext, useContext, useRef, type ReactNode } from 'react';
 import { useStore } from 'zustand';
 
+import { AuthProvider } from '@/domains/auth/auth.context';
+import { UnauthorizedHandler } from '@/domains/auth/components/unauthorized-handler';
 import { createCartStore, type CartStore } from '@/domains/cart/cart.store';
 
 // ---------------------------------------------------------------------------
@@ -10,6 +13,8 @@ import { createCartStore, type CartStore } from '@/domains/cart/cart.store';
 // ---------------------------------------------------------------------------
 
 const CartContext = createContext<ReturnType<typeof createCartStore> | null>(null);
+
+const queryClient = new QueryClient();
 
 // ---------------------------------------------------------------------------
 // Provider  —  wraps the app so client components can access the store
@@ -22,7 +27,14 @@ export function Providers({ children }: { children: ReactNode }) {
     storeRef.current = createCartStore();
   }
 
-  return <CartContext.Provider value={storeRef.current}>{children}</CartContext.Provider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <UnauthorizedHandler />
+        <CartContext.Provider value={storeRef.current}>{children}</CartContext.Provider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
 }
 
 // ---------------------------------------------------------------------------

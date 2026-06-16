@@ -13,6 +13,7 @@
     "openapi:generate": "rm -rf src/api && openapi-ts -o src/api -c @hey-api/client-ky"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "ky": "^2.0.2",
