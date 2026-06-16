@@ -32,7 +32,7 @@ interface AuthActions {
 export type AuthStore = AuthState & AuthActions;
 
 // ---------------------------------------------------------------------------
-// Factory  —  called from AuthProvider in src/domains/auth/auth.context.tsx
+// Factory  —  called from Providers in src/lib/providers.tsx
 // ---------------------------------------------------------------------------
 
 export const createAuthStore = () =>

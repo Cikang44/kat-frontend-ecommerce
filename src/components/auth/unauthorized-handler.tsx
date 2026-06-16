@@ -3,8 +3,8 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
-import { useAuthStore } from '../auth.context';
-import { useRefreshToken } from '../auth.hooks';
+import { useRefreshToken } from '@/domains/auth/auth.hooks';
+import { useAuthStore } from '@/lib/providers';
 
 /**
  * Renders nothing.  Listens for the `auth:unauthorized` custom event

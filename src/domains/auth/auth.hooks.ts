@@ -20,10 +20,10 @@ import type {
   AuthUser,
 } from '@/api/types.gen';
 import { setStoredToken, clearStoredToken } from '@/lib/api-client';
+import { useAuthStore } from '@/lib/providers';
 import { queryKeys } from '@/lib/query-keys';
 
 import { api, type LoginResult, type SignupResult, type VerifyOtpResult } from './auth.api';
-import { useAuthStore } from './auth.context';
 
 // ---------------------------------------------------------------------------
 // Mutations  —  write operations that change server-side auth state
