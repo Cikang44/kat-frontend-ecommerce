@@ -1,16 +1,16 @@
-import type { ProductImage } from '@/api/types.gen';
+import type { ProductImage, ProductVariant, ProductListItem } from '@/api/types.gen';
 
 /**
  * A single entry in the shopping cart.
  *
- * Maps to the `cart_items` table in the backend DB, plus client-only
- * fields for UI state (checked, localId).
+ * Fields are inferred from generated OpenAPI types where possible
+ * (`ProductVariant` for variant fields, `ProductListItem` for product type).
  *
- * Backend constraints (from `backend-ecommerce/src/database/schema/`):
- * - `cart_items.variant_id` is **NOT NULL** — every entry always references a
+ * Backend constraints:
+ * - `cart_items.variant_id` is NOT NULL — every entry always references a
  *   variant.  Products without meaningful variations still get a variant row
  *   with `sleeveType: 'none'`, `size: 'none'`, `color: null`.
- * - `cart_items.user_id` is omitted here because the store is scoped to the
+ * - `cart_items.user_id` is omitted because the store is scoped to the
  *   current user and the backend infers the user from the auth token.
  */
 export interface CartItem {
@@ -37,23 +37,28 @@ export interface CartItem {
   basePrice: number;
 
   /** Product type — affects visibility by user role. */
-  productType: 'merchandise' | 'collaboration' | 'kit_panitia';
+  productType: ProductListItem['type'];
 
   /** Variant ID */
   variantId: string;
 
-  sleeveType: 'lengan_panjang' | 'lengan_pendek' | 'none';
+  /** Sleeve type — derived from ProductVariant. */
+  sleeveType: ProductVariant['sleeveType'];
 
-  /** Nullable in the DB (`text('color')`). */
+  /**
+   * Nullable in the DB (`text('color')`).
+   * The generated type is `string`, but the DB constraint allows null.
+   */
   color: string | null;
 
-  size: 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'none';
+  /** Size — derived from ProductVariant. */
+  size: ProductVariant['size'];
 
   /** Price modifier from the selected variant. */
-  priceModifier: number;
+  priceModifier: ProductVariant['priceModifier'];
 
   /** Current stock of the selected variant. */
-  stock: number;
+  stock: ProductVariant['stock'];
 
   // ── Derived / client-only ──────────────────────────────────────────────
 
