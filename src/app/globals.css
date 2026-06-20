@@ -2,6 +2,22 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
+@font-face {
+  font-family: 'Redzone';
+  src: url('/fonts/Redzone-BlackReg.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geom';
+  src: url('/fonts/Geom-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -123,8 +139,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Geom', sans-serif;
   }
   html {
     @apply font-sans;
+    background-color: #133b79;
   }
 }
