@@ -1,10 +1,10 @@
-import { Loader2Icon } from 'lucide-react';
+import { RefreshLinear } from 'vuesax-icon-pack';
 
 import { cn } from '@/lib/utils';
 
 function Spinner({ className, ...props }: React.ComponentProps<'svg'>) {
   return (
-    <Loader2Icon
+    <RefreshLinear
       role="status"
       aria-label="Loading"
       className={cn('size-4 animate-spin', className)}
