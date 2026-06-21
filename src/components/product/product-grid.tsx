@@ -24,11 +24,11 @@ export function ProductGrid() {
 
   if (isLoading) {
     return (
-      <div className="grid animate-pulse grid-cols-2 justify-items-center gap-4 md:grid-cols-3 md:gap-8">
+      <div className="grid w-full animate-pulse grid-cols-2 justify-items-center gap-4 md:grid-cols-3 md:gap-[30px]">
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="h-[273px] w-[168px] rounded-[17px] bg-gray-200 md:h-[447px] md:w-[423px]"
+            className="h-[273px] w-[168px] rounded-[17px] bg-gray-200 md:h-[447px] md:w-full"
           ></div>
         ))}
       </div>
