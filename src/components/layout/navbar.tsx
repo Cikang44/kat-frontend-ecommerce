@@ -1,4 +1,3 @@
-// components/layout/navbar.tsx
 'use client';
 
 import Image from 'next/image';
@@ -6,16 +5,21 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
+import { useIsAdmin } from '@/domains/auth/auth.hooks';
+import { useCartTotalQuantity } from '@/domains/cart/cart.hooks';
+import { useAuthStore } from '@/lib/providers';
+
 type NavLink = {
   label: string;
   href: string;
+  adminOnly?: boolean;
 };
 
 const NAV_LINKS: NavLink[] = [
   { label: 'Product List', href: '/products' },
-  { label: 'Item', href: '/admin/dashboard-item' },
-  { label: 'Transaction', href: '/admin/dashboard-transaction' },
-  { label: 'Hand Over', href: '/admin/hand-over' },
+  { label: 'Item', href: '/admin/dashboard-item', adminOnly: true },
+  { label: 'Transaction', href: '/admin/dashboard-transaction', adminOnly: true },
+  { label: 'Hand Over', href: '/admin/hand-over', adminOnly: true },
 ];
 
 function isLinkActive(pathname: string, href: string): boolean {
@@ -53,6 +57,24 @@ function UserIcon() {
   );
 }
 
+function LoginIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+    >
+      <path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4" />
+      <path d="M14 8l4 4-4 4" />
+      <path d="M18 12H8" />
+    </svg>
+  );
+}
+
 function MenuIcon({ open }: { open: boolean }) {
   return open ? (
     <svg
@@ -82,21 +104,59 @@ function MenuIcon({ open }: { open: boolean }) {
   );
 }
 
+function AuthLinks({ isLoggedIn, onNavigate }: { isLoggedIn: boolean; onNavigate?: () => void }) {
+  const totalQuantity = useCartTotalQuantity();
+  if (!isLoggedIn) {
+    return (
+      <Link
+        href="/login"
+        onClick={onNavigate}
+        className="flex items-center gap-2 rounded-full bg-[#fff3b8] px-5 py-2 text-sm font-bold text-[#022c3f] hover:bg-[#f7e8bd]"
+      >
+        <LoginIcon />
+        Login
+      </Link>
+    );
+  }
+
+  return (
+    <>
+      <Link
+        href="/cart"
+        onClick={onNavigate}
+        aria-label="Cart"
+        className="flex items-center gap-2 text-[#fff3b8] hover:text-[#f7e8bd]"
+      >
+        <span className="text-sm font-semibold">{totalQuantity}</span>
+        <CartIcon />
+      </Link>
+      <Link
+        href="/profile"
+        onClick={onNavigate}
+        className="flex items-center gap-2 rounded-full border border-[#fff3b8]/50 px-4 py-1.5 text-sm font-semibold text-[#fff3b8] hover:bg-white/5"
+      >
+        <UserIcon />
+        User
+      </Link>
+    </>
+  );
+}
+
 type NavbarProps = {
-  /** Background image shown behind the full-screen mobile menu. Put the file in /public. */
   mobileMenuBgSrc?: string;
-  /** Dark overlay strength (0–100) on top of that image so text stays readable. */
   mobileMenuOverlayOpacity?: number;
 };
 
-function Navbar({
-  mobileMenuBgSrc = '/bg-footer.png', // <-- put your image in /public and update this path
-  mobileMenuOverlayOpacity = 0,
-}: NavbarProps) {
+function Navbar({ mobileMenuBgSrc = '/bg-footer.png', mobileMenuOverlayOpacity = 0 }: NavbarProps) {
   const pathname = usePathname() ?? '/';
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Lock background scroll while the full-screen mobile menu is open.
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const { data: adminData } = useIsAdmin();
+  const isAdmin = adminData?.isAdmin ?? false;
+
+  const visibleLinks = NAV_LINKS.filter((link) => !link.adminOnly || isAdmin);
+
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';
     return () => {
@@ -123,8 +183,8 @@ function Navbar({
           </Link>
 
           {/* Desktop links */}
-          <ul className="text-18px hidden items-center gap-8 font-semibold md:flex">
-            {NAV_LINKS.map((link) => {
+          <ul className="hidden items-center gap-8 text-lg font-semibold md:flex">
+            {visibleLinks.map((link) => {
               const active = isLinkActive(pathname, link.href);
               return (
                 <li key={link.href}>
@@ -141,18 +201,9 @@ function Navbar({
             })}
           </ul>
 
-          {/* Desktop right side: cart + user */}
+          {/* Desktop right side: cart + user, or Login when logged out */}
           <div className="hidden items-center gap-4 md:flex">
-            <Link href="/cart" aria-label="Cart" className="text-[#fff3b8] hover:text-[#f7e8bd]">
-              <CartIcon />
-            </Link>
-            <Link
-              href="/profile"
-              className="flex items-center gap-2 rounded-full border border-[#fff3b8] px-4 py-1.5 text-sm font-semibold text-[#fff3b8] hover:bg-white/5"
-            >
-              <UserIcon />
-              User
-            </Link>
+            <AuthLinks isLoggedIn={isLoggedIn} />
           </div>
 
           {/* Mobile menu toggle */}
@@ -213,7 +264,7 @@ function Navbar({
 
             {/* Stacked links */}
             <ul className="flex flex-col gap-6 px-6 py-8 text-lg font-semibold">
-              {NAV_LINKS.map((link) => {
+              {visibleLinks.map((link) => {
                 const active = isLinkActive(pathname, link.href);
                 return (
                   <li key={link.href}>
@@ -232,24 +283,9 @@ function Navbar({
             {/* Pushes the bottom row to the bottom of the screen */}
             <div className="flex-1" />
 
-            {/* Bottom row: cart + user */}
-            <div className="flex items-center justify-center gap-6 border-t border-[#fff3b8] px-6 py-6">
-              <Link
-                href="/cart"
-                onClick={() => setMobileOpen(false)}
-                aria-label="Cart"
-                className="text-[#fff3b8]"
-              >
-                <CartIcon />
-              </Link>
-              <Link
-                href="/profile"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2 rounded-full border border-[#fff3b8] px-5 py-2 text-sm font-semibold text-[#fff3b8]"
-              >
-                <UserIcon />
-                User
-              </Link>
+            {/* Bottom row: cart + user, or Login when logged out */}
+            <div className="flex items-center justify-center gap-6 border-t border-[#fff3b8]/20 px-6 py-6">
+              <AuthLinks isLoggedIn={isLoggedIn} onNavigate={() => setMobileOpen(false)} />
             </div>
           </div>
         </div>
