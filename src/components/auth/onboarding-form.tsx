@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuthStore } from '@/domains/auth/auth.context';
+import { useAuthStore } from '@/lib/providers';
 
 type Role = 'umum' | 'panitia';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { createContext, useContext, useRef, type ReactNode } from 'react';
 import { useStore } from 'zustand';
 
@@ -8,14 +8,14 @@ import { UnauthorizedHandler } from '@/components/auth/unauthorized-handler';
 import { createAuthStore, type AuthStore } from '@/domains/auth/auth.store';
 import { createCartStore, type CartStore } from '@/domains/cart/cart.store';
 
+import { getQueryClient } from './query-client';
+
 // ---------------------------------------------------------------------------
 // Contexts  —  each holds one zustand store instance per React tree (SSR-safe)
 // ---------------------------------------------------------------------------
 
 const AuthContext = createContext<ReturnType<typeof createAuthStore> | null>(null);
 const CartContext = createContext<ReturnType<typeof createCartStore> | null>(null);
-
-const queryClient = new QueryClient();
 
 // ---------------------------------------------------------------------------
 // Provider
@@ -29,7 +29,7 @@ export function Providers({ children }: { children: ReactNode }) {
   if (!cartStoreRef.current) cartStoreRef.current = createCartStore();
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={getQueryClient()}>
       <AuthContext.Provider value={authStoreRef.current}>
         <UnauthorizedHandler />
         <CartContext.Provider value={cartStoreRef.current}>{children}</CartContext.Provider>
