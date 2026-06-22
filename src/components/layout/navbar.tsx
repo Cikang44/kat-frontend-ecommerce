@@ -28,17 +28,8 @@ function isLinkActive(pathname: string, href: string): boolean {
 
 function CartIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      className="h-5 w-5"
-    >
-      <circle cx="9" cy="21" r="1" />
-      <circle cx="19" cy="21" r="1" />
-      <path d="M2 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L21 7H6" />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/shopping-cart.svg" alt="Cart" className="h-5 w-5" />
   );
 }
 
@@ -167,19 +158,15 @@ function Navbar({ mobileMenuBgSrc = '/bg-footer.png', mobileMenuOverlayOpacity =
   return (
     <div className="sticky top-4 z-50 mx-4 md:mx-8">
       <nav className="mx-auto max-w-[1180px] rounded-2xl border-0 bg-[#022c3f] md:border md:border-[#fff3b8]">
-        <div className="flex items-center justify-between gap-2 px-4 py-2 md:gap-6">
+        <div className="flex items-center justify-between gap-2 px-4 py-3 md:gap-6">
           {/* Brand */}
           <Link
             href="/"
-            className="text-center font-['Redzone',sans-serif] text-lg leading-tight font-black tracking-wide whitespace-nowrap text-[#fff3b8] uppercase"
+            className="px-4 text-center font-['Redzone',sans-serif] text-lg leading-tight font-black tracking-wide whitespace-nowrap text-[#fff3b8] uppercase"
             onClick={() => setMobileOpen(false)}
           >
-            <span className="block text-[14px] leading-none tracking-tight md:text-[18px]">
-              Ganesha
-            </span>
-            <span className="block text-[11px] leading-none tracking-tight md:text-[14px]">
-              Goods
-            </span>
+            <span className="block text-[22px] leading-none tracking-tight">Ganesha</span>
+            <span className="block text-[15px] leading-none tracking-tight">Goods</span>
           </Link>
 
           {/* Desktop links */}
@@ -191,7 +178,7 @@ function Navbar({ mobileMenuBgSrc = '/bg-footer.png', mobileMenuOverlayOpacity =
                   <Link
                     href={link.href}
                     className={
-                      active ? 'text-white' : 'text-white/40 transition hover:text-white/70'
+                      active ? 'text-white/40' : 'text-white transition hover:text-white/70'
                     }
                   >
                     {link.label}
@@ -271,7 +258,7 @@ function Navbar({ mobileMenuBgSrc = '/bg-footer.png', mobileMenuOverlayOpacity =
                     <Link
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
-                      className={active ? 'text-white' : 'text-white/40'}
+                      className={active ? 'text-white/40' : 'text-white'}
                     >
                       {link.label}
                     </Link>
