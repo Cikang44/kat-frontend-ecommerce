@@ -1,9 +1,9 @@
 'use client';
 
-import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { EyeLinear, EyeSlashLinear } from 'vuesax-icon-pack';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,7 +100,11 @@ export function SignupForm() {
               onClick={() => setShowPassword((v) => !v)}
               className="absolute top-1/2 right-2.5 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              {showPassword ? (
+                <EyeSlashLinear className="size-4" />
+              ) : (
+                <EyeLinear className="size-4" />
+              )}
             </button>
           </div>
         </div>

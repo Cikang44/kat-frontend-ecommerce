@@ -1,5 +1,5 @@
-import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react';
 import * as React from 'react';
+import { ArrowLeftLinear, ArrowRightLinear, MoreLinear } from 'vuesax-icon-pack';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -60,7 +60,7 @@ function PaginationPrevious({
       className={cn('pl-2!', className)}
       {...props}
     >
-      <ChevronLeftIcon data-icon="inline-start" />
+      <ArrowLeftLinear data-icon="inline-start" />
       <span className="hidden sm:block">{text}</span>
     </PaginationLink>
   );
@@ -79,7 +79,7 @@ function PaginationNext({
       {...props}
     >
       <span className="hidden sm:block">{text}</span>
-      <ChevronRightIcon data-icon="inline-end" />
+      <ArrowRightLinear data-icon="inline-end" />
     </PaginationLink>
   );
 }
@@ -95,7 +95,7 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'
       )}
       {...props}
     >
-      <MoreHorizontalIcon />
+      <MoreLinear />
       <span className="sr-only">More pages</span>
     </span>
   );
