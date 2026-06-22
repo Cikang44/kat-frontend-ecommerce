@@ -4,6 +4,80 @@ import { persist } from 'zustand/middleware';
 import type { CartItem } from './cart.types';
 
 // ---------------------------------------------------------------------------
+// Mock seed data  —  start with a few items so the cart page isn't empty
+// during development.  Remove or empty the array once the backend is wired.
+// ---------------------------------------------------------------------------
+
+const SEED_ITEMS: CartItem[] = [
+  {
+    localId: 'seed-1',
+    productId: 'prod-kaos-angkatan',
+    productName: 'Kaos Angkatan',
+    productImage: {
+      id: 'img-1',
+      url: '/mock/kaos-angkatan-black.jpg',
+      isPrimary: true,
+      sortOrder: 1,
+    },
+    basePrice: 90000,
+    productType: 'merchandise',
+    variantId: 'var-xl-black',
+    sleeveType: 'none',
+    color: 'Hitam',
+    size: 'XL',
+    priceModifier: 0,
+    stock: 50,
+    unitPrice: 90000,
+    quantity: 2,
+    checked: true,
+  },
+  {
+    localId: 'seed-2',
+    productId: 'prod-kaos-angkatan',
+    productName: 'Kaos Angkatan',
+    productImage: {
+      id: 'img-2',
+      url: '/mock/kaos-angkatan-navy.jpg',
+      isPrimary: false,
+      sortOrder: 2,
+    },
+    basePrice: 90000,
+    productType: 'merchandise',
+    variantId: 'var-m-navy',
+    sleeveType: 'none',
+    color: 'Navy',
+    size: 'M',
+    priceModifier: 0,
+    stock: 30,
+    unitPrice: 90000,
+    quantity: 1,
+    checked: true,
+  },
+  {
+    localId: 'seed-3',
+    productId: 'prod-kaos-angkatan',
+    productName: 'Kaos Angkatan',
+    productImage: {
+      id: 'img-3',
+      url: '/mock/kaos-angkatan-white.jpg',
+      isPrimary: false,
+      sortOrder: 3,
+    },
+    basePrice: 90000,
+    productType: 'merchandise',
+    variantId: 'var-s-white',
+    sleeveType: 'none',
+    color: 'Putih',
+    size: 'S',
+    priceModifier: 0,
+    stock: 20,
+    unitPrice: 90000,
+    quantity: 3,
+    checked: false,
+  },
+];
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -77,7 +151,7 @@ export const createCartStore = () =>
       (set, get) => ({
         // ── State ────────────────────────────────────────────────────────
 
-        items: [],
+        items: SEED_ITEMS,
 
         // ── Actions ──────────────────────────────────────────────────────
 

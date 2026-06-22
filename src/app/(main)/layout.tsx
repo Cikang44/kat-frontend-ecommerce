@@ -8,7 +8,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <>
       {/* Background */}
       <div className="absolute inset-0 w-screen overflow-hidden">
-        <div className="relative flex h-screen shrink-0 items-center justify-center overflow-hidden md:hidden">
+        <div className="fixed inset-0 top-0 left-0 flex h-screen shrink-0 items-center justify-center overflow-hidden md:hidden">
           <Image
             src="/warna-bg-mobile.png"
             alt=""
@@ -26,7 +26,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Desktop: illustration left panel (hidden on mobile) */}
-        <div className="relative hidden h-full overflow-hidden md:flex md:w-screen">
+        <div className="fixed inset-0 top-0 left-0 hidden h-full overflow-hidden md:flex md:w-screen">
           <Image
             src="/warna-bg-desktop.png"
             alt=""
@@ -46,7 +46,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
       </div>
       <Navbar />
-      <div className="min-h-[calc(100vh-232.5px-41px)] md:min-h-[calc(100vh-136px-50px)]">
+      <div className="z-1 min-h-[calc(100vh-232.5px-41px)] md:min-h-[calc(100vh-136px-50px)]">
         {children}
       </div>
       <Footer />

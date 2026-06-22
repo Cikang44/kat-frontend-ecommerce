@@ -27,10 +27,15 @@ export function CartItemRow({ item }: { item: CartItem }) {
   const atMaxQty = item.quantity >= item.stock;
 
   return (
-    <div className={cn('flex items-start rounded-xl p-4 border border-[#022C3F] items-center')}>
+    <div
+      className={cn(
+        'flex rounded-xl p-4 gap-2 md:gap-7 border border-[#022C3F] items-center bg-powder',
+      )}
+    >
       {/* Checkbox */}
-      <div className="color-[#022C3F] flex shrink-0 items-center border-[#022C3F] pt-0.5">
+      <div className="flex shrink-0 items-center px-1 md:size-9 md:px-2">
         <Checkbox
+          className="data-checked:bg-navy-deep [&>span>svg]:text-cream border-[#022C3F] md:size-6 md:[&>span>svg]:size-4.5"
           checked={item.checked}
           onCheckedChange={() => toggleItemCheck(item.localId)}
           aria-label={item.checked ? 'Hapus dari pilihan checkout' : 'Pilih untuk checkout'}
@@ -38,11 +43,13 @@ export function CartItemRow({ item }: { item: CartItem }) {
       </div>
 
       {/* Thumbnail */}
-      <div className="size-16 shrink-0 overflow-hidden rounded-lg">
+      <div className="size-16 shrink-0 overflow-hidden rounded-lg border border-[#7A213D] bg-[#FFE788] md:size-24">
         {item.productImage?.url ? (
           <Image
             src={item.productImage.url}
             alt={item.productName}
+            width={96}
+            height={96}
             className="size-full object-cover"
           />
         ) : (
@@ -58,7 +65,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
 
         {variantDesc && (
           <div>
-            <p className="inline rounded-xs bg-[#C8C8C8] px-1 text-center font-[Geom] text-xs text-pretty">
+            <p className="inline rounded-md bg-[#774C26] px-3 py-0.5 text-center font-[Geom] text-xs text-pretty text-white">
               {variantDesc}
             </p>
           </div>
@@ -82,7 +89,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
             type="button"
             variant="outline"
             size="icon-xs"
-            className="border-[#022C3F] bg-[#FFE788] hover:bg-[#FFE788]"
+            className="cursor-pointer border-[#022C3F] bg-[#FFE788] hover:bg-[#FFE788] disabled:cursor-not-allowed md:size-8"
             onClick={() => {
               const current = cartItems.find((i) => i.localId === item.localId);
               if (current) updateQuantity(item.localId, current.quantity - 1);
@@ -101,7 +108,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
             variant="outline"
             size="icon-xs"
             disabled={atMaxQty}
-            className="border-[#022C3F] bg-[#FFE788] hover:bg-[#FFE788]"
+            className="cursor-pointer border-[#022C3F] bg-[#FFE788] hover:bg-[#FFE788] disabled:cursor-not-allowed md:size-8"
             onClick={() => {
               const current = cartItems.find((i) => i.localId === item.localId);
               if (current) updateQuantity(item.localId, current.quantity + 1);

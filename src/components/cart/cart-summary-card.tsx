@@ -15,8 +15,9 @@ export function CartSummaryCard() {
     <div className="sticky inset-x-0 bottom-0 z-10 rounded-xl border-[#FFE788] bg-[#022C3F] shadow-lg">
       <div className="sm:grid-2 mx-auto flex items-center gap-2 p-2 sm:p-4">
         {/* Select all */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <Checkbox
+            className="md:size-6 md:[&>span>svg]:size-4.5"
             checked={allChecked}
             onCheckedChange={(checked) => toggleSelectAll(checked === true)}
             aria-label={allChecked ? 'Hapus semua pilihan' : 'Pilih semua'}
