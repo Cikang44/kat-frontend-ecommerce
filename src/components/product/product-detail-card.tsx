@@ -76,7 +76,7 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-[430px] flex-col gap-5 md:max-w-7xl">
+    <div className="mx-auto flex w-full flex-col gap-5">
       {/* Mobile: single column with blue card containing everything */}
       <div className="flex flex-col gap-5 md:hidden">
         <div className="bg-powder rounded-[15px] px-5 py-3">
@@ -147,14 +147,14 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
         <div className="bg-powder flex flex-col gap-6 rounded-[15px] p-6">
           <BackButton />
 
-          <div className="flex gap-6">
+          <div className="flex w-full gap-6">
             {/* Left column: Gallery */}
             <div className="w-[550px] shrink-0">
               <ProductImageGallery images={product.images} productName={product.name} />
             </div>
 
             {/* Right column: Title, price, description, variants, actions */}
-            <div className="flex flex-1 flex-col gap-8">
+            <div className="flex min-w-0 flex-1 flex-col gap-8">
               <h1 className="from-royal bg-gradient-to-r to-[#5e68a3] bg-clip-text font-['Redzone'] text-[72px] leading-none text-transparent">
                 {product.name}
               </h1>
@@ -179,7 +179,7 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
                 className="text-2xl"
               />
 
-              <div className="bg-navy flex w-full flex-col gap-8 rounded-[15px] border-4 border-white/50 p-6">
+              <div className="bg-navy flex flex-col gap-8 rounded-[15px] border-4 border-white/50 p-6">
                 <div className="flex flex-col gap-4">
                   <h3 className="text-cream font-['Redzone'] text-2xl">
                     Atur jumlah dan metode pembelian
@@ -198,7 +198,7 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
                     </span>
                   </div>
 
-                  <div className="flex gap-6">
+                  <div className="flex flex-wrap gap-6">
                     <Button
                       type="button"
                       variant="outline"
@@ -214,7 +214,7 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
                       type="button"
                       onClick={handleBuyNow}
                       disabled={!selectedVariant}
-                      className="border-gold bg-gold text-navy-deep hover:bg-gold/90 h-[76px] w-[349px] gap-5 rounded-[15px] border-2 font-['Geom'] text-xl font-bold disabled:opacity-50"
+                      className="border-gold bg-gold text-navy-deep hover:bg-gold/90 h-[76px] flex-1 gap-5 rounded-[15px] border-2 font-['Geom'] text-xl font-bold disabled:opacity-50"
                     >
                       Beli Langsung
                       <TagIcon2Broken className="size-5" />

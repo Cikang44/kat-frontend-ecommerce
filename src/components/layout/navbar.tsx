@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { ShoppingCartLinear } from 'vuesax-icon-pack';
 
 import { useIsAdmin } from '@/domains/auth/auth.hooks';
 import { useCartTotalQuantity } from '@/domains/cart/cart.hooks';
@@ -27,10 +28,7 @@ function isLinkActive(pathname: string, href: string): boolean {
 }
 
 function CartIcon() {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src="/shopping-cart.svg" alt="Cart" className="h-5 w-5" />
-  );
+  return <ShoppingCartLinear className="h-5 w-5" />;
 }
 
 function UserIcon() {
