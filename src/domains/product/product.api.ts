@@ -151,24 +151,326 @@ const MOCK_IMAGES: ProductImage[] = [
   { id: 'img-3', url: '/mock/kaos-angkatan-white.jpg', isPrimary: false, sortOrder: 3 },
   { id: 'img-4', url: '/mock/kaos-angkatan-black.jpg', isPrimary: false, sortOrder: 4 },
 ];
-
 const MOCK_PRODUCTS: ProductListItem[] = [
   {
-    id: 'prod-kaos-angkatan',
-    name: 'Kaos Angkatan',
-    description: 'Kualitas bagus rekomen banget, ayo beli.',
-    basePrice: 90000,
+    id: 'm-1',
+    name: 'Kaos Ganesha Goods',
+    description: 'Kaos nyaman dipakai.',
+    basePrice: 85000,
     type: 'merchandise',
     category: 'baju',
     faculty: '',
     primaryImage: MOCK_IMAGES[0],
-    variantCount: MOCK_VARIANTS.length,
-    minPrice: 90000,
-    maxPrice: 90000,
+    variantCount: 4,
+    minPrice: 85000,
+    maxPrice: 85000,
+  },
+  {
+    id: 'm-2',
+    name: 'Lanyard Logo Ganesha',
+    description: 'Lanyard tebal dan kuat.',
+    basePrice: 25000,
+    type: 'merchandise',
+    category: 'aksesoris',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 25000,
+    maxPrice: 25000,
+  },
+  {
+    id: 'm-3',
+    name: 'Mug Keramik ITB',
+    description: 'Mug untuk ngopi pas nugas.',
+    basePrice: 35000,
+    type: 'merchandise',
+    category: 'peralatan_tulis',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 35000,
+    maxPrice: 35000,
+  },
+  {
+    id: 'm-4',
+    name: 'Gantungan Kunci Kayu',
+    description: 'Gantungan kunci estetik.',
+    basePrice: 15000,
+    type: 'merchandise',
+    category: 'aksesoris',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 15000,
+    maxPrice: 15000,
+  },
+  {
+    id: 'm-5',
+    name: 'Notebook Premium',
+    description: 'Buku catatan kertas tebal.',
+    basePrice: 45000,
+    type: 'merchandise',
+    category: 'peralatan_tulis',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 45000,
+    maxPrice: 45000,
+  },
+  {
+    id: 'm-6',
+    name: 'Sticker Pack Lucu',
+    description: 'Sticker anti air untuk laptop.',
+    basePrice: 10000,
+    type: 'merchandise',
+    category: 'aksesoris',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 10000,
+    maxPrice: 10000,
+  },
+  {
+    id: 'm-7',
+    name: 'Hoodie Navy ITB',
+    description: 'Hoodie hangat untuk begadang.',
+    basePrice: 195000,
+    type: 'merchandise',
+    category: 'baju',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 4,
+    minPrice: 195000,
+    maxPrice: 210000,
+  },
+  {
+    id: 'm-8',
+    name: 'Cincin Perak Ganesha',
+    description: 'Perhiasan perak asli.',
+    basePrice: 120000,
+    type: 'merchandise',
+    category: 'perhiasan',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 2,
+    minPrice: 120000,
+    maxPrice: 120000,
+  },
+
+  // --- TYPE: COLLABORATION (DENGAN FACULTY) ---
+  {
+    id: 'c-1',
+    name: 'Kaos Kolaborasi STEI',
+    description: 'Desain khusus anak STEI.',
+    basePrice: 95000,
+    type: 'collaboration',
+    category: 'baju',
+    faculty: 'STEI',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 3,
+    minPrice: 95000,
+    maxPrice: 95000,
+  },
+  {
+    id: 'c-2',
+    name: 'Lanyard STEI x GG',
+    description: 'Lanyard khusus STEI.',
+    basePrice: 30000,
+    type: 'collaboration',
+    category: 'aksesoris',
+    faculty: 'STEI',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 30000,
+    maxPrice: 30000,
+  },
+  {
+    id: 'c-3',
+    name: 'Jaket FTSL',
+    description: 'Jaket lapangan FTSL.',
+    basePrice: 220000,
+    type: 'collaboration',
+    category: 'baju',
+    faculty: 'FTSL',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 4,
+    minPrice: 220000,
+    maxPrice: 240000,
+  },
+  {
+    id: 'c-4',
+    name: 'Topi Rimba SITH',
+    description: 'Topi praktikum lapangan.',
+    basePrice: 55000,
+    type: 'collaboration',
+    category: 'baju',
+    faculty: 'SITH',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 55000,
+    maxPrice: 55000,
+  },
+  {
+    id: 'c-5',
+    name: 'Totebag SBM',
+    description: 'Totebag kanvas SBM.',
+    basePrice: 65000,
+    type: 'collaboration',
+    category: 'aksesoris',
+    faculty: 'SBM',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 65000,
+    maxPrice: 65000,
+  },
+  {
+    id: 'c-6',
+    name: 'Gantungan Kunci FSRD',
+    description: 'Desain nyentrik FSRD.',
+    basePrice: 20000,
+    type: 'collaboration',
+    category: 'aksesoris',
+    faculty: 'FSRD',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 20000,
+    maxPrice: 20000,
+  },
+  {
+    id: 'c-7',
+    name: 'Pulpen FTI',
+    description: 'Pulpen ukir FTI.',
+    basePrice: 25000,
+    type: 'collaboration',
+    category: 'peralatan_tulis',
+    faculty: 'FTI',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 25000,
+    maxPrice: 25000,
+  },
+  {
+    id: 'c-8',
+    name: 'Kemeja FMIPA',
+    description: 'Kemeja formal FMIPA.',
+    basePrice: 150000,
+    type: 'collaboration',
+    category: 'baju',
+    faculty: 'FMIPA',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 4,
+    minPrice: 150000,
+    maxPrice: 150000,
+  },
+
+  // --- TYPE: KIT PANITIA ---
+  {
+    id: 'k-1',
+    name: 'Kaos Panitia Pusat',
+    description: 'Wajib dibeli seluruh panitia.',
+    basePrice: 50000,
+    type: 'kit_panitia',
+    category: 'baju',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[0],
+    variantCount: 4,
+    minPrice: 50000,
+    maxPrice: 50000,
+  },
+  {
+    id: 'k-2',
+    name: 'Nametag Panitia',
+    description: 'Nametag ID Card Panitia.',
+    basePrice: 15000,
+    type: 'kit_panitia',
+    category: 'aksesoris',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 15000,
+    maxPrice: 15000,
+  },
+  {
+    id: 'k-3',
+    name: 'Buku Panduan Panitia',
+    description: 'Buku SOP Panitia.',
+    basePrice: 35000,
+    type: 'kit_panitia',
+    category: 'peralatan_tulis',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 35000,
+    maxPrice: 35000,
+  },
+  {
+    id: 'k-4',
+    name: 'Rompi Keamanan',
+    description: 'Rompi untuk divisi keamanan.',
+    basePrice: 85000,
+    type: 'kit_panitia',
+    category: 'baju',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 2,
+    minPrice: 85000,
+    maxPrice: 85000,
+  },
+  {
+    id: 'k-5',
+    name: 'Gelang Tiket Panitia',
+    description: 'Gelang akses panitia.',
+    basePrice: 5000,
+    type: 'kit_panitia',
+    category: 'aksesoris',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 5000,
+    maxPrice: 5000,
+  },
+  {
+    id: 'k-6',
+    name: 'Kemeja Divisi Acara',
+    description: 'Kemeja khusus acara.',
+    basePrice: 110000,
+    type: 'kit_panitia',
+    category: 'baju',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 4,
+    minPrice: 110000,
+    maxPrice: 110000,
+  },
+  {
+    id: 'k-7',
+    name: 'Tas Ransel Lapangan',
+    description: 'Tas untuk divisi operasional.',
+    basePrice: 140000,
+    type: 'kit_panitia',
+    category: 'aksesoris',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 140000,
+    maxPrice: 140000,
+  },
+  {
+    id: 'k-8',
+    name: 'Pin Panitia',
+    description: 'Pin panitia kebanggaan.',
+    basePrice: 8000,
+    type: 'kit_panitia',
+    category: 'aksesoris',
+    faculty: '',
+    primaryImage: MOCK_IMAGES[1],
+    variantCount: 1,
+    minPrice: 8000,
+    maxPrice: 8000,
   },
 ];
 
-const MOCK_DETAIL: ProductDetail = {
+const _MOCK_DETAIL: ProductDetail = {
   id: 'prod-kaos-angkatan',
   name: 'Kaos Angkatan',
   description: 'Kualitas bagus rekomen banget, ayo beli.',
@@ -184,20 +486,23 @@ const MOCK_DETAIL: ProductDetail = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const _delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function matchMulti(
   items: ProductListItem[],
   values: string[],
   key: keyof ProductListItem,
 ): ProductListItem[] {
-  if (!values.length) return items;
-  return items.filter((p) => values.includes(String(p[key])));
+  const validValues = values.filter((v) => v.trim() !== '');
+
+  if (validValues.length === 0) return items;
+
+  return items.filter((p) => validValues.includes(String(p[key])));
 }
 
 function searchProducts(items: ProductListItem[], query?: string): ProductListItem[] {
-  if (!query) return items;
-  const q = query.toLowerCase();
+  if (!query || query.trim() === '') return items;
+  const q = query.toLowerCase().trim();
   return items.filter(
     (p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q),
   );
@@ -214,57 +519,68 @@ function paginate(items: ProductListItem[], page: number, limit: number): Produc
 }
 
 // ---------------------------------------------------------------------------
-// API functions
+// API Object Realisasi
 // ---------------------------------------------------------------------------
 
 export const api = {
-  /**
-   * GET /product — product list with filters & pagination.
-   *
-   * type, category, faculty accept comma-separated multi-values.
-   */
   async list(filters?: {
-    /** merchandise, collaboration, kit_panitia (comma-separated multi) */
     type?: string;
-    /** perhiasan, baju, peralatan_tulis, aksesoris (comma-separated multi) */
     category?: string;
-    /** faculty name (comma-separated multi) */
     faculty?: string;
-    /** keyword search (case-insensitive) */
     search?: string;
-    /** page number (default: 1) */
     page?: string;
-    /** items per page (default: 20, max: 50) */
     limit?: string;
   }): Promise<ProductListResult> {
-    await delay(400);
+    // Simulasi delay jaringan kecil
+    await new Promise((r) => setTimeout(r, 400));
 
     const page = Math.max(1, Number(filters?.page) || 1);
     const limit = Math.min(Math.max(1, Number(filters?.limit) || 20), 50);
 
-    let items = MOCK_PRODUCTS;
+    // Ambil basis data dari array 24 mock produk yang telah dibuat sebelumnya
+    let items = [...MOCK_PRODUCTS];
 
+    // Jalankan filter 'type' (Merchandise, Collaboration, Kit Panitia)
     if (filters?.type) {
       const types = filters.type.split(',').map((t) => t.trim());
       items = matchMulti(items, types, 'type');
     }
+
+    // Jalankan filter 'category' (Baju, Aksesoris, Peralatan Tulis, Perhiasan)
     if (filters?.category) {
       const cats = filters.category.split(',').map((c) => c.trim());
       items = matchMulti(items, cats, 'category');
     }
+
+    // Jalankan filter 'faculty' (STEI, FTSL, dll.)
     if (filters?.faculty) {
       const facs = filters.faculty.split(',').map((f) => f.trim());
       items = matchMulti(items, facs, 'faculty');
     }
 
+    // Jalankan filter pencarian kata kunci nama/deskripsi
     items = searchProducts(items, filters?.search);
+
+    // Kembalikan data berupa potongan halaman yang sesuai
     return paginate(items, page, limit);
   },
 
-  /** GET /product/:id — product detail */
   async detail(id: string): Promise<ProductDetail> {
-    await delay(300);
-    if (id !== MOCK_DETAIL.id) throw new Error('Produk tidak ditemukan');
-    return MOCK_DETAIL;
+    await new Promise((r) => setTimeout(r, 300));
+    const found = MOCK_PRODUCTS.find((p) => p.id === id);
+    if (!found) throw new Error('Produk tidak ditemukan');
+
+    // Mengembalikan detail produk struktural (Varian disesuaikan ID produk)
+    return {
+      id: found.id,
+      name: found.name,
+      description: found.description,
+      basePrice: found.basePrice,
+      type: found.type,
+      category: found.category,
+      faculty: found.faculty,
+      images: [found.primaryImage],
+      variants: MOCK_VARIANTS, // Menggunakan array struktur varian global sebagai sampel
+    };
   },
 };
