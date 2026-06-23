@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 
+import { Checkbox } from '@/components/ui/checkbox';
+
 const CATEGORY_OPTIONS = [
   { label: 'Merchandise', value: 'merchandise' },
   { label: 'Collaboration', value: 'collaboration' },
@@ -50,15 +52,15 @@ export function SearchFilterPanel() {
   };
 
   return (
-    <div className="z-10 mb-8 flex w-full flex-col gap-3 md:flex-row md:gap-4">
-      <div className="flex flex-1 flex-row gap-3 md:gap-4">
+    <div className="z-10 mb-6 flex w-full flex-col gap-2 md:mb-8 md:flex-row md:gap-4">
+      <div className="flex flex-1 flex-row gap-2 md:gap-4">
         <Link href="/products">
           <button
             type="button"
             className="flex flex-shrink-0 cursor-pointer items-center justify-center transition-transform active:scale-95"
             style={{
-              width: 'clamp(48px, 12vw, 66px)',
-              height: 'clamp(48px, 12vw, 66px)',
+              width: 'clamp(40px, 10vw, 66px)',
+              height: 'clamp(40px, 10vw, 66px)',
               borderRadius: '15px',
               background: 'linear-gradient(140.48deg, #1D3F7F 31.13%, #5E68A3 90.15%)',
               boxShadow: '0px 0px 11.19px 0px rgba(255, 255, 255, 0.5)',
@@ -72,15 +74,15 @@ export function SearchFilterPanel() {
 
         <div
           className="relative flex flex-1 items-center"
-          style={{ height: 'clamp(48px, 12vw, 66px)' }}
+          style={{ height: 'clamp(40px, 10vw, 66px)' }}
         >
-          <div className="absolute left-4 text-gray-400">
-            <Search size={20} />
+          <div className="absolute left-3 text-gray-400">
+            <Search size={16} />
           </div>
           <input
             type="text"
             placeholder="Search products..."
-            className="h-full w-full rounded-[15px] border border-gray-200 bg-[#F8F9FA] pr-4 pl-12 font-['Geom'] text-[#133b79] transition-all focus:ring-2 focus:ring-[#133b79] focus:outline-none"
+            className="bg-powder h-full w-full rounded-[12px] border border-gray-200 pr-3 pl-10 font-['Geom'] text-sm text-[#133b79] transition-all focus:ring-2 focus:ring-[#133b79] focus:outline-none md:rounded-[15px] md:pr-4 md:pl-12 md:text-base"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleSearchSubmit}
@@ -88,7 +90,7 @@ export function SearchFilterPanel() {
         </div>
       </div>
 
-      <div className="flex gap-3" style={{ height: 'clamp(48px, 12vw, 66px)' }}>
+      <div className="flex gap-2" style={{ height: 'clamp(40px, 10vw, 66px)' }}>
         <FilterDropdown
           title="All Categories"
           options={CATEGORY_OPTIONS.map((o) => o.label)}
@@ -158,7 +160,7 @@ function FilterDropdown({
     <div className="relative h-full flex-1 md:flex-none" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-full w-full min-w-[140px] cursor-pointer items-center justify-between gap-2 rounded-[15px] border border-gray-200 bg-[#F8F9FA] px-4 font-['Geom'] text-[#133b79] transition-colors hover:bg-gray-50 md:min-w-[180px]"
+        className="bg-powder hover:bg-powder/60 flex h-full w-full min-w-[110px] cursor-pointer items-center justify-between gap-1.5 rounded-[12px] border border-gray-200 px-3 font-['Geom'] text-sm text-[#133b79] transition-colors md:min-w-[180px] md:gap-2 md:rounded-[15px] md:px-4 md:text-base"
       >
         <span className="truncate text-sm md:text-base">
           {selected.length > 0 ? `${selected.length} Selected` : title}
@@ -167,36 +169,29 @@ function FilterDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full z-50 mt-2 flex w-full min-w-[180px] flex-col overflow-hidden rounded-[15px] border border-gray-200 bg-white shadow-lg">
-          <div className="flex max-h-[250px] flex-col gap-1 overflow-y-auto p-2">
+        <div className="absolute top-full z-50 mt-2 flex w-full min-w-[160px] flex-col overflow-hidden rounded-[12px] border border-gray-200 bg-white shadow-lg md:min-w-[180px] md:rounded-[15px]">
+          <div className="flex max-h-[220px] flex-col gap-0.5 overflow-y-auto p-1.5 md:max-h-[250px] md:gap-1 md:p-2">
             {options.map((opt, idx) => {
               const actualValue = mappedValues ? mappedValues[idx] : opt;
               const isChecked = selected.includes(actualValue);
               return (
                 <label
                   key={actualValue}
-                  className="flex cursor-pointer items-center gap-3 rounded-[10px] px-3 py-2 font-['Geom'] text-sm text-[#133b79] transition-colors hover:bg-gray-100 md:text-base"
+                  className="text-navy flex cursor-pointer items-center gap-2 rounded-[8px] px-2 py-1.5 font-['Geom'] text-xs transition-colors hover:bg-gray-100 md:gap-3 md:rounded-[10px] md:px-3 md:py-2 md:text-base"
                 >
-                  <div
-                    className={`flex h-5 w-5 items-center justify-center rounded-[6px] border transition-colors ${isChecked ? 'border-[#133b79] bg-[#133b79]' : 'border-gray-300'}`}
-                  >
-                    {isChecked && <span className="text-xs text-white">✓</span>}
-                  </div>
-                  <input
-                    type="checkbox"
-                    className="hidden"
+                  <Checkbox
                     checked={isChecked}
-                    onChange={() => toggleSelection(actualValue)}
+                    onCheckedChange={() => toggleSelection(actualValue)}
                   />
                   {opt}
                 </label>
               );
             })}
           </div>
-          <div className="border-t border-gray-100 p-3">
+          <div className="border-t border-gray-100 p-2 md:p-3">
             <button
               onClick={handleApply}
-              className="hover:bg-navy-deep w-full cursor-pointer rounded-[10px] bg-[#133b79] py-2 font-['Geom'] text-sm font-bold text-white transition-colors md:py-3 md:text-base"
+              className="hover:bg-navy-deep w-full cursor-pointer rounded-[8px] bg-[#133b79] py-1.5 font-['Geom'] text-xs font-bold text-white transition-colors md:rounded-[10px] md:py-3 md:text-base"
             >
               Terapkan
             </button>

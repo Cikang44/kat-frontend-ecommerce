@@ -24,11 +24,11 @@ export function ProductGrid() {
 
   if (isLoading) {
     return (
-      <div className="grid w-full animate-pulse grid-cols-2 justify-items-center gap-4 md:grid-cols-3 md:gap-[30px]">
+      <div className="grid w-full animate-pulse grid-cols-2 justify-items-center gap-2 md:grid-cols-3 md:gap-[30px]">
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="h-[273px] w-[168px] rounded-[17px] bg-gray-200 md:h-[447px] md:w-full"
+            className="h-[210px] w-[155px] rounded-[12px] bg-gray-200 md:h-[447px] md:w-full"
           ></div>
         ))}
       </div>
@@ -74,7 +74,7 @@ export function ProductGrid() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="grid w-full grid-cols-2 justify-items-center gap-4 md:grid-cols-3 md:gap-[30px]">
+      <div className="grid w-full grid-cols-2 justify-items-center gap-6 md:grid-cols-3 md:gap-[30px]">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -86,14 +86,14 @@ export function ProductGrid() {
             <button
               onClick={() => handlePageChange(1)}
               disabled={meta.page === 1}
-              className="cursor-pointer rounded-[6px] bg-[#133b79] px-3 py-1.5 font-['Geom'] text-xs text-white transition-opacity disabled:opacity-50 md:rounded-[8px] md:px-4 md:py-2 md:text-sm"
+              className="cursor-pointer rounded-[6px] bg-[#133b79] px-3 py-1.5 font-['Geom'] text-xs text-white transition-opacity disabled:opacity-50 md:rounded-[8px] md:px-4 md:py-2 md:text-lg"
             >
               &laquo; First
             </button>
             <button
               onClick={() => handlePageChange(meta.page - 1)}
               disabled={meta.page === 1}
-              className="cursor-pointer rounded-[6px] bg-[#133b79] px-3 py-1.5 font-['Geom'] text-xs text-white transition-opacity disabled:opacity-50 md:rounded-[8px] md:px-4 md:py-2 md:text-sm"
+              className="cursor-pointer rounded-[6px] bg-[#133b79] px-3 py-1.5 font-['Geom'] text-xs text-white transition-opacity disabled:opacity-50 md:rounded-[8px] md:px-4 md:py-2 md:text-lg"
             >
               &lsaquo; Back
             </button>
@@ -126,7 +126,7 @@ export function ProductGrid() {
                   return (
                     <span
                       key={`dots-${index}`}
-                      className="px-1 py-1.5 font-['Geom'] text-xs font-bold text-[#133b79] md:px-2 md:py-2 md:text-sm"
+                      className="px-1 py-1.5 font-['Geom'] text-xs font-bold text-[#133b79] md:px-2 md:py-2 md:text-lg"
                     >
                       ...
                     </span>
@@ -138,7 +138,7 @@ export function ProductGrid() {
                   <button
                     key={`page-${p}`}
                     onClick={() => handlePageChange(p as number)}
-                    className={`cursor-pointer rounded-[6px] px-3 py-1.5 font-['Geom'] text-xs transition-colors md:rounded-[8px] md:px-4 md:py-2 md:text-sm ${
+                    className={`cursor-pointer rounded-[6px] px-3 py-1.5 font-['Geom'] text-xs transition-colors md:rounded-[8px] md:px-4 md:py-2 md:text-lg ${
                       isCurrent
                         ? 'bg-[#7A93C4] font-bold text-white' // Warna biru pudar untuk page aktif
                         : 'hover:bg-navy-deep bg-[#133b79] text-white'
@@ -153,14 +153,14 @@ export function ProductGrid() {
             <button
               onClick={() => handlePageChange(meta.page + 1)}
               disabled={meta.page === meta.totalPages}
-              className="cursor-pointer rounded-[6px] bg-[#133b79] px-3 py-1.5 font-['Geom'] text-xs text-white transition-opacity disabled:opacity-50 md:rounded-[8px] md:px-4 md:py-2 md:text-sm"
+              className="cursor-pointer rounded-[6px] bg-[#133b79] px-3 py-1.5 font-['Geom'] text-xs text-white transition-opacity disabled:opacity-50 md:rounded-[8px] md:px-4 md:py-2 md:text-lg"
             >
               Next &rsaquo;
             </button>
             <button
               onClick={() => handlePageChange(meta.totalPages)}
               disabled={meta.page === meta.totalPages}
-              className="cursor-pointer rounded-[6px] bg-[#133b79] px-3 py-1.5 font-['Geom'] text-xs text-white transition-opacity disabled:opacity-50 md:rounded-[8px] md:px-4 md:py-2 md:text-sm"
+              className="cursor-pointer rounded-[6px] bg-[#133b79] px-3 py-1.5 font-['Geom'] text-xs text-white transition-opacity disabled:opacity-50 md:rounded-[8px] md:px-4 md:py-2 md:text-lg"
             >
               Last &raquo;
             </button>
