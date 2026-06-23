@@ -160,7 +160,7 @@ function FilterDropdown({
     <div className="relative h-full flex-1 md:flex-none" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-powder hover:bg-powder/60 flex h-full w-full min-w-[110px] cursor-pointer items-center justify-between gap-1.5 rounded-[12px] border border-gray-200 px-3 font-['Geom'] text-sm text-[#133b79] transition-colors md:min-w-[180px] md:gap-2 md:rounded-[15px] md:px-4 md:text-base"
+        className="bg-powder hover:bg-powder/80 flex h-full w-full min-w-[110px] cursor-pointer items-center justify-between gap-1.5 rounded-[12px] border border-gray-200 px-3 font-['Geom'] text-sm text-[#133b79] transition-colors md:min-w-[180px] md:gap-2 md:rounded-[15px] md:px-4 md:text-base"
       >
         <span className="truncate text-sm md:text-base">
           {selected.length > 0 ? `${selected.length} Selected` : title}

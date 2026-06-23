@@ -18,7 +18,7 @@ export function ProductDetailClient({ id }: { id: string }) {
 
   if (error || !product) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 pt-6 text-center md:pt-10.5">
         <h1 className="font-['Redzone'] text-2xl text-[#fff3b8]">Produk tidak ditemukan</h1>
         <p className="font-['Geom'] text-[#fff3b8]/80">
           {error?.message ?? 'Coba muat ulang halaman ini.'}
@@ -34,7 +34,7 @@ export function ProductDetailClient({ id }: { id: string }) {
   }
 
   return (
-    <main className="relative min-h-screen w-full overflow-hidden px-4 py-6 md:px-8 lg:px-12">
+    <main className="relative min-h-screen w-full overflow-hidden px-4 py-6 pt-6 md:px-8 md:pt-10.5 lg:px-12">
       <ProductDetailCard product={product} />
     </main>
   );
