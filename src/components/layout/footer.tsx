@@ -57,7 +57,7 @@ const Footer: React.FC<FooterProps> = ({
 
           <span className="h-18 w-px bg-[#f3dea0]" />
 
-          <div className="flex flex-col gap-2.5 font-['Redzone',sans-serif]">
+          <div className="flex flex-col gap-2.5">
             <p className="text-sm leading-relaxed text-white/85">
               For more information, check out our other social media!
             </p>
@@ -77,20 +77,20 @@ const Footer: React.FC<FooterProps> = ({
         {/* ===== Mobile layout ===== */}
         <div className="flex flex-col items-center gap-4 text-center md:hidden">
           <div className="font-['Redzone',sans-serif] text-xl leading-tight font-black tracking-wide text-[#f3dea0] uppercase">
-            <span className="block">Ganesha</span>
-            <span className="block">Goods</span>
+            <span className="block text-[18px] leading-none tracking-tight">Ganesha</span>
+            <span className="block text-[14px] leading-none tracking-tight">Goods</span>
           </div>
 
           <div className="flex w-full items-center justify-center gap-2">
             <p className="min-w-0 flex-1 text-left font-['Redzone',sans-serif] text-sm leading-tight text-white/85">
               For more information, check out our other social media!
             </p>
-            <button
+            {/* <button
               type="button"
               className="shrink-0 rounded-lg bg-[#f3dea0] px-7 py-2.5 text-sm font-semibold text-[#0c2143] hover:bg-[#f7e8bd]"
             >
               Login
-            </button>
+            </button> */}
           </div>
 
           <hr className="w-full max-w-[300px] border-t border-white/20" />

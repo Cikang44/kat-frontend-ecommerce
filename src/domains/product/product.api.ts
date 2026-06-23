@@ -146,24 +146,10 @@ const MOCK_VARIANTS: ProductVariant[] = [
 ];
 
 const MOCK_IMAGES: ProductImage[] = [
-  {
-    id: 'img-1',
-    url: '/mock/kaos-angkatan-black.jpg',
-    isPrimary: true,
-    sortOrder: 1,
-  },
-  {
-    id: 'img-2',
-    url: '/mock/kaos-angkatan-navy.jpg',
-    isPrimary: false,
-    sortOrder: 2,
-  },
-  {
-    id: 'img-3',
-    url: '/mock/kaos-angkatan-white.jpg',
-    isPrimary: false,
-    sortOrder: 3,
-  },
+  { id: 'img-1', url: '/mock/kaos-angkatan-black.jpg', isPrimary: true, sortOrder: 1 },
+  { id: 'img-2', url: '/mock/kaos-angkatan-navy.jpg', isPrimary: false, sortOrder: 2 },
+  { id: 'img-3', url: '/mock/kaos-angkatan-white.jpg', isPrimary: false, sortOrder: 3 },
+  { id: 'img-4', url: '/mock/kaos-angkatan-black.jpg', isPrimary: false, sortOrder: 4 },
 ];
 const MOCK_PRODUCTS: ProductListItem[] = [
   {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ArrowLeftLinear } from 'vuesax-icon-pack';
+import { ArrowCircleLeftLinear } from 'vuesax-icon-pack';
 
 import { cn } from '@/lib/utils';
 
@@ -22,8 +22,8 @@ export function BackButton({ label = 'Kembali', className }: BackButtonProps) {
         className,
       )}
     >
-      <span className="size-9">
-        <ArrowLeftLinear className="text-ink size-9" />
+      <span className="size-6">
+        <ArrowCircleLeftLinear className="text-ink size-6" />
       </span>
       <span>{label}</span>
     </button>
