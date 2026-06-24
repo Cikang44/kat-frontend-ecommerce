@@ -44,6 +44,15 @@ export function LoginForm() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-1.5">
+          <p className="text-sm text-white/80">Untuk keperluan testing, gunakan</p>
+          <p className="text-xs text-white/60">
+            Email: <span className="font-mono">test@example.com</span>
+            <br />
+            Password: <span className="font-mono">Password12345</span>
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
           <label className="text-sm font-extrabold text-white">
             Email<span className="text-red-500">*</span>
           </label>

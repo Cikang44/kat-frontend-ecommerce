@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { ShoppingBagBroken, TagIcon2Broken } from 'vuesax-icon-pack';
 
@@ -19,7 +19,7 @@ interface ProductDetailCardProps {
 }
 
 export function ProductDetailCard({ product }: ProductDetailCardProps) {
-  const router = useRouter();
+  // const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
 
   const sizes = useMemo(
@@ -68,12 +68,12 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
     addItem(item);
   };
 
-  const handleBuyNow = () => {
-    const item = buildCartItem();
-    if (!item) return;
-    addItem(item);
-    router.push('/checkout');
-  };
+  // const handleBuyNow = () => {
+  //   const item = buildCartItem();
+  //   if (!item) return;
+  //   addItem(item);
+  //   router.push('/checkout');
+  // };
 
   return (
     <div className="mx-auto flex w-full flex-col gap-5">
@@ -131,8 +131,9 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
 
             <Button
               type="button"
-              onClick={handleBuyNow}
-              disabled={!selectedVariant}
+              disabled={true}
+              // onClick={handleBuyNow}
+              // disabled={!selectedVariant}
               className="border-gold bg-gold text-navy-deep hover:bg-gold/90 h-14 w-full gap-3 rounded-[15px] border-2 font-['Geom'] text-xl font-bold disabled:opacity-50"
             >
               Beli Langsung
@@ -212,8 +213,9 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
 
                     <Button
                       type="button"
-                      onClick={handleBuyNow}
-                      disabled={!selectedVariant}
+                      disabled={true}
+                      // onClick={handleBuyNow}
+                      // disabled={!selectedVariant}
                       className="border-gold bg-gold text-navy-deep hover:bg-gold/90 h-[76px] flex-1 gap-5 rounded-[15px] border-2 font-['Geom'] text-xl font-bold disabled:opacity-50"
                     >
                       Beli Langsung

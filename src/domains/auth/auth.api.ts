@@ -88,8 +88,8 @@ const MOCK_USERS: MockUser[] = [
   {
     id: 'usr-panitia-001',
     name: 'Budi Panitia',
-    email: 'panitia@ganesha.id',
-    password: 'Panitia1234',
+    email: 'test@example.com',
+    password: 'Password12345',
     role: 'panitia',
     isOnboardingComplete: true,
     lineId: '@budi_panitia',

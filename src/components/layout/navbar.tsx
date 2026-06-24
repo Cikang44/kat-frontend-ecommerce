@@ -9,6 +9,7 @@ import { ShoppingCartLinear } from 'vuesax-icon-pack';
 import { useIsAdmin } from '@/domains/auth/auth.hooks';
 import { useCartTotalQuantity } from '@/domains/cart/cart.hooks';
 import { useAuthStore } from '@/lib/providers';
+import { cn } from '@/lib/utils';
 
 type NavLink = {
   label: string;
@@ -175,9 +176,11 @@ function Navbar({ mobileMenuBgSrc = '/bg-footer.png', mobileMenuOverlayOpacity =
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={
-                      active ? 'text-white/40' : 'text-white transition hover:text-white/70'
-                    }
+                    data-disabled={link.href !== '/products'}
+                    className={cn(
+                      active ? 'text-white/40' : 'text-white transition hover:text-white/70',
+                      'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:text-white/30',
+                    )}
                   >
                     {link.label}
                   </Link>
