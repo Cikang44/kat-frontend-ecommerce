@@ -59,7 +59,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
 
       {/* Info */}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <p className="font-[Redzone] text-sm font-medium text-pretty text-[#7A213D] sm:text-xl">
+        <p className="text-navy font-[Redzone] text-sm font-medium text-pretty sm:text-xl">
           {item.productName}
         </p>
 
