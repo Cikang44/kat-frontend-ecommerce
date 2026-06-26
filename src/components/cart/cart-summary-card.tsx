@@ -1,15 +1,39 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useAllChecked, useCheckedCount, useCheckedTotalPrice } from '@/domains/cart/cart.hooks';
+import {
+  useAllChecked,
+  useCheckedCount,
+  useCheckedTotalPrice,
+  useCheckedItems,
+} from '@/domains/cart/cart.hooks';
+import { useInitiateOrder } from '@/domains/order/order.hooks';
 import { useCartStore } from '@/lib/providers';
 
 export function CartSummaryCard() {
+  const router = useRouter();
   const allChecked = useAllChecked();
   const checkedCount = useCheckedCount();
+  const checkedItems = useCheckedItems();
   const totalPrice = useCheckedTotalPrice();
   const toggleSelectAll = useCartStore((s) => s.toggleSelectAll);
+  const initiateOrder = useInitiateOrder();
+
+  const handleCheckout = () => {
+    if (checkedItems.length === 0) return;
+
+    initiateOrder.mutate(
+      { cart_item_ids: checkedItems.map((item) => item.id) },
+      {
+        onSuccess: (result) => {
+          router.push(`/checkout/${result.order_id}`);
+        },
+      },
+    );
+  };
 
   return (
     <div className="sticky inset-x-0 bottom-0 z-10 rounded-xl border-[#FFE788] bg-[#022C3F] shadow-lg">
@@ -42,10 +66,13 @@ export function CartSummaryCard() {
 
         {/* Checkout button */}
         <Button
-          disabled
+          disabled={checkedCount === 0 || initiateOrder.isPending}
+          onClick={handleCheckout}
           className="bg-[#FFE788] px-4 py-1.5 font-[Redzone] text-xs text-[#022C3F] sm:px-6 sm:py-2 sm:text-base"
         >
-          Check Out{checkedCount > 0 ? ` (${checkedCount})` : ''}
+          {initiateOrder.isPending
+            ? 'Memproses...'
+            : `Check Out${checkedCount > 0 ? ` (${checkedCount})` : ''}`}
         </Button>
       </div>
     </div>
