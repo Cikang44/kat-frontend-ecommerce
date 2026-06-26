@@ -64,11 +64,11 @@ const Footer: React.FC<FooterProps> = ({
             <div className="flex gap-6">
               <div className="flex items-center gap-2 text-[13.5px] text-white/85">
                 <SocialIcon slug="whatsapp" color="FFFFFF" alt="WhatsApp" className="shrink-0" />
-                <span>asjxksj</span>
+                <span>bit.ly/WA-BU26</span>
               </div>
               <div className="flex items-center gap-2 text-[13.5px] text-white/85">
                 <SocialIcon slug="instagram" color="FFFFFF" alt="Instagram" className="shrink-0" />
-                <span>asjxksj</span>
+                <span>@ganeshagoods</span>
               </div>
             </div>
           </div>
