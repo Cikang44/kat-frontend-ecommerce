@@ -26,7 +26,7 @@ export function CartSummaryCard() {
     if (checkedItems.length === 0) return;
 
     initiateOrder.mutate(
-      { cart_item_ids: checkedItems.map((item) => item.id) },
+      { cart_item_ids: checkedItems.map((item) => item.localId) },
       {
         onSuccess: (result) => {
           router.push(`/checkout/${result.order_id}`);

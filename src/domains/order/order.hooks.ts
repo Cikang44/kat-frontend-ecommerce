@@ -2,11 +2,13 @@
 
 import {
   useMutation,
+  useQueries,
   useQuery,
   useQueryClient,
   type UseMutationResult,
   type UseQueryResult,
 } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
 
 import { queryKeys } from '@/lib/query-keys';
 
@@ -20,6 +22,27 @@ import {
   type GenerateQrResult,
 } from './order.api';
 import type { InitiateOrderBody, ConfirmOrderBody } from './order.types';
+
+// ---------------------------------------------------------------------------
+// Combined types for useOrderHistoryWithDetails
+// ---------------------------------------------------------------------------
+
+export type OrderWithDetails = OrderHistoryResult[number] & {
+  items: OrderDetailResult['items'];
+  deliveryMethod?: OrderDetailResult['deliveryMethod'];
+  paymentMethod?: OrderDetailResult['paymentMethod'];
+};
+
+// ---------------------------------------------------------------------------
+// Types for usePickupQr
+// ---------------------------------------------------------------------------
+
+export interface PickupQrState {
+  qrDataUrl: string | null;
+  expiresAt: Date | null;
+  timeLeft: string;
+  isExpired: boolean;
+}
 
 // ---------------------------------------------------------------------------
 // Mutations
@@ -37,14 +60,10 @@ export function useInitiateOrder(): UseMutationResult<
   Error,
   InitiateOrderBody
 > {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (body) => api.initiateOrder(body),
-    onSuccess: () => {
-      // Invalidate cart — the checked items are now in a draft
-      queryClient.invalidateQueries({ queryKey: ['cart'] });
-    },
+    // Note: Cart is zustand-based, not React Query.
+    // Cart cleanup is handled by the caller (CartSummaryCard) after navigation.
   });
 }
 
@@ -59,10 +78,14 @@ export function useConfirmOrder(): UseMutationResult<ConfirmOrderResult, Error, 
 
   return useMutation({
     mutationFn: (body) => api.confirmOrder(body),
-    onSuccess: (_result) => {
+    onSuccess: (_result, variables) => {
       // Invalidate order history — a new order was created
       queryClient.invalidateQueries({ queryKey: queryKeys.orders.history });
       queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
+      // Remove stale checkout cache — draft is now confirmed
+      queryClient.removeQueries({
+        queryKey: queryKeys.orders.checkout(variables.order_id),
+      });
     },
   });
 }
@@ -131,4 +154,143 @@ export function useGenerateOrderQr(): UseMutationResult<
   return useMutation({
     mutationFn: (orderId) => api.generateOrderQr(orderId),
   });
+}
+
+// ---------------------------------------------------------------------------
+// Combined Queries
+// ---------------------------------------------------------------------------
+
+/**
+ * Combined hook that fetches order history with full item details.
+ *
+ * Fetches the order list, then fetches details for each order in parallel.
+ * Returns merged data with item details (name, variant, quantity).
+ *
+ * Note: Creates N+1 API calls. Acceptable for typical user order count.
+ */
+export function useOrderHistoryWithDetails(): {
+  data: OrderWithDetails[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
+} {
+  const historyQuery = useOrderHistory();
+  const orderIds = historyQuery.data?.map((order) => order.id) ?? [];
+
+  const detailQueries = useQueries({
+    queries: orderIds.map((id) => ({
+      queryKey: queryKeys.orders.detail(id),
+      queryFn: () => api.getOrderDetail(id),
+      staleTime: 30 * 1000,
+    })),
+  });
+
+  const isLoading = historyQuery.isLoading || detailQueries.some((q) => q.isLoading);
+
+  // Collect all errors, not just the first one
+  const errors: Error[] = [];
+  if (historyQuery.error) errors.push(historyQuery.error);
+  detailQueries.forEach((q) => {
+    if (q.error) errors.push(q.error);
+  });
+  const error: Error | null = errors.length > 0 ? errors[0] : null;
+
+  // Build a map from orderId → detail data to avoid index mismatch
+  const detailMap = new Map<string, OrderDetailResult>();
+  detailQueries.forEach((q, index) => {
+    if (q.data && orderIds[index]) {
+      detailMap.set(orderIds[index], q.data);
+    }
+  });
+
+  const orders: OrderWithDetails[] | undefined = historyQuery.data?.map((historyItem) => {
+    const detail = detailMap.get(historyItem.id);
+    return {
+      ...historyItem,
+      items: detail?.items ?? [],
+      deliveryMethod: detail?.deliveryMethod,
+      paymentMethod: detail?.paymentMethod,
+    };
+  });
+
+  return { data: orders, isLoading, error };
+}
+
+// ---------------------------------------------------------------------------
+// QR Pickup Hook
+// ---------------------------------------------------------------------------
+
+/**
+ * Manages QR generation and countdown for pickup orders.
+ *
+ * Usage:
+ *   const { qrDataUrl, timeLeft, isExpired, generate } = usePickupQr(orderId);
+ */
+export function usePickupQr(orderId: string | undefined) {
+  const generateQr = useGenerateOrderQr();
+  const [state, setState] = useState<PickupQrState>({
+    qrDataUrl: null,
+    expiresAt: null,
+    timeLeft: '',
+    isExpired: false,
+  });
+
+  // Reset state when orderId changes
+  useEffect(() => {
+    setState({
+      qrDataUrl: null,
+      expiresAt: null,
+      timeLeft: '',
+      isExpired: false,
+    });
+  }, [orderId]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!state.expiresAt || state.isExpired) return;
+
+    const timer = setInterval(() => {
+      const now = new Date();
+      const diff = state.expiresAt!.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setState((prev) => ({ ...prev, timeLeft: 'expired', isExpired: true }));
+        clearInterval(timer);
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setState((prev) => ({
+        ...prev,
+        timeLeft: `${hours}j ${minutes}m ${seconds}s`,
+      }));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [state.expiresAt, state.isExpired]);
+
+  const generate = useCallback(() => {
+    if (!orderId) {
+      console.warn('usePickupQr: generate called without orderId');
+      return;
+    }
+    generateQr.mutate(orderId, {
+      onSuccess: (data) => {
+        setState({
+          qrDataUrl: data.qrDataUrl,
+          expiresAt: new Date(data.expiresAt),
+          timeLeft: '',
+          isExpired: false,
+        });
+      },
+    });
+  }, [orderId, generateQr.mutate]);
+
+  return {
+    ...state,
+    generate,
+    isGenerating: generateQr.isPending,
+    error: generateQr.error,
+  };
 }

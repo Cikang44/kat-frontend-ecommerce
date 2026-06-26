@@ -3,9 +3,11 @@
 import {
   useMutation,
   useQuery,
+  useQueryClient,
   type UseMutationResult,
   type UseQueryResult,
 } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 import { queryKeys } from '@/lib/query-keys';
 
@@ -54,7 +56,8 @@ export function usePaymentFee(
   return useQuery({
     queryKey: queryKeys.payment.fee(method ?? '', amount ?? 0),
     queryFn: () => api.getFee(method!, amount!),
-    enabled: !!method && !!amount && amount > 0,
+    // Note: amount === 0 is intentionally excluded — no fee for zero amount
+    enabled: !!method && amount !== undefined && amount > 0,
     staleTime: 60 * 1000, // 1 min — fee is stable
   });
 }
@@ -65,8 +68,8 @@ export function usePaymentFee(
  * Full payment page data: QR string / VA info, countdown, shipping info,
  * order summary. Used on initial render of the payment page.
  *
- * Automatically refetches every 30s while the payment is still
- * `belum_bayar` to keep the countdown and QR up-to-date.
+ * Status polling is handled separately by usePaymentStatus (5s interval).
+ * This query only fetches on mount and refetches when window refocuses.
  */
 export function usePaymentDetail(
   orderId: string | undefined,
@@ -76,7 +79,7 @@ export function usePaymentDetail(
     queryFn: () => api.getPaymentDetail(orderId!),
     enabled: !!orderId,
     staleTime: 15 * 1000,
-    refetchInterval: (query) => (query.state.data?.status === 'belum_bayar' ? 30_000 : false),
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -92,7 +95,9 @@ export function usePaymentDetail(
 export function usePaymentStatus(
   orderId: string | undefined,
 ): UseQueryResult<PaymentStatusResult, Error> {
-  return useQuery({
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
     queryKey: queryKeys.payment.status(orderId ?? ''),
     queryFn: () => api.getPaymentStatus(orderId!),
     enabled: !!orderId,
@@ -100,4 +105,15 @@ export function usePaymentStatus(
     refetchInterval: (query) => (query.state.data?.status === 'belum_bayar' ? 5000 : false),
     staleTime: 0, // always fetch fresh status
   });
+
+  // When status changes to terminal state, invalidate usePaymentDetail
+  // so it fetches fresh data (items, shipping, etc.)
+  const status = query.data?.status;
+  useEffect(() => {
+    if (status && status !== 'belum_bayar' && orderId) {
+      queryClient.invalidateQueries({ queryKey: queryKeys.payment.detail(orderId) });
+    }
+  }, [status, orderId, queryClient]);
+
+  return query;
 }
