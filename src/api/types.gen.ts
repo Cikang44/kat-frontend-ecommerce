@@ -129,11 +129,11 @@ export type OnboardingBody = {
    */
   role: 'umum' | 'panitia';
   /**
-   * NIM mahasiswa. WAJIB diisi jika role = panitia.
+   * NIM mahasiswa. Wajib diisi jika role = panitia.
    */
   nim?: string;
   /**
-   * Kode bidang panitia. WAJIB diisi jika role = panitia. Harus valid sesuai database panitia_divisions.
+   * Kode bidang panitia. Wajib diisi jika role = panitia. Harus valid sesuai database panitia_divisions.
    */
   divisionCode?: string;
 };
@@ -198,9 +198,6 @@ export type ProductListItem = {
   id: string;
   name: string;
   description: string;
-  /**
-   * Harga dasar produk dalam IDR
-   */
   basePrice: number;
   type: 'merchandise' | 'collaboration' | 'kit_panitia';
   category: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris';
@@ -209,17 +206,8 @@ export type ProductListItem = {
    */
   faculty: string;
   primaryImage: ProductImage;
-  /**
-   * Jumlah varian yang tersedia
-   */
   variantCount: number;
-  /**
-   * Harga terendah dari semua varian
-   */
   minPrice: number;
-  /**
-   * Harga tertinggi dari semua varian
-   */
   maxPrice: number;
 };
 
@@ -269,7 +257,7 @@ export type ProductVariant = {
   color: string;
   size: 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'none';
   /**
-   * Harga tambahan di atas base_price produk (dalam IDR, bisa 0 atau positif)
+   * Harga tambahan di atas base_price produk
    */
   priceModifier: number;
   stock: number;
@@ -278,6 +266,332 @@ export type ProductVariant = {
    * Harga akhir = base_price + price_modifier
    */
   finalPrice: number;
+};
+
+export type GetCartResponse = {
+  success: true;
+  data: {
+    items: Array<CartItem>;
+    summary: CartSummary;
+  };
+};
+
+export type CartItem = {
+  id: string;
+  quantity: number;
+  /**
+   * basePrice + priceModifier varian
+   */
+  unitPrice: number;
+  /**
+   * unitPrice x quantity
+   */
+  subtotal: number;
+  variant: CartItemVariant;
+  product: CartItemProduct;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CartItemVariant = {
+  id: string;
+  sleeveType: 'lengan_panjang' | 'lengan_pendek' | 'none';
+  color: string;
+  size: 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'none';
+  priceModifier: number;
+  stock: number;
+  sku: string;
+};
+
+export type CartItemProduct = {
+  id: string;
+  name: string;
+  description: string;
+  basePrice: number;
+  type: 'merchandise' | 'collaboration' | 'kit_panitia';
+  category: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris';
+  imageUrl: string;
+};
+
+export type CartSummary = {
+  totalItems: number;
+  totalQuantity: number;
+  totalAmount: number;
+};
+
+export type AddToCartResponse = {
+  success: true;
+  data: {
+    item: CartItem;
+    summary: CartSummary;
+  };
+};
+
+export type AddToCartBody = {
+  /**
+   * ID varian produk yang ingin ditambahkan ke cart
+   */
+  variantId: string;
+  quantity: number;
+};
+
+export type UpdateCartItemResponse = {
+  success: true;
+  data: {
+    item: CartItem;
+    summary: CartSummary;
+  };
+};
+
+export type UpdateCartItemBody = {
+  /**
+   * Quantity baru. Minimal 1. Gunakan DELETE untuk menghapus item.
+   */
+  quantity: number;
+};
+
+export type DeleteCartItemResponse = {
+  success: true;
+  data: {
+    message: string;
+    summary: CartSummary;
+  };
+};
+
+export type InitiateOrderResponse = {
+  success: true;
+  data: OrderDraft;
+};
+
+export type OrderDraft = {
+  order_id: string;
+  status: 'draft';
+  items: Array<OrderItemSnapshot>;
+  summary: OrderSummary;
+};
+
+export type OrderItemSnapshot = {
+  product_id: string;
+  product_name: string;
+  image_url: string;
+  variant: {
+    id: string;
+    size: string;
+    color: string;
+    sleeve_type: string;
+  };
+  unit_price: number;
+  quantity: number;
+  subtotal: number;
+};
+
+export type OrderSummary = {
+  total_items: number;
+  total_product_price: number;
+};
+
+export type InitiateOrderBody = {
+  cart_item_ids: Array<string>;
+};
+
+export type OrderHistoryResponse = {
+  success: true;
+  data: Array<{
+    id: string;
+    status: 'draft' | 'belum_bayar' | 'lunas' | 'diterima' | 'expired';
+    totalBilled: number;
+    itemCount: number;
+    createdAt: string;
+    paidAt: string;
+  }>;
+};
+
+export type CheckoutResponse = {
+  success: true;
+  data: CheckoutOrder;
+};
+
+export type CheckoutOrder = {
+  order_id: string;
+  status: 'draft';
+  items: Array<OrderItemSnapshot>;
+  user_prefill: {
+    name: string;
+    phone: string;
+    line: string;
+  };
+  delivery_options: Array<OrderOption>;
+  payment_methods: Array<OrderOption>;
+  summary: OrderSummary;
+};
+
+export type OrderOption = {
+  value: string;
+  label: string;
+};
+
+export type ConfirmOrderResponse = {
+  success: true;
+  data: {
+    order_id: string;
+    status: 'belum_bayar';
+    delivery_method: OrderDeliveryMethod;
+    payment_method: OrderPaymentMethod;
+    payment_expired_at: string;
+    redirect_url: string;
+  };
+};
+
+export type OrderDeliveryMethod = 'pickup' | 'shipping';
+
+export type OrderPaymentMethod = 'qris' | 'bca_va';
+
+export type ConfirmOrderBody = {
+  order_id: string;
+  delivery_method: OrderDeliveryMethod & unknown;
+  receiver: OrderReceiver;
+  payment_method: OrderPaymentMethod & unknown;
+};
+
+export type OrderReceiver = {
+  name: string;
+  phone: string;
+  line: string;
+  address: string;
+};
+
+export type OrderDetailResponse = {
+  success: true;
+  data: OrderDetail;
+};
+
+export type OrderDetail = {
+  id: string;
+  status: 'draft' | 'belum_bayar' | 'lunas' | 'diterima' | 'expired';
+  deliveryMethod: 'pickup' | 'kurir';
+  deliveryAddress: string;
+  contactName: string;
+  contactPhone: string;
+  contactLineId: string;
+  paymentMethod: OrderPaymentMethod & unknown;
+  totalAmount: number;
+  gatewayFee: number;
+  totalBilled: number;
+  paymentExpiredAt: string;
+  paidAt: string;
+  createdAt: string;
+  items: Array<{
+    id: string;
+    productName: string;
+    productType: 'merchandise' | 'collaboration' | 'kit_panitia';
+    productCategory: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris';
+    variantSnapshot: {
+      [key: string]: unknown;
+    };
+    unitPrice: number;
+    quantity: number;
+    subtotal: number;
+  }>;
+};
+
+export type GenerateQrResponse = {
+  success: true;
+  data: {
+    qrDataUrl: string;
+    expiresAt: string;
+  };
+};
+
+export type PaymentFeeResponse = {
+  success: true;
+  data: {
+    method: string;
+    subtotal: number;
+    fee: number;
+    total: number;
+  };
+};
+
+export type InitiatePaymentResponse = {
+  success: true;
+  data: {
+    paymentId: string;
+    paymentReference: string;
+    method: string;
+    expiredAt: string;
+    qrString?: string;
+    bank?: string;
+    accountNumber?: string;
+    amount: number;
+  };
+};
+
+export type InitiatePaymentBody = {
+  method: string;
+};
+
+export type PaymentStatusResponse = {
+  success: true;
+  data: {
+    status: 'belum_bayar' | 'lunas' | 'expired' | 'diterima';
+  };
+};
+
+export type PaymentDetailResponse = {
+  success: true;
+  data: {
+    status: 'belum_bayar' | 'lunas' | 'expired';
+    method: string;
+    expiredAt: string;
+    /**
+     * Sisa waktu pembayaran dalam detik (0 jika expired)
+     */
+    countdown: number;
+    orderSummary: {
+      orderId: string;
+      subtotal: number;
+      fee: number;
+      total: number;
+      items: Array<{
+        productName: string;
+        variant: {
+          [key: string]: unknown;
+        };
+        quantity: number;
+        unitPrice: number;
+        subtotal: number;
+      }>;
+    };
+    shipping: {
+      method: string;
+      name: string;
+      phone: string;
+      address: string;
+    };
+    paymentDetail: {
+      fee: number;
+      qrString?: string;
+      bank?: string;
+      accountNumber?: string;
+    };
+  };
+};
+
+export type PaymentWebhookResponse = {
+  success: true;
+};
+
+export type PaymentWebhookBody = {
+  order_id: string;
+  status_code: string;
+  gross_amount: string;
+  signature_key: string;
+  transaction_status: string;
+  transaction_id?: string;
+  payment_type?: string;
+  fraud_status?: string;
+  transaction_time?: string;
+  [key: string]: unknown;
 };
 
 export type AdminProductListResponse = {
@@ -351,7 +665,7 @@ export type PostApiV1AuthSignupErrors = {
    */
   409: ErrorResponse;
   /**
-   * Terlalu banyak permintaan — rate limit terlampaui (maks 3x/jam/IP)
+   * Terlalu banyak permintaan - rate limit terlampaui (maks 3x/jam/IP)
    */
   429: ErrorResponse;
 };
@@ -385,7 +699,11 @@ export type PostApiV1AuthLoginErrors = {
    */
   401: ErrorResponse;
   /**
-   * Terlalu banyak percobaan login — rate limit terlampaui (maks 5x/15 menit)
+   * Email sudah terverifikasi tetapi onboarding belum selesai
+   */
+  403: ErrorResponse;
+  /**
+   * Terlalu banyak percobaan login - rate limit terlampaui (maks 5x/15 menit)
    */
   429: ErrorResponse;
 };
@@ -411,17 +729,13 @@ export type PostApiV1AuthVerifyOtpData = {
 
 export type PostApiV1AuthVerifyOtpErrors = {
   /**
-   * Format OTP tidak valid atau OTP salah
+   * Validasi gagal, OTP salah/kedaluwarsa, atau email tidak menunggu verifikasi
    */
   400: ErrorResponse;
   /**
-   * OTP kedaluwarsa atau sudah digunakan
+   * Terlalu banyak percobaan verifikasi OTP (maks 5x/10 menit/IP)
    */
-  401: ErrorResponse;
-  /**
-   * Email tidak ditemukan atau tidak sedang menunggu verifikasi
-   */
-  404: ErrorResponse;
+  429: ErrorResponse;
 };
 
 export type PostApiV1AuthVerifyOtpError =
@@ -446,15 +760,11 @@ export type PostApiV1AuthResendOtpData = {
 
 export type PostApiV1AuthResendOtpErrors = {
   /**
-   * Validasi gagal (format email salah)
+   * Validasi gagal, email tidak ditemukan, atau akun sudah terverifikasi
    */
   400: ErrorResponse;
   /**
-   * Email tidak ditemukan atau akun sudah terverifikasi
-   */
-  404: ErrorResponse;
-  /**
-   * Terlalu banyak permintaan — rate limit terlampaui (maks 3x/jam/IP)
+   * Terlalu banyak permintaan - rate limit terlampaui (maks 3x/jam/IP)
    */
   429: ErrorResponse;
 };
@@ -508,7 +818,7 @@ export type PostApiV1AuthLogoutData = {
 
 export type PostApiV1AuthLogoutErrors = {
   /**
-   * Tidak terautentikasi
+   * Bearer access token tidak ada atau tidak valid
    */
   401: ErrorResponse;
 };
@@ -534,11 +844,11 @@ export type PostApiV1AuthChangePasswordData = {
 
 export type PostApiV1AuthChangePasswordErrors = {
   /**
-   * Validasi gagal (password baru lemah, confirmPassword tidak cocok, dll.)
+   * Validasi gagal, konfirmasi tidak cocok, atau password baru sama dengan password lama
    */
   400: ErrorResponse;
   /**
-   * Tidak terautentikasi atau password lama salah
+   * Bearer access token tidak valid atau password lama salah
    */
   401: ErrorResponse;
 };
@@ -565,13 +875,17 @@ export type PostApiV1AuthOnboardingData = {
 
 export type PostApiV1AuthOnboardingErrors = {
   /**
-   * Validasi gagal — untuk panitia: kode bidang tidak valid, NIM kosong, dll.
+   * Validasi gagal atau kode bidang panitia tidak valid
    */
   400: ErrorResponse;
   /**
    * Onboarding token tidak valid atau kedaluwarsa
    */
   401: ErrorResponse;
+  /**
+   * Email belum diverifikasi
+   */
+  403: ErrorResponse;
   /**
    * Onboarding sudah diselesaikan sebelumnya
    */
@@ -648,6 +962,31 @@ export type PatchApiV1UserProfileResponses = {
 export type PatchApiV1UserProfileResponse =
   PatchApiV1UserProfileResponses[keyof PatchApiV1UserProfileResponses];
 
+export type GetApiV1UserMeData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/user/me';
+};
+
+export type GetApiV1UserMeErrors = {
+  /**
+   * Tidak terautentikasi - access token tidak ada atau kedaluwarsa
+   */
+  401: ErrorResponse;
+};
+
+export type GetApiV1UserMeError = GetApiV1UserMeErrors[keyof GetApiV1UserMeErrors];
+
+export type GetApiV1UserMeResponses = {
+  /**
+   * Data profil berhasil diambil
+   */
+  200: UserProfileResponse;
+};
+
+export type GetApiV1UserMeResponse = GetApiV1UserMeResponses[keyof GetApiV1UserMeResponses];
+
 export type GetApiV1UserProfileIsAdminData = {
   body?: never;
   path?: never;
@@ -675,226 +1014,624 @@ export type GetApiV1UserProfileIsAdminResponses = {
 export type GetApiV1UserProfileIsAdminResponse =
   GetApiV1UserProfileIsAdminResponses[keyof GetApiV1UserProfileIsAdminResponses];
 
-export type GetApiV1ProductMerchData = {
+export type GetApiV1ProductData = {
   body?: never;
   path?: never;
   query?: {
     /**
-     * Nomor halaman (default: 1)
+     * Nomor halaman
      */
-    page?: string;
+    page?: number;
     /**
-     * Jumlah item per halaman (default: 10, maks: 50)
+     * Jumlah item per halaman
      */
-    limit?: string;
+    limit?: number;
     /**
      * Pencarian teks pada nama produk (case-insensitive)
      */
     search?: string;
     /**
-     * Filter berdasarkan kategori
+     * Filter berdasarkan kategori. Bisa dikirim lebih dari satu.
      */
-    category?: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris';
+    category?: Array<'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris'>;
+    /**
+     * Filter berdasarkan tipe produk. Bisa dikirim lebih dari satu.
+     */
+    type?: Array<'merchandise' | 'collaboration' | 'kit_panitia'>;
+    /**
+     * Filter berdasarkan fakultas. Bisa dikirim lebih dari satu.
+     */
+    faculty?: Array<string>;
   };
-  url: '/api/v1/product/merch';
+  url: '/api/v1/product';
 };
 
-export type GetApiV1ProductMerchErrors = {
-  /**
-   * Tidak terautentikasi
-   */
-  401: ErrorResponse;
-};
-
-export type GetApiV1ProductMerchError =
-  GetApiV1ProductMerchErrors[keyof GetApiV1ProductMerchErrors];
-
-export type GetApiV1ProductMerchResponses = {
-  /**
-   * Daftar produk merchandise berhasil diambil
-   */
-  200: ProductListResponse;
-};
-
-export type GetApiV1ProductMerchResponse =
-  GetApiV1ProductMerchResponses[keyof GetApiV1ProductMerchResponses];
-
-export type GetApiV1ProductPanitiaData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Nomor halaman (default: 1)
-     */
-    page?: string;
-    /**
-     * Jumlah item per halaman (default: 10, maks: 50)
-     */
-    limit?: string;
-    /**
-     * Pencarian teks pada nama produk (case-insensitive)
-     */
-    search?: string;
-    /**
-     * Filter berdasarkan kategori
-     */
-    category?: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris';
-  };
-  url: '/api/v1/product/panitia';
-};
-
-export type GetApiV1ProductPanitiaErrors = {
-  /**
-   * Tidak terautentikasi
-   */
-  401: ErrorResponse;
-  /**
-   * Akses ditolak — hanya untuk panitia dan admin
-   */
-  403: ErrorResponse;
-};
-
-export type GetApiV1ProductPanitiaError =
-  GetApiV1ProductPanitiaErrors[keyof GetApiV1ProductPanitiaErrors];
-
-export type GetApiV1ProductPanitiaResponses = {
-  /**
-   * Daftar produk kit panitia berhasil diambil
-   */
-  200: ProductListResponse;
-};
-
-export type GetApiV1ProductPanitiaResponse =
-  GetApiV1ProductPanitiaResponses[keyof GetApiV1ProductPanitiaResponses];
-
-export type GetApiV1ProductCollabData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Nomor halaman (default: 1)
-     */
-    page?: string;
-    /**
-     * Jumlah item per halaman (default: 10, maks: 50)
-     */
-    limit?: string;
-    /**
-     * Pencarian teks pada nama produk (case-insensitive)
-     */
-    search?: string;
-    /**
-     * Filter berdasarkan kategori
-     */
-    category?: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris';
-    /**
-     * Filter berdasarkan nama fakultas (khusus produk kolaborasi)
-     */
-    faculty?: string;
-  };
-  url: '/api/v1/product/collab';
-};
-
-export type GetApiV1ProductCollabErrors = {
-  /**
-   * Tidak terautentikasi
-   */
-  401: ErrorResponse;
-};
-
-export type GetApiV1ProductCollabError =
-  GetApiV1ProductCollabErrors[keyof GetApiV1ProductCollabErrors];
-
-export type GetApiV1ProductCollabResponses = {
-  /**
-   * Daftar produk kolaborasi berhasil diambil
-   */
-  200: ProductListResponse;
-};
-
-export type GetApiV1ProductCollabResponse =
-  GetApiV1ProductCollabResponses[keyof GetApiV1ProductCollabResponses];
-
-export type GetApiV1ProductCategoriesData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Filter kategori. Jika tidak diisi, mengembalikan semua kategori.
-     */
-    category?: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris';
-    page?: string;
-    limit?: string;
-    search?: string;
-  };
-  url: '/api/v1/product/categories';
-};
-
-export type GetApiV1ProductCategoriesErrors = {
-  /**
-   * Tidak terautentikasi
-   */
-  401: ErrorResponse;
-};
-
-export type GetApiV1ProductCategoriesError =
-  GetApiV1ProductCategoriesErrors[keyof GetApiV1ProductCategoriesErrors];
-
-export type GetApiV1ProductCategoriesResponses = {
+export type GetApiV1ProductResponses = {
   /**
    * Produk berhasil diambil
    */
   200: ProductListResponse;
 };
 
-export type GetApiV1ProductCategoriesResponse =
-  GetApiV1ProductCategoriesResponses[keyof GetApiV1ProductCategoriesResponses];
+export type GetApiV1ProductResponse = GetApiV1ProductResponses[keyof GetApiV1ProductResponses];
 
-export type GetApiV1ProductIdData = {
+export type GetApiV1ProductByIdData = {
   body?: never;
   path: {
     id: string;
   };
   query?: never;
-  url: '/api/v1/product/:id';
+  url: '/api/v1/product/{id}';
 };
 
-export type GetApiV1ProductIdErrors = {
+export type GetApiV1ProductByIdErrors = {
   /**
-   * Tidak terautentikasi
-   */
-  401: ErrorResponse;
-  /**
-   * Akses ditolak — produk kit_panitia tidak dapat diakses oleh umum
-   */
-  403: ErrorResponse;
-  /**
-   * Produk tidak ditemukan atau sudah dinonaktifkan
+   * Produk tidak ditemukan
    */
   404: ErrorResponse;
 };
 
-export type GetApiV1ProductIdError = GetApiV1ProductIdErrors[keyof GetApiV1ProductIdErrors];
+export type GetApiV1ProductByIdError = GetApiV1ProductByIdErrors[keyof GetApiV1ProductByIdErrors];
 
-export type GetApiV1ProductIdResponses = {
+export type GetApiV1ProductByIdResponses = {
   /**
    * Detail produk berhasil diambil
    */
   200: ProductDetailResponse;
 };
 
-export type GetApiV1ProductIdResponse =
-  GetApiV1ProductIdResponses[keyof GetApiV1ProductIdResponses];
+export type GetApiV1ProductByIdResponse =
+  GetApiV1ProductByIdResponses[keyof GetApiV1ProductByIdResponses];
+
+export type GetApiV1CartData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/cart';
+};
+
+export type GetApiV1CartErrors = {
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+};
+
+export type GetApiV1CartError = GetApiV1CartErrors[keyof GetApiV1CartErrors];
+
+export type GetApiV1CartResponses = {
+  /**
+   * Isi cart berhasil diambil
+   */
+  200: GetCartResponse;
+};
+
+export type GetApiV1CartResponse = GetApiV1CartResponses[keyof GetApiV1CartResponses];
+
+export type PostApiV1CartData = {
+  body: AddToCartBody;
+  path?: never;
+  query?: never;
+  url: '/api/v1/cart';
+};
+
+export type PostApiV1CartErrors = {
+  /**
+   * Validasi gagal (quantity kurang dari 1, variantId bukan UUID, dll.)
+   */
+  400: ErrorResponse;
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * User umum mencoba menambahkan produk kit panitia
+   */
+  403: ErrorResponse;
+  /**
+   * Produk atau varian tidak ditemukan
+   */
+  404: ErrorResponse;
+};
+
+export type PostApiV1CartError = PostApiV1CartErrors[keyof PostApiV1CartErrors];
+
+export type PostApiV1CartResponses = {
+  /**
+   * Item berhasil ditambahkan ke cart
+   */
+  201: AddToCartResponse;
+};
+
+export type PostApiV1CartResponse = PostApiV1CartResponses[keyof PostApiV1CartResponses];
+
+export type DeleteApiV1CartByItemIdData = {
+  body?: never;
+  path: {
+    /**
+     * ID cart item yang ingin dihapus
+     */
+    itemId: string;
+  };
+  query?: never;
+  url: '/api/v1/cart/{itemId}';
+};
+
+export type DeleteApiV1CartByItemIdErrors = {
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Item bukan milik user yang sedang login
+   */
+  403: ErrorResponse;
+  /**
+   * Item cart tidak ditemukan
+   */
+  404: ErrorResponse;
+};
+
+export type DeleteApiV1CartByItemIdError =
+  DeleteApiV1CartByItemIdErrors[keyof DeleteApiV1CartByItemIdErrors];
+
+export type DeleteApiV1CartByItemIdResponses = {
+  /**
+   * Item berhasil dihapus, summary cart terbaru dikembalikan
+   */
+  200: DeleteCartItemResponse;
+};
+
+export type DeleteApiV1CartByItemIdResponse =
+  DeleteApiV1CartByItemIdResponses[keyof DeleteApiV1CartByItemIdResponses];
+
+export type PatchApiV1CartByItemIdData = {
+  body: UpdateCartItemBody;
+  path: {
+    /**
+     * ID cart item yang ingin diupdate
+     */
+    itemId: string;
+  };
+  query?: never;
+  url: '/api/v1/cart/{itemId}';
+};
+
+export type PatchApiV1CartByItemIdErrors = {
+  /**
+   * Validasi gagal (quantity kurang dari 1, itemId bukan UUID)
+   */
+  400: ErrorResponse;
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Item bukan milik user yang sedang login
+   */
+  403: ErrorResponse;
+  /**
+   * Item cart tidak ditemukan
+   */
+  404: ErrorResponse;
+};
+
+export type PatchApiV1CartByItemIdError =
+  PatchApiV1CartByItemIdErrors[keyof PatchApiV1CartByItemIdErrors];
+
+export type PatchApiV1CartByItemIdResponses = {
+  /**
+   * Quantity item berhasil diupdate
+   */
+  200: UpdateCartItemResponse;
+};
+
+export type PatchApiV1CartByItemIdResponse =
+  PatchApiV1CartByItemIdResponses[keyof PatchApiV1CartByItemIdResponses];
+
+export type PostApiV1OrderInitiateData = {
+  body: InitiateOrderBody;
+  path?: never;
+  query?: never;
+  url: '/api/v1/order/initiate';
+};
+
+export type PostApiV1OrderInitiateErrors = {
+  /**
+   * Input tidak valid
+   */
+  400: ErrorResponse;
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Item cart tidak valid atau bukan milik user
+   */
+  403: ErrorResponse;
+};
+
+export type PostApiV1OrderInitiateError =
+  PostApiV1OrderInitiateErrors[keyof PostApiV1OrderInitiateErrors];
+
+export type PostApiV1OrderInitiateResponses = {
+  /**
+   * Draft checkout berhasil dibuat
+   */
+  201: InitiateOrderResponse;
+};
+
+export type PostApiV1OrderInitiateResponse =
+  PostApiV1OrderInitiateResponses[keyof PostApiV1OrderInitiateResponses];
+
+export type GetApiV1OrderHistoryData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/order/history';
+};
+
+export type GetApiV1OrderHistoryErrors = {
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+};
+
+export type GetApiV1OrderHistoryError =
+  GetApiV1OrderHistoryErrors[keyof GetApiV1OrderHistoryErrors];
+
+export type GetApiV1OrderHistoryResponses = {
+  /**
+   * Riwayat order berhasil diambil
+   */
+  200: OrderHistoryResponse;
+};
+
+export type GetApiV1OrderHistoryResponse =
+  GetApiV1OrderHistoryResponses[keyof GetApiV1OrderHistoryResponses];
+
+export type GetApiV1OrderByOrderIdCheckoutData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: '/api/v1/order/{orderId}/checkout';
+};
+
+export type GetApiV1OrderByOrderIdCheckoutErrors = {
+  /**
+   * Checkout sudah dikonfirmasi
+   */
+  400: ErrorResponse;
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Checkout tidak ditemukan
+   */
+  404: ErrorResponse;
+};
+
+export type GetApiV1OrderByOrderIdCheckoutError =
+  GetApiV1OrderByOrderIdCheckoutErrors[keyof GetApiV1OrderByOrderIdCheckoutErrors];
+
+export type GetApiV1OrderByOrderIdCheckoutResponses = {
+  /**
+   * Draft checkout berhasil diambil
+   */
+  200: CheckoutResponse;
+};
+
+export type GetApiV1OrderByOrderIdCheckoutResponse =
+  GetApiV1OrderByOrderIdCheckoutResponses[keyof GetApiV1OrderByOrderIdCheckoutResponses];
+
+export type PostApiV1OrderConfirmData = {
+  body: ConfirmOrderBody;
+  path?: never;
+  query?: never;
+  url: '/api/v1/order/confirm';
+};
+
+export type PostApiV1OrderConfirmErrors = {
+  /**
+   * Checkout tidak valid atau sudah dikonfirmasi
+   */
+  400: ErrorResponse;
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Checkout tidak ditemukan
+   */
+  404: ErrorResponse;
+};
+
+export type PostApiV1OrderConfirmError =
+  PostApiV1OrderConfirmErrors[keyof PostApiV1OrderConfirmErrors];
+
+export type PostApiV1OrderConfirmResponses = {
+  /**
+   * Checkout berhasil dikonfirmasi
+   */
+  200: ConfirmOrderResponse;
+};
+
+export type PostApiV1OrderConfirmResponse =
+  PostApiV1OrderConfirmResponses[keyof PostApiV1OrderConfirmResponses];
+
+export type GetApiV1OrderByOrderIdData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: '/api/v1/order/{orderId}';
+};
+
+export type GetApiV1OrderByOrderIdErrors = {
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Order ini bukan milik pengguna yang sedang login
+   */
+  403: ErrorResponse;
+  /**
+   * Order tidak ditemukan
+   */
+  404: ErrorResponse;
+};
+
+export type GetApiV1OrderByOrderIdError =
+  GetApiV1OrderByOrderIdErrors[keyof GetApiV1OrderByOrderIdErrors];
+
+export type GetApiV1OrderByOrderIdResponses = {
+  /**
+   * Detail order berhasil diambil
+   */
+  200: OrderDetailResponse;
+};
+
+export type GetApiV1OrderByOrderIdResponse =
+  GetApiV1OrderByOrderIdResponses[keyof GetApiV1OrderByOrderIdResponses];
+
+export type PostApiV1OrderByOrderIdGenerateQrData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: '/api/v1/order/{orderId}/generate-qr';
+};
+
+export type PostApiV1OrderByOrderIdGenerateQrErrors = {
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Order bukan milik pengguna ini, atau order belum berstatus lunas
+   */
+  403: ErrorResponse;
+  /**
+   * Order tidak ditemukan
+   */
+  404: ErrorResponse;
+};
+
+export type PostApiV1OrderByOrderIdGenerateQrError =
+  PostApiV1OrderByOrderIdGenerateQrErrors[keyof PostApiV1OrderByOrderIdGenerateQrErrors];
+
+export type PostApiV1OrderByOrderIdGenerateQrResponses = {
+  /**
+   * QR pickup berhasil dibuat
+   */
+  200: GenerateQrResponse;
+};
+
+export type PostApiV1OrderByOrderIdGenerateQrResponse =
+  PostApiV1OrderByOrderIdGenerateQrResponses[keyof PostApiV1OrderByOrderIdGenerateQrResponses];
+
+export type GetApiV1PaymentFeeData = {
+  body?: never;
+  path?: never;
+  query: {
+    method: string;
+    amount: number;
+  };
+  url: '/api/v1/payment/fee';
+};
+
+export type GetApiV1PaymentFeeErrors = {
+  /**
+   * Validasi gagal (amount tidak valid)
+   */
+  400: ErrorResponse;
+  /**
+   * Metode pembayaran tidak tersedia
+   */
+  404: ErrorResponse;
+};
+
+export type GetApiV1PaymentFeeError = GetApiV1PaymentFeeErrors[keyof GetApiV1PaymentFeeErrors];
+
+export type GetApiV1PaymentFeeResponses = {
+  /**
+   * Perhitungan fee berhasil
+   */
+  200: PaymentFeeResponse;
+};
+
+export type GetApiV1PaymentFeeResponse =
+  GetApiV1PaymentFeeResponses[keyof GetApiV1PaymentFeeResponses];
+
+export type PostApiV1PaymentByOrderIdInitiateData = {
+  body: InitiatePaymentBody;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: '/api/v1/payment/{orderId}/initiate';
+};
+
+export type PostApiV1PaymentByOrderIdInitiateErrors = {
+  /**
+   * Validasi gagal
+   */
+  400: ErrorResponse;
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Order bukan milik user
+   */
+  403: ErrorResponse;
+  /**
+   * Order atau metode pembayaran tidak ditemukan
+   */
+  404: ErrorResponse;
+  /**
+   * Order sudah dibayar atau sudah expired
+   */
+  409: ErrorResponse;
+  /**
+   * Gagal membuat transaksi di payment gateway
+   */
+  500: ErrorResponse;
+};
+
+export type PostApiV1PaymentByOrderIdInitiateError =
+  PostApiV1PaymentByOrderIdInitiateErrors[keyof PostApiV1PaymentByOrderIdInitiateErrors];
+
+export type PostApiV1PaymentByOrderIdInitiateResponses = {
+  /**
+   * Pembayaran berhasil diinisiasi
+   */
+  201: InitiatePaymentResponse;
+};
+
+export type PostApiV1PaymentByOrderIdInitiateResponse =
+  PostApiV1PaymentByOrderIdInitiateResponses[keyof PostApiV1PaymentByOrderIdInitiateResponses];
+
+export type GetApiV1PaymentByOrderIdStatusData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: '/api/v1/payment/{orderId}/status';
+};
+
+export type GetApiV1PaymentByOrderIdStatusErrors = {
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Order bukan milik user
+   */
+  403: ErrorResponse;
+  /**
+   * Order tidak ditemukan
+   */
+  404: ErrorResponse;
+};
+
+export type GetApiV1PaymentByOrderIdStatusError =
+  GetApiV1PaymentByOrderIdStatusErrors[keyof GetApiV1PaymentByOrderIdStatusErrors];
+
+export type GetApiV1PaymentByOrderIdStatusResponses = {
+  /**
+   * Status pembayaran
+   */
+  200: PaymentStatusResponse;
+};
+
+export type GetApiV1PaymentByOrderIdStatusResponse =
+  GetApiV1PaymentByOrderIdStatusResponses[keyof GetApiV1PaymentByOrderIdStatusResponses];
+
+export type GetApiV1PaymentByOrderIdData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: '/api/v1/payment/{orderId}';
+};
+
+export type GetApiV1PaymentByOrderIdErrors = {
+  /**
+   * Tidak terautentikasi
+   */
+  401: ErrorResponse;
+  /**
+   * Pembayaran bukan milik user
+   */
+  403: ErrorResponse;
+  /**
+   * Pembayaran tidak ditemukan
+   */
+  404: ErrorResponse;
+};
+
+export type GetApiV1PaymentByOrderIdError =
+  GetApiV1PaymentByOrderIdErrors[keyof GetApiV1PaymentByOrderIdErrors];
+
+export type GetApiV1PaymentByOrderIdResponses = {
+  /**
+   * Detail pembayaran
+   */
+  200: PaymentDetailResponse;
+};
+
+export type GetApiV1PaymentByOrderIdResponse =
+  GetApiV1PaymentByOrderIdResponses[keyof GetApiV1PaymentByOrderIdResponses];
+
+export type PostApiV1PaymentWebhookData = {
+  body: PaymentWebhookBody;
+  path?: never;
+  query?: never;
+  url: '/api/v1/payment/webhook';
+};
+
+export type PostApiV1PaymentWebhookErrors = {
+  /**
+   * Signature tidak valid
+   */
+  401: ErrorResponse;
+};
+
+export type PostApiV1PaymentWebhookError =
+  PostApiV1PaymentWebhookErrors[keyof PostApiV1PaymentWebhookErrors];
+
+export type PostApiV1PaymentWebhookResponses = {
+  /**
+   * Webhook diterima
+   */
+  200: PaymentWebhookResponse;
+};
+
+export type PostApiV1PaymentWebhookResponse =
+  PostApiV1PaymentWebhookResponses[keyof PostApiV1PaymentWebhookResponses];
 
 export type GetApiV1AdminProductsData = {
   body?: never;
   path?: never;
   query?: {
-    page?: string;
     /**
-     * Maks 100 per halaman
+     * Nomor halaman, minimal 1 dan tidak boleh melebihi halaman terakhir (default: 1)
      */
-    limit?: string;
+    page?: number;
+    /**
+     * Jumlah item per halaman, minimal 1 dan maksimal 100 (default: 20)
+     */
+    limit?: number;
     search?: string;
     /**
      * Filter berdasarkan tipe produk
@@ -915,11 +1652,15 @@ export type GetApiV1AdminProductsData = {
 
 export type GetApiV1AdminProductsErrors = {
   /**
-   * Tidak terautentikasi
+   * Query parameter tidak sesuai dengan batas atau format yang ditentukan
+   */
+  400: ErrorResponse;
+  /**
+   * Input tidak valid
    */
   401: ErrorResponse;
   /**
-   * Akses ditolak — hanya admin
+   * Input tidak valid
    */
   403: ErrorResponse;
 };
@@ -945,8 +1686,14 @@ export type GetApiV1AdminProductsCategoriesData = {
      * Filter berdasarkan kategori. Jika tidak diisi, mengembalikan semua kategori.
      */
     category?: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris';
-    page?: string;
-    limit?: string;
+    /**
+     * Nomor halaman, minimal 1 dan tidak boleh melebihi halaman terakhir (default: 1)
+     */
+    page?: number;
+    /**
+     * Jumlah item per halaman, minimal 1 dan maksimal 100 (default: 20)
+     */
+    limit?: number;
     search?: string;
   };
   url: '/api/v1/admin/products/categories';
@@ -954,11 +1701,15 @@ export type GetApiV1AdminProductsCategoriesData = {
 
 export type GetApiV1AdminProductsCategoriesErrors = {
   /**
-   * Tidak terautentikasi
+   * Query parameter tidak sesuai dengan batas atau format yang ditentukan
+   */
+  400: ErrorResponse;
+  /**
+   * Input tidak valid
    */
   401: ErrorResponse;
   /**
-   * Akses ditolak — hanya admin
+   * Input tidak valid
    */
   403: ErrorResponse;
 };

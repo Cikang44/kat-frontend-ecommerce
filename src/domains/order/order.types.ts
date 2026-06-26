@@ -1,4 +1,20 @@
-// TypeScript types for order domain
-// Expand as the domain logic grows.
-
-export type OrderState = Record<string, never>;
+// Re-export generated types — thin barrel, no custom types yet.
+export type {
+  OrderDraft,
+  OrderItemSnapshot,
+  OrderSummary,
+  CheckoutOrder,
+  CheckoutResponse,
+  ConfirmOrderBody,
+  ConfirmOrderResponse,
+  OrderDeliveryMethod,
+  OrderPaymentMethod,
+  OrderReceiver,
+  OrderOption,
+  OrderDetail,
+  OrderDetailResponse,
+  OrderHistoryResponse,
+  InitiateOrderBody,
+  InitiateOrderResponse,
+  GenerateQrResponse,
+} from '@/api';

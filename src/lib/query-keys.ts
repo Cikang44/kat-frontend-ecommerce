@@ -33,6 +33,15 @@ export const queryKeys = {
     all: ['orders'] as const,
     history: ['orders', 'history'] as const,
     detail: (id: string) => ['orders', 'detail', id] as const,
+    checkout: (id: string) => ['orders', 'checkout', id] as const,
+  },
+
+  /** Payment endpoints */
+  payment: {
+    all: ['payment'] as const,
+    detail: (id: string) => ['payment', 'detail', id] as const,
+    status: (id: string) => ['payment', 'status', id] as const,
+    fee: (method: string, amount: number) => ['payment', 'fee', method, amount] as const,
   },
 
   /** Admin dashboard endpoints */
