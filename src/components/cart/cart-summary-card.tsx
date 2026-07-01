@@ -1,34 +1,42 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  useAllChecked,
-  useCheckedCount,
-  useCheckedTotalPrice,
-  useCheckedItems,
-} from '@/domains/cart/cart.hooks';
+import { useAllChecked, useCheckedCount, useCheckedTotalPrice } from '@/domains/cart/cart.hooks';
 import { useInitiateOrder } from '@/domains/order/order.hooks';
 import { useCartStore } from '@/lib/providers';
+import { formatPrice } from '@/lib/utils';
 
 export function CartSummaryCard() {
   const router = useRouter();
   const allChecked = useAllChecked();
   const checkedCount = useCheckedCount();
-  const checkedItems = useCheckedItems();
-  const totalPrice = useCheckedTotalPrice();
+  const checkedTotalPrice = useCheckedTotalPrice();
   const toggleSelectAll = useCartStore((s) => s.toggleSelectAll);
+  const clearChecked = useCartStore((s) => s.clearChecked);
+  // Subscribe to the stable `items` reference and derive checked ids in a memo;
+  // subscribing directly to a filtered array (useCheckedItems) returns a new
+  // reference on every snapshot and breaks useSyncExternalStore (infinite loop).
+  const items = useCartStore((s) => s.items);
+  const checkedItemIds = useMemo(
+    () => items.filter((i) => i.checked).map((i) => i.localId),
+    [items],
+  );
+
   const initiateOrder = useInitiateOrder();
 
   const handleCheckout = () => {
-    if (checkedItems.length === 0) return;
+    if (checkedItemIds.length === 0) return;
 
     initiateOrder.mutate(
-      { cart_item_ids: checkedItems.map((item) => item.localId) },
+      { cart_item_ids: checkedItemIds },
       {
         onSuccess: (result) => {
+          // Remove the checked-out items once the draft order exists.
+          clearChecked();
           router.push(`/checkout/${result.order_id}`);
         },
       },
@@ -56,12 +64,7 @@ export function CartSummaryCard() {
 
         {/* Total price */}
         <p className="font-[Geom] text-sm font-bold whitespace-nowrap text-white sm:text-base">
-          {Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-          }).format(totalPrice)}
+          {formatPrice(checkedTotalPrice)}
         </p>
 
         {/* Checkout button */}
