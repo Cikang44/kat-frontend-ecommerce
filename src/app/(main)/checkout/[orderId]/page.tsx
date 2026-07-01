@@ -3,8 +3,11 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
-import { DeliveryForm } from '@/components/checkout/delivery-form';
-import { PaymentMethodSelector } from '@/components/checkout/payment-method-selector';
+import { ConfirmPaymentDialog } from '@/components/checkout/confirm-payment-dialog';
+import { ContactInfoForm } from '@/components/checkout/contact-info-form';
+import { MockCartTable } from '@/components/checkout/mock-cart-table';
+import { PaymentSection } from '@/components/checkout/payment-section';
+import { ShippingOptions } from '@/components/checkout/shipping-options';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { MockOrderReceiver } from '@/domains/order/order.api';
@@ -13,7 +16,6 @@ import type {
   OrderDeliveryMethod,
   OrderPaymentMethod,
 } from '@/domains/order/order.types';
-import { formatPrice } from '@/lib/utils';
 
 const EMPTY_RECEIVER: MockOrderReceiver = {
   name: '',
@@ -38,10 +40,10 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod | null>(null);
   const [receiver, setReceiver] = useState<MockOrderReceiver>(EMPTY_RECEIVER);
   const [isDeliverySubmitted, setIsDeliverySubmitted] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   useEffect(() => {
     if (!data) return;
-
     setReceiver({
       name: data.user_prefill.name,
       faculty: data.user_prefill.faculty,
@@ -53,7 +55,6 @@ export default function CheckoutPage() {
       pickup_location: '',
       shipping_option: '',
     });
-    setIsDeliverySubmitted(false);
   }, [data]);
 
   const contactValid = useMemo(
@@ -71,11 +72,9 @@ export default function CheckoutPage() {
     if (deliveryMethod === 'pickup') {
       return receiver.pickup_location.trim() !== '';
     }
-
     if (deliveryMethod === 'shipping') {
       return receiver.address.trim() !== '' && receiver.shipping_option.trim() !== '';
     }
-
     return false;
   }, [deliveryMethod, receiver]);
 
@@ -103,8 +102,7 @@ export default function CheckoutPage() {
   };
 
   const handleConfirm = () => {
-    if (!orderId || !deliveryMethod || !paymentMethod || !contactValid || !deliveryValid) return;
-
+    if (!canConfirm) return;
     confirmOrder.mutate(
       {
         order_id: orderId,
@@ -120,25 +118,21 @@ export default function CheckoutPage() {
     );
   };
 
+
   if (isPending) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Spinner className="text-[#FFE788]" />
+      <div className="flex items-center justify-center" style={{ minHeight: 'inherit' }}>
+        <Spinner />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 px-4 text-center text-white">
-        <p className="font-[Redzone] text-lg">Checkout gagal dimuat</p>
-        <p className="max-w-md text-sm text-white/80">{error.message}</p>
-        <Button
-          onClick={() => router.push('/cart')}
-          className="bg-[#FFE788] font-[Redzone] text-[#022C3F]"
-        >
-          Kembali ke Keranjang
-        </Button>
+      <div className="flex items-center justify-center" style={{ minHeight: 'inherit' }}>
+        <p className="font-[Geom] text-red-500">
+          {error?.message ?? 'Gagal memuat data checkout.'}
+        </p>
       </div>
     );
   }
@@ -147,65 +141,78 @@ export default function CheckoutPage() {
 
   return (
     <div className="flex flex-col px-4 py-6" style={{ minHeight: 'inherit' }}>
+      {/* Breadcrumb */}
+      <nav className="mb-4 flex items-center gap-2 text-sm font-[Geom] text-[#022C3F]/60">
+        <span>Keranjang</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path
+            d="M4.5 2.5L7.5 6L4.5 9.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span className="font-medium text-[#022C3F]">Checkout</span>
+      </nav>
+
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:grid lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="space-y-6">
-          <DeliveryForm
-            deliveryOptions={data.delivery_options}
-            pickupLocations={data.pickup_locations}
-            shippingOptions={data.shipping_options}
-            deliveryMethod={deliveryMethod}
-            onDeliveryMethodChange={handleDeliveryMethodChange}
+        {/* Left column — MockCartTable */}
+        <div className="min-w-0">
+          <MockCartTable />
+        </div>
+
+        {/* Right column — accordion sections + actions */}
+        <div className="flex min-w-0 flex-col gap-4">
+          <ContactInfoForm
             receiver={receiver}
             onReceiverChange={handleReceiverChange}
             prefill={data.user_prefill}
-            onSubmit={() => setIsDeliverySubmitted(true)}
-            isSubmitted={isDeliverySubmitted}
           />
 
-          <PaymentMethodSelector
+          <ShippingOptions
+            deliveryMethod={deliveryMethod}
+            onDeliveryMethodChange={handleDeliveryMethodChange}
+            pickupLocations={data.pickup_locations}
+            shippingOptions={data.shipping_options}
+            receiver={receiver}
+            onReceiverChange={handleReceiverChange}
+          />
+
+          <PaymentSection
             paymentMethods={data.payment_methods}
             paymentMethod={paymentMethod}
             onPaymentMethodChange={setPaymentMethod}
           />
-        </div>
 
-        <div className="space-y-4">
-          <section className="rounded-xl border border-[#022C3F] bg-[#022C3F] p-4 text-white shadow-lg">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-[Geom] text-white/80">Total ({data.summary.total_items} item)</span>
-              <span className="font-[Redzone] text-lg text-[#FFE788]">
-                {formatPrice(data.summary.total_product_price)}
-              </span>
-            </div>
-
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <Button
-                onClick={() => router.push('/cart')}
-                variant="outline"
-                className="flex-1 border-[#FFE788] bg-transparent font-[Geom] text-white hover:bg-white/10"
-              >
-                Kembali ke Keranjang
-              </Button>
-
-              <Button
-                disabled={!canConfirm || confirmOrder.isPending}
-                onClick={handleConfirm}
-                className="flex-1 bg-[#FFE788] font-[Redzone] text-[#022C3F]"
-              >
-                {confirmOrder.isPending ? 'Memproses...' : 'Konfirmasi Pesanan'}
-              </Button>
-            </div>
-
-            {confirmOrder.isError && (
-              <p className="mt-2 text-center text-xs text-[#FF8888]">
-                {confirmOrder.error instanceof Error
-                  ? confirmOrder.error.message
-                  : 'Gagal konfirmasi'}
-              </p>
-            )}
-          </section>
+          <div className="flex flex-col gap-3 pt-2">
+            <Button
+              onClick={() => {
+                setIsDeliverySubmitted(true);
+                if (!canConfirm) return;
+                setShowConfirmDialog(true);
+              }}
+              disabled={confirmOrder.isPending}
+              className="w-full bg-navy font-[Redzone] text-white hover:bg-[#133B79]/90"
+            >
+              {confirmOrder.isPending ? 'Memproses...' : 'Bayar'}
+            </Button>
+            <Button
+              onClick={() => router.push('/cart')}
+              variant="outline"
+              className="w-full border-white/30 bg-transparent font-[Geom] text-white hover:bg-white/10"
+            >
+              Kembali ke Keranjang
+            </Button>
+          </div>
         </div>
       </div>
+
+      <ConfirmPaymentDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }
