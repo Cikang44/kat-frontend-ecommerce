@@ -51,7 +51,7 @@ export function DeliveryForm({
         : false;
 
   return (
-    <section className="rounded-xl border border-[#022C3F] bg-powder p-4">
+    <section className="rounded-xl border-[5px] border-[#022C3F] bg-powder p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
         <h2 className="font-[Redzone] text-lg font-bold text-[#022C3F]">Pengiriman</h2>
         <span className="font-[Geom] text-xs text-[#022C3F]/70">

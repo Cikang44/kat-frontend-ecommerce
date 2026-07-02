@@ -20,7 +20,7 @@ export function MockCartTable() {
   const totalPrice = MOCK_ITEMS.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
   return (
-    <section className="rounded-xl border border-[#022C3F] bg-powder p-4">
+    <section className="rounded-xl border-[5px] border-[#022C3F] bg-powder p-4">
       <h2 className="mb-4 flex items-center gap-2 font-[Redzone] text-lg font-bold text-[#022C3F]">
         <svg
           className="size-5"

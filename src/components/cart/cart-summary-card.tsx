@@ -36,7 +36,6 @@ export function CartSummaryCard() {
       {
         onSuccess: (result) => {
           // Remove the checked-out items once the draft order exists.
-          clearChecked();
           router.push(`/checkout/${result.order_id}`);
         },
       },

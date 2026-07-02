@@ -27,7 +27,7 @@ export function OrderSummary({
       : totalProductPrice;
 
   return (
-    <section className="rounded-xl border border-[#022C3F] bg-[#022C3F] p-4 text-white">
+    <section className="rounded-xl border-[5px] border-[#022C3F] bg-[#022C3F] p-4 text-white">
       <h2 className="font-[Geom] mb-3 text-base font-semibold">Ringkasan Transaksi</h2>
 
       <div className="space-y-2 text-sm">

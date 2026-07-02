@@ -1,5 +1,4 @@
 'use client';
-
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -10,6 +9,7 @@ import { PaymentSection } from '@/components/checkout/payment-section';
 import { ShippingOptions } from '@/components/checkout/shipping-options';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { formatPrice } from '@/lib/utils';
 import type { MockOrderReceiver } from '@/domains/order/order.api';
 import { useCheckoutData, useConfirmOrder } from '@/domains/order/order.hooks';
 import type {
@@ -82,8 +82,7 @@ export default function CheckoutPage() {
     deliveryMethod !== null &&
     paymentMethod !== null &&
     contactValid &&
-    deliveryValid &&
-    isDeliverySubmitted;
+    deliveryValid;
 
   const handleReceiverChange = (nextReceiver: MockOrderReceiver) => {
     setReceiver(nextReceiver);
@@ -98,7 +97,6 @@ export default function CheckoutPage() {
       pickup_location: '',
       shipping_option: '',
     });
-    setIsDeliverySubmitted(false);
   };
 
   const handleConfirm = () => {
@@ -117,7 +115,6 @@ export default function CheckoutPage() {
       },
     );
   };
-
 
   if (isPending) {
     return (
@@ -162,14 +159,13 @@ export default function CheckoutPage() {
           <MockCartTable />
         </div>
 
-        {/* Right column — accordion sections + actions */}
         <div className="flex min-w-0 flex-col gap-4">
           <ContactInfoForm
             receiver={receiver}
             onReceiverChange={handleReceiverChange}
+            submitted={isDeliverySubmitted}
             prefill={data.user_prefill}
           />
-
           <ShippingOptions
             deliveryMethod={deliveryMethod}
             onDeliveryMethodChange={handleDeliveryMethodChange}
@@ -177,34 +173,24 @@ export default function CheckoutPage() {
             shippingOptions={data.shipping_options}
             receiver={receiver}
             onReceiverChange={handleReceiverChange}
+            submitted={isDeliverySubmitted}
           />
-
           <PaymentSection
             paymentMethods={data.payment_methods}
             paymentMethod={paymentMethod}
             onPaymentMethodChange={setPaymentMethod}
+            submitted={isDeliverySubmitted}
+            totalProductPrice={data.summary.total_product_price}
+            deliveryMethod={deliveryMethod}
+            shippingCost={null}
+            formatPrice={formatPrice}
+            onBayarClick={() => {
+              setIsDeliverySubmitted(true);
+              if (!canConfirm) return;
+              setShowConfirmDialog(true);
+            }}
+            isPending={confirmOrder.isPending}
           />
-
-          <div className="flex flex-col gap-3 pt-2">
-            <Button
-              onClick={() => {
-                setIsDeliverySubmitted(true);
-                if (!canConfirm) return;
-                setShowConfirmDialog(true);
-              }}
-              disabled={confirmOrder.isPending}
-              className="w-full bg-navy font-[Redzone] text-white hover:bg-[#133B79]/90"
-            >
-              {confirmOrder.isPending ? 'Memproses...' : 'Bayar'}
-            </Button>
-            <Button
-              onClick={() => router.push('/cart')}
-              variant="outline"
-              className="w-full border-white/30 bg-transparent font-[Geom] text-white hover:bg-white/10"
-            >
-              Kembali ke Keranjang
-            </Button>
-          </div>
         </div>
       </div>
 

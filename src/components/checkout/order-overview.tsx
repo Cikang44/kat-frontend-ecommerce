@@ -20,7 +20,7 @@ function variantLabel(variant: OrderItemSnapshot['variant']): string {
 
 export function OrderOverview({ items, summary }: OrderOverviewProps) {
   return (
-    <section className="rounded-xl border border-[#022C3F] bg-powder p-4">
+    <section className="rounded-xl border-[5px] border-[#022C3F] bg-powder p-4">
       <h2 className="font-[Redzone] mb-3 text-lg font-bold text-[#022C3F]">Pesanan</h2>
 
       <ul className="space-y-3">
