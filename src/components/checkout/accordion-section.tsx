@@ -25,7 +25,7 @@ export function AccordionSection({
   return (
     <section
       className={cn(
-        'rounded-xl outline-[5px] outline-white/50 bg-navy text-white',
+        'rounded-xl outline-[5px] outline-white/50 bg-[#1B2F53] text-white',
         className,
       )}
     >

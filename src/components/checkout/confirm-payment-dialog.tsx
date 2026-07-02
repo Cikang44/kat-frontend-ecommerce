@@ -58,39 +58,39 @@ export function ConfirmPaymentDialog({
     >
       <div
         className={cn(
-          'w-full max-w-sm rounded-xl bg-[#022C3F] p-6 shadow-xl transition-all duration-200',
+          'w-full max-w-sm rounded-xl bg-[#1B2F53] p-6 shadow-xl transition-all duration-200',
           visible ? 'scale-100 opacity-100' : 'scale-95 opacity-0',
         )}
         onClick={(e) => e.stopPropagation()}
       >
         <h2
           id="confirm-payment-title"
-          className="font-[Redzone] mb-2 text-lg font-bold text-white"
+          className="font-[Redzone] text-center mb-2 text-2xl font-bold text-[#FFF3B8]"
         >
-          Lanjutkan ke Pembayaran?
+          Lanjutkan ke <br />Pembayaran?
         </h2>
 
-        <p className="font-[Geom] mb-6 text-sm leading-relaxed text-white/70">
+        <p className="font-[Geom] text-center mb-6 text-sm leading-relaxed text-[#FFF3B8]">
           Pastikan pesanan Anda sudah benar. Data pemesanan ini tidak dapat
           diubah setelah pembayaran.
         </p>
 
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-center gap-3">
           <button
             type="button"
-            className="font-[Geom] cursor-pointer text-sm text-white/60 underline-offset-2 hover:text-white/90 hover:underline"
+            className="border border-[#FFF3B8] bg-[#1B2F53] bg- w-full text-[#FFF3B8] py-1 rounded-md font-[Geom] font-medium"
             onClick={() => onOpenChange(false)}
           >
             Batal
           </button>
 
-          <Button
+          <button
             type="button"
-            className="bg-[#FFE788] text-[#022C3F] hover:bg-[#FFE788]/90 font-[Geom] font-medium"
+            className="bg-[#FFF3B8] w-full text-[#022C3F] py-1 rounded-md hover:bg-[#FFF3B8]/90 font-[Geom] font-medium"
             onClick={handleConfirm}
           >
             Bayar
-          </Button>
+          </button>
         </div>
       </div>
     </div>

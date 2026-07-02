@@ -46,7 +46,7 @@ export function PaymentSection({
     : 'Pilih metode pembayaran';
 
   return (
-    <section className="rounded-xl outline-[5px] outline-white/50 bg-navy p-4 text-white">
+    <section className="rounded-xl outline-[5px] outline-white/50 bg-[#1B2F53] p-4 text-white">
       <h2 className="mb-3 flex items-center gap-2 font-[Redzone] text-base font-bold text-white">
         <span className="flex size-5 items-center justify-center">
           <WalletIcon2Linear size={18} />
