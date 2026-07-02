@@ -1,5 +1,5 @@
 'use client';
-import { ArrowDownLinear, WalletLinear } from 'vuesax-icon-pack';
+import { ArrowDownLinear, WalletIcon2Linear } from 'vuesax-icon-pack';
 import { useState } from 'react';
 import type { OrderOption, OrderPaymentMethod } from '@/domains/order/order.types';
 import { cn } from '@/lib/utils';
@@ -23,7 +23,7 @@ export function PaymentSection({
     : 'Pilih metode pembayaran';
 
   return (
-    <AccordionSection icon={<WalletLinear size={18} />} title="Metode Pembayaran">
+    <AccordionSection icon={<WalletIcon2Linear size={18} />} title="Metode Pembayaran">
       <div className="relative z-20">
         <button
           type="button"

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowDownLinear, BoxTickLinear } from 'vuesax-icon-pack';
+import { ArrowDownLinear, ShoppingCartBroken } from 'vuesax-icon-pack';
 import { useState } from 'react';
 
 import type { MockOrderReceiver } from '@/domains/order/order.api';
@@ -43,7 +43,7 @@ export function ShippingOptions({
     onReceiverChange({ ...receiver, ...patch });
 
   return (
-    <AccordionSection icon={<BoxTickLinear size={18} />} title="Opsi Pengiriman">
+    <AccordionSection icon={<ShoppingCartBroken size={18} />} title="Opsi Pengiriman">
       <div className="space-y-3">
         {/* Dropdown — absolutely positioned above rest to avoid clipping */}
         <div className="relative z-20">
