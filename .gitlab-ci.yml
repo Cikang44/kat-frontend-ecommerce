@@ -16,7 +16,7 @@ variables:
   CI_ALPINE_IMAGE: "kat-harbor.itb.ac.id/hub-cache/library/alpine:3.24"
   CI_KANIKO_IMAGE: "kat-harbor.itb.ac.id/gcr-cache/kaniko-project/executor:debug"
   SECRET_DETECTION_ENABLED: "true"
-  NODE_ENV: development
+  NEXT_TELEMETRY_DISABLED: "1"
 
 default:
   tags:
