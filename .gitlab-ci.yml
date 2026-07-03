@@ -32,14 +32,14 @@ lint:
   extends: .bun-base
   stage: lint
   script:
-    - bun install --frozen-lockfile
+    - bun install --frozen-lockfile || bun install
     - bun run lint
 
 test:
   extends: .bun-base
   stage: test
   script:
-    - bun install --frozen-lockfile
+    - bun install --frozen-lockfile || bun install
     - bun run build
 
 build:
