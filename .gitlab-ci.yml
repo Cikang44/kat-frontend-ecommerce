@@ -1,0 +1,83 @@
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+  - secret-detection
+
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+variables:
+  APP_DEPLOY_NAME: ganeshagoods-stg-frontend
+  IMAGE: "kat-harbor.itb.ac.id/library/frontend-ecommerce"
+  CI_BUN_IMAGE: "kat-harbor.itb.ac.id/hub-cache/oven/bun:1-alpine"
+  CI_ALPINE_IMAGE: "kat-harbor.itb.ac.id/hub-cache/library/alpine:3.24"
+  CI_KANIKO_IMAGE: "kat-harbor.itb.ac.id/gcr-cache/kaniko-project/executor:debug"
+  SECRET_DETECTION_ENABLED: "true"
+  NODE_ENV: development
+
+default:
+  tags:
+    - general
+
+.bun-base:
+  image: $CI_BUN_IMAGE
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+lint:
+  extends: .bun-base
+  stage: lint
+  script:
+    - bun install --frozen-lockfile
+    - bun run lint
+
+test:
+  extends: .bun-base
+  stage: test
+  script:
+    - bun install --frozen-lockfile
+    - bun run build
+
+build:
+  stage: build
+  tags:
+    - kaniko
+  image:
+    name: $CI_KANIKO_IMAGE
+    entrypoint: [""]
+  script:
+    - |
+      AUTH=$(printf "%s:%s" "$HARBOR_USERNAME" "$HARBOR_PASSWORD" | base64)
+      mkdir -p /kaniko/.docker
+      printf '{"auths":{"kat-harbor.itb.ac.id":{"auth":"%s"}}}\n' "$AUTH" > /kaniko/.docker/config.json
+    - /kaniko/executor --context "${CI_PROJECT_DIR}" --dockerfile "${CI_PROJECT_DIR}/Dockerfile" --destination "${IMAGE}:${CI_COMMIT_SHORT_SHA}" --label "org.opencontainers.image.revision=${CI_COMMIT_SHA}" --label "org.opencontainers.image.source=${CI_PROJECT_URL}"
+
+deploy:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+  tags:
+    - deploy
+  image: $CI_ALPINE_IMAGE
+  script:
+    - apk add --no-cache git sed grep
+    - |
+      if ! echo "$APP_DEPLOY_NAME" | grep -Eq '^[a-zA-Z0-9_-]+$'; then
+        echo "SECURITY ERROR: APP_DEPLOY_NAME ($APP_DEPLOY_NAME) contains invalid characters"
+        exit 1
+      fi
+    - git clone https://oauth2:${GIT_TOKEN}@github.com/KAT-ITB-2026/kat-argo-apps.git
+    - cd kat-argo-apps
+    - TARGET_FILE="apps/stg/${APP_DEPLOY_NAME}/values.yaml"
+    - test -f "$TARGET_FILE"
+    - 'sed -i "s/^  tag:.*/  tag: ${CI_COMMIT_SHORT_SHA}/" "$TARGET_FILE"'
+    - git config user.name "GitLab CI"
+    - git config user.email "ci@gitlab.com"
+    - git add "$TARGET_FILE"
+    - 'git commit -m "deploy: update ${APP_DEPLOY_NAME} to ${CI_COMMIT_SHORT_SHA}" || exit 0'
+    - git push origin main
