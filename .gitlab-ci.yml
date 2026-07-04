@@ -149,7 +149,7 @@ harbor_trivy_report:
       ' 2>/dev/null || echo "No Harbor vulnerability report available yet")"
       body="$(printf 'Harbor Trivy result for `%s:%s`:\n\n%s\n\nArtifact: `%s/%s:%s`' "$HARBOR_REPOSITORY" "$CI_COMMIT_SHORT_SHA" "$trivy_summary" "$HARBOR_PROJECT" "$HARBOR_REPOSITORY" "$CI_COMMIT_SHORT_SHA")"
 
-      related_mr="$(api "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/commits/${CI_COMMIT_SHA}/merge_requests" | jq -r '.[0].iid // empty' || true)"
+      related_mr="$(api "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/commits/${CI_COMMIT_SHA}/merge_requests" | jq -r '[.[] | select(.state == "opened")][0].iid // empty' || true)"
       if [ -n "$related_mr" ]; then
         if ! api -X POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/merge_requests/${related_mr}/notes" --data-urlencode "body=${body}"; then
           echo "ERROR: unable to post Harbor Trivy MR comment; set masked GITLAB_COMMENT_TOKEN or GITLAB_TOKEN with API scope"
