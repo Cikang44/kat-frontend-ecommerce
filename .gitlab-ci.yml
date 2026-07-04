@@ -4,7 +4,6 @@ stages:
   - build
   - report
   - deploy
-  - secret-detection
 
 include:
   - template: Jobs/SAST.gitlab-ci.yml
@@ -35,14 +34,14 @@ lint:
   extends: .bun-base
   stage: lint
   script:
-    - bun install --frozen-lockfile || bun install
+    - bun install --frozen-lockfile
     - bun run lint
 
 test:
   extends: .bun-base
   stage: test
   script:
-    - bun install --frozen-lockfile || bun install
+    - bun install --frozen-lockfile
     - bun run build
 
 build:
@@ -167,6 +166,8 @@ deploy:
   rules:
     - if: $CI_COMMIT_BRANCH == "staging"
     - if: $CI_COMMIT_TAG
+  needs:
+    - build
   tags:
     - deploy
   image: $CI_ALPINE_IMAGE
