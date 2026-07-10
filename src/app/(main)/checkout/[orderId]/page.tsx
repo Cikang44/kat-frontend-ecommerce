@@ -1,123 +1,204 @@
 'use client';
-
-import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
+import { ConfirmPaymentDialog } from '@/components/checkout/confirm-payment-dialog';
+import { ContactInfoForm } from '@/components/checkout/contact-info-form';
+import { MockCartTable } from '@/components/checkout/mock-cart-table';
+import { PaymentSection } from '@/components/checkout/payment-section';
+import { ShippingOptions } from '@/components/checkout/shipping-options';
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { formatPrice } from '@/lib/utils';
+import type { MockOrderReceiver } from '@/domains/order/order.api';
 import { useCheckoutData, useConfirmOrder } from '@/domains/order/order.hooks';
+import type {
+  OrderDeliveryMethod,
+  OrderPaymentMethod,
+} from '@/domains/order/order.types';
+
+const EMPTY_RECEIVER: MockOrderReceiver = {
+  name: '',
+  faculty: '',
+  major: '',
+  phone: '',
+  line: '',
+  email: '',
+  address: '',
+  pickup_location: '',
+  shipping_option: '',
+};
 
 export default function CheckoutPage() {
-  const { orderId } = useParams<{ orderId: string }>();
   const router = useRouter();
+  const { orderId } = useParams<{ orderId: string }>();
 
-  const { data: checkout, isLoading, error } = useCheckoutData(orderId);
+  const { data, isPending, isError, error } = useCheckoutData(orderId);
   const confirmOrder = useConfirmOrder();
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
+  const [deliveryMethod, setDeliveryMethod] = useState<OrderDeliveryMethod | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod | null>(null);
+  const [receiver, setReceiver] = useState<MockOrderReceiver>(EMPTY_RECEIVER);
+  const [isDeliverySubmitted, setIsDeliverySubmitted] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  if (error || !checkout) {
-    return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4">
-        <h1 className="font-[redzone] text-2xl font-bold text-[#022C3F]">
-          Checkout Tidak Ditemukan
-        </h1>
-        <p className="text-muted-foreground">
-          {error?.message || 'Checkout tidak ditemukan atau sudah dikonfirmasi.'}
-        </p>
-        <button
-          onClick={() => router.push('/cart')}
-          className="rounded-lg bg-[#022C3F] px-4 py-2 text-white"
-        >
-          Kembali ke Cart
-        </button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!data) return;
+    setReceiver({
+      name: data.user_prefill.name,
+      faculty: data.user_prefill.faculty,
+      major: data.user_prefill.major,
+      phone: data.user_prefill.phone,
+      line: data.user_prefill.line,
+      email: data.user_prefill.email,
+      address: '',
+      pickup_location: '',
+      shipping_option: '',
+    });
+  }, [data]);
 
-  const handleConfirm = async () => {
-    // TODO: collect delivery_method, receiver, payment_method from forms
+  const contactValid = useMemo(
+    () =>
+      receiver.name.trim() !== '' &&
+      receiver.faculty.trim() !== '' &&
+      receiver.major.trim() !== '' &&
+      receiver.phone.trim() !== '' &&
+      receiver.line.trim() !== '' &&
+      receiver.email.trim() !== '',
+    [receiver],
+  );
+
+  const deliveryValid = useMemo(() => {
+    if (deliveryMethod === 'pickup') {
+      return receiver.pickup_location.trim() !== '';
+    }
+    if (deliveryMethod === 'shipping') {
+      return receiver.address.trim() !== '' && receiver.shipping_option.trim() !== '';
+    }
+    return false;
+  }, [deliveryMethod, receiver]);
+
+  const canConfirm =
+    deliveryMethod !== null &&
+    paymentMethod !== null &&
+    contactValid &&
+    deliveryValid;
+
+  const handleReceiverChange = (nextReceiver: MockOrderReceiver) => {
+    setReceiver(nextReceiver);
+    setIsDeliverySubmitted(false);
+  };
+
+  const handleDeliveryMethodChange = (method: OrderDeliveryMethod) => {
+    setDeliveryMethod(method);
+    setReceiver({
+      ...receiver,
+      address: '',
+      pickup_location: '',
+      shipping_option: '',
+    });
+  };
+
+  const handleConfirm = () => {
+    if (!canConfirm) return;
     confirmOrder.mutate(
       {
         order_id: orderId,
-        delivery_method: 'pickup',
-        receiver: {
-          name: checkout.user_prefill.name,
-          phone: checkout.user_prefill.phone,
-          line: checkout.user_prefill.line,
-          address: '',
-        },
-        payment_method: 'qris',
+        delivery_method: deliveryMethod,
+        payment_method: paymentMethod,
+        receiver,
       },
       {
-        onSuccess: (result) => {
-          router.push(result.redirect_url);
+        onSuccess: ({ redirect_url }) => {
+          router.push(redirect_url);
         },
       },
     );
   };
 
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center" style={{ minHeight: 'inherit' }}>
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center" style={{ minHeight: 'inherit' }}>
+        <p className="font-[Geom] text-red-500">
+          {error?.message ?? 'Gagal memuat data checkout.'}
+        </p>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6">
-      <h1 className="mb-6 font-[redzone] text-4xl font-bold text-[#022C3F]">Checkout</h1>
+    <div className="flex flex-col px-4 py-6" style={{ minHeight: 'inherit' }}>
+      {/* Breadcrumb */}
+      <nav className="mb-4 flex items-center gap-2 text-sm font-[Geom] text-[#022C3F]/60">
+        <span>Keranjang</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path
+            d="M4.5 2.5L7.5 6L4.5 9.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span className="font-medium text-[#022C3F]">Checkout</span>
+      </nav>
 
-      {/* Order Items */}
-      <div className="space-y-3">
-        {checkout.items.map((item) => (
-          <div key={item.product_id} className="flex gap-3 rounded-lg bg-white p-3 shadow-sm">
-            <div className="h-16 w-16 shrink-0 rounded bg-gray-100">
-              {item.image_url && (
-                <Image
-                  src={item.image_url}
-                  alt={item.product_name}
-                  width={64}
-                  height={64}
-                  className="h-full w-full rounded object-cover"
-                />
-              )}
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">{item.product_name}</p>
-              <p className="text-muted-foreground text-sm">
-                {item.variant.size && `Size: ${item.variant.size}`}
-                {item.variant.color && ` • ${item.variant.color}`}
-              </p>
-              <p className="text-sm">
-                {item.quantity}x Rp{item.unit_price.toLocaleString('id-ID')}
-              </p>
-            </div>
-            <p className="font-medium">Rp{item.subtotal.toLocaleString('id-ID')}</p>
-          </div>
-        ))}
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:grid lg:grid-cols-[1.2fr_0.8fr]">
+        {/* Left column — MockCartTable */}
+        <div className="min-w-0">
+          <MockCartTable />
+        </div>
+
+        <div className="flex min-w-0 flex-col gap-4">
+          <ContactInfoForm
+            receiver={receiver}
+            onReceiverChange={handleReceiverChange}
+            submitted={isDeliverySubmitted}
+            prefill={data.user_prefill}
+          />
+          <ShippingOptions
+            deliveryMethod={deliveryMethod}
+            onDeliveryMethodChange={handleDeliveryMethodChange}
+            pickupLocations={data.pickup_locations}
+            shippingOptions={data.shipping_options}
+            receiver={receiver}
+            onReceiverChange={handleReceiverChange}
+            submitted={isDeliverySubmitted}
+          />
+          <PaymentSection
+            paymentMethods={data.payment_methods}
+            paymentMethod={paymentMethod}
+            onPaymentMethodChange={setPaymentMethod}
+            submitted={isDeliverySubmitted}
+            totalProductPrice={data.summary.total_product_price}
+            deliveryMethod={deliveryMethod}
+            shippingCost={null}
+            formatPrice={formatPrice}
+            onBayarClick={() => {
+              setIsDeliverySubmitted(true);
+              if (!canConfirm) return;
+              setShowConfirmDialog(true);
+            }}
+            isPending={confirmOrder.isPending}
+          />
+        </div>
       </div>
 
-      {/* Summary */}
-      <div className="mt-6 rounded-lg bg-white p-4 shadow-sm">
-        <div className="flex justify-between">
-          <span>Total Item</span>
-          <span>{checkout.summary.total_items}</span>
-        </div>
-        <div className="flex justify-between font-bold">
-          <span>Total Harga</span>
-          <span>Rp{checkout.summary.total_product_price.toLocaleString('id-ID')}</span>
-        </div>
-      </div>
-
-      {/* TODO: Delivery Form, Payment Method Selector */}
-
-      {/* Confirm Button */}
-      <button
-        onClick={handleConfirm}
-        disabled={confirmOrder.isPending}
-        className="mt-6 w-full rounded-lg bg-[#FFE788] py-3 font-[redzone] text-lg font-bold text-[#022C3F] disabled:opacity-50"
-      >
-        {confirmOrder.isPending ? 'Memproses...' : 'Konfirmasi Pesanan'}
-      </button>
+      <ConfirmPaymentDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }

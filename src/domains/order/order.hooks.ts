@@ -20,8 +20,9 @@ import {
   type OrderDetailResult,
   type OrderHistoryResult,
   type GenerateQrResult,
+  type MockConfirmOrderBody,
 } from './order.api';
-import type { InitiateOrderBody, ConfirmOrderBody } from './order.types';
+import type { InitiateOrderBody } from './order.types';
 
 // ---------------------------------------------------------------------------
 // Combined types for useOrderHistoryWithDetails
@@ -73,7 +74,7 @@ export function useInitiateOrder(): UseMutationResult<
  * Locks the draft into a final order. On success, the frontend
  * should redirect to the returned `redirect_url` (/payment/{order_id}).
  */
-export function useConfirmOrder(): UseMutationResult<ConfirmOrderResult, Error, ConfirmOrderBody> {
+export function useConfirmOrder(): UseMutationResult<ConfirmOrderResult, Error, MockConfirmOrderBody> {
   const queryClient = useQueryClient();
 
   return useMutation({

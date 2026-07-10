@@ -14,9 +14,34 @@ import type {
   GenerateQrResponse,
   ConfirmOrderResponse,
   OrderPaymentMethod,
+  OrderReceiver,
 } from '@/api';
 
 import type { InitiateOrderBody, ConfirmOrderBody } from './order.types';
+
+export type MockCheckoutUserPrefill = CheckoutOrder['user_prefill'] & {
+  email: string;
+  faculty: string;
+  major: string;
+};
+
+export type MockOrderReceiver = OrderReceiver & {
+  email: string;
+  faculty: string;
+  major: string;
+  pickup_location: string;
+  shipping_option: string;
+};
+
+export type MockCheckoutDataResult = Omit<CheckoutOrder, 'user_prefill'> & {
+  user_prefill: MockCheckoutUserPrefill;
+  pickup_locations: CheckoutOrder['delivery_options'];
+  shipping_options: CheckoutOrder['delivery_options'];
+};
+
+export type MockConfirmOrderBody = Omit<ConfirmOrderBody, 'receiver'> & {
+  receiver: MockOrderReceiver;
+};
 
 // ---------------------------------------------------------------------------
 // ApiError  —  mirrors the backend's ErrorResponse shape
@@ -40,7 +65,7 @@ export class ApiError extends Error {
 export type InitiateOrderResult = OrderDraft;
 
 /** GET /order/{orderId}/checkout response data */
-export type CheckoutDataResult = CheckoutOrder;
+export type CheckoutDataResult = MockCheckoutDataResult;
 
 /** POST /order/confirm response data */
 export type ConfirmOrderResult = ConfirmOrderResponse['data'];
@@ -118,7 +143,9 @@ const generateOrderId = () => `mock-order-${Date.now()}-${++orderCounter}`;
 // ---------------------------------------------------------------------------
 
 function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  const { promise, resolve } = Promise.withResolvers<void>();
+  setTimeout(resolve, ms);
+  return promise;
 }
 
 // ---------------------------------------------------------------------------
@@ -166,12 +193,23 @@ export const api = {
       items: MOCK_ITEMS,
       user_prefill: {
         name: 'John Doe',
+        faculty: 'FMIPA',
+        major: 'Matematika',
         phone: '081234567890',
         line: '@johndoe',
+        email: 'john@itb.ac.id',
       },
       delivery_options: [
-        { value: 'pickup', label: 'Ambil di Pickup Point' },
-        { value: 'shipping', label: 'Dikirimkan' },
+        { value: 'pickup', label: 'Pickup' },
+        { value: 'shipping', label: 'Delivery' },
+      ],
+      pickup_locations: [
+        { value: 'cc-barat', label: 'Campus Center Barat' },
+        { value: 'sabuga', label: 'SABUGA' },
+      ],
+      shipping_options: [
+        { value: 'regular', label: 'Regular' },
+        { value: 'same_day', label: 'Same Day' },
       ],
       payment_methods: [
         { value: 'qris', label: 'QRIS' },
