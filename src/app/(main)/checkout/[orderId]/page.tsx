@@ -56,6 +56,8 @@ export default function CheckoutPage() {
 
   const deliveryValid = useMemo(() => {
     if (!deliveryMethod) return false;
+    // Backend only requires address for shipping (kurir), not for pickup
+    if (deliveryMethod === 'pickup') return true;
     return receiver.address.trim() !== '';
   }, [deliveryMethod, receiver]);
 
@@ -77,13 +79,11 @@ export default function CheckoutPage() {
 
   const handleConfirm = () => {
     if (!canConfirm || !deliveryMethod || !paymentMethod) return;
-    // Q4: checkout UI uses 'shipping' but the backend order record uses 'kurir'
-    // for the delivered method. Map to the backend's canonical value on write.
-    const backendDeliveryMethod = (deliveryMethod === 'shipping' ? 'kurir' : deliveryMethod) as OrderDeliveryMethod;
+    // Backend expects 'pickup' | 'shipping' and maps to 'kurir' internally
     confirmOrder.mutate(
       {
         order_id: orderId,
-        delivery_method: backendDeliveryMethod,
+        delivery_method: deliveryMethod,
         payment_method: paymentMethod,
         receiver: {
           name: receiver.name,
