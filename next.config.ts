@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
-const BACKEND_URL = process.env.BACKEND_URL ?? 'https://backend-ecommerce-production-7c80.up.railway.app';
+// Fallback for local development. On Vercel, vercel.json rewrites take precedence.
+const BACKEND_URL = (process.env.BACKEND_URL ?? 'https://backend-ecommerce-production-7c80.up.railway.app').replace(/\/+$/, '');
 
 const nextConfig: NextConfig = {
   async rewrites() {
