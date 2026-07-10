@@ -103,12 +103,12 @@ export default function PaymentPage() {
       <section className="mb-4 rounded-xl border border-[#FFF3B8]/40 bg-[#1B2F53] p-4 text-white">
         <h2 className="mb-3 font-[Redzone] text-lg font-bold">Metode Pembayaran</h2>
         <p className="font-[Geom] text-sm">Metode: {data.method.toUpperCase()}</p>
-        {data.paymentDetail.qrString ? (
+        {data.paymentDetail.qrImageUrl ? (
           <div className="mt-3">
             <p className="mb-2 font-[Geom] text-xs">Scan QRIS:</p>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={data.paymentDetail.qrString}
+              src={data.paymentDetail.qrImageUrl}
               alt="QRIS"
               className="h-48 w-48 rounded bg-white p-2"
             />

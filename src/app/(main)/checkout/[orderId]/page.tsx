@@ -7,7 +7,6 @@ import { ContactInfoForm } from '@/components/checkout/contact-info-form';
 import { OrderOverview } from '@/components/checkout/order-overview';
 import { PaymentSection } from '@/components/checkout/payment-section';
 import { ShippingOptions } from '@/components/checkout/shipping-options';
-import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { formatPrice } from '@/lib/utils';
 import { useCheckoutData, useConfirmOrder } from '@/domains/order/order.hooks';

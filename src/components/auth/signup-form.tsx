@@ -124,9 +124,9 @@ export function SignupForm() {
 
         <Button
           type="button"
-          disabled
+          onClick={() => (window.location.href = '/api/v1/auth/google')}
           style={{ fontFamily: "'Redzone', sans-serif" }}
-          className="w-full cursor-not-allowed border-transparent bg-white font-black text-[#022C3F] opacity-50"
+          className="w-full cursor-pointer border-transparent bg-white font-black text-[#022C3F] hover:bg-gray-100"
         >
           <svg className="mr-2 size-4" viewBox="0 0 24 24" aria-hidden="true">
             <path

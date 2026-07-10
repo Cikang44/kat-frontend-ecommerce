@@ -1,6 +1,75 @@
-import { useCartStore } from '@/lib/providers';
+'use client';
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { api } from './cart.api';
+import { queryKeys } from '@/lib/query-keys';
+import { useCartStore } from '@/lib/providers';
 import type { CartItem } from './cart.types';
+
+// ---------------------------------------------------------------------------
+// Query — fetch cart from backend
+// ---------------------------------------------------------------------------
+
+export function useCartQuery() {
+  return useQuery({
+    queryKey: queryKeys.cart.all,
+    queryFn: () => api.getCart(),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Mutations
+// ---------------------------------------------------------------------------
+
+/**
+ * Add an item to the backend cart.
+ * On success, invalidates the cart query so the UI refreshes.
+ */
+export function useAddToCart() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ variantId, quantity }: { variantId: string; quantity: number }) =>
+      api.addToCart(variantId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
+    },
+  });
+}
+
+/**
+ * Update the quantity of a backend cart item.
+ */
+export function useUpdateCartItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
+      api.updateCartItem(itemId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
+    },
+  });
+}
+
+/**
+ * Remove a backend cart item.
+ */
+export function useRemoveCartItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (itemId: string) => api.removeCartItem(itemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Legacy zustand hooks (kept for backward compatibility)
+// ---------------------------------------------------------------------------
 
 /** All items currently in the cart. */
 export function useCartItems(): CartItem[] {

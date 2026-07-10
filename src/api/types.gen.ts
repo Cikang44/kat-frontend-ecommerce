@@ -571,6 +571,7 @@ export type PaymentDetailResponse = {
     paymentDetail: {
       fee: number;
       qrString?: string;
+      qrImageUrl?: string;
       bank?: string;
       accountNumber?: string;
     };

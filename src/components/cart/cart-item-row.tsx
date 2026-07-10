@@ -1,8 +1,6 @@
 'use client';
 
 import { MinusIcon, PlusIcon } from 'lucide-react';
-import Image from 'next/image';
-
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { CartItem } from '@/domains/cart/cart.types';
@@ -45,7 +43,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
       {/* Thumbnail */}
       <div className="size-16 shrink-0 overflow-hidden rounded-lg border border-[#7A213D] bg-[#FFE788] md:size-24">
         {item.productImage?.url ? (
-          <Image
+          <img
             src={item.productImage.url}
             alt={item.productName}
             width={96}

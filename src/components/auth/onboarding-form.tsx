@@ -1,10 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+import { useOnboarding } from '@/domains/auth/auth.hooks';
 import { useAuthStore } from '@/lib/providers';
 
 type Role = 'umum' | 'panitia';
@@ -22,29 +24,71 @@ const radioUnselected: React.CSSProperties = {
 
 export function OnboardingForm() {
   const router = useRouter();
-  const existingUser = useAuthStore((s) => s.user);
-  const setUser = useAuthStore((s) => s.setUser);
+  const onboarding = useOnboarding();
+  const onboardingToken = useAuthStore((s) => s.onboardingToken);
 
   const [role, setRole] = useState<Role | null>(null);
   const [nim, setNim] = useState('');
   const [divisionCode, setDivisionCode] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Redirect to login if no onboarding token
+  useEffect(() => {
+    if (onboardingToken === null) {
+      router.replace('/login');
+    }
+  }, [onboardingToken, router]);
+
+  // Show loading while redirecting
+  if (onboardingToken === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner />
+          <p className="text-sm text-white/60">Mengalihkan ke login...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isPanitia = role === 'panitia';
+  const canSubmit = role !== null && (!isPanitia || (nim.trim() && divisionCode.trim()));
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!role) return;
 
-    setIsSubmitting(true);
+    onboarding.mutate(
+      {
+        lineId: '', // Not collected in onboarding form
+        phone: '', // Not collected in onboarding form
+        role,
+        nim: isPanitia ? nim : undefined,
+        divisionCode: isPanitia ? divisionCode : undefined,
+      },
+      {
+        onSuccess: () => {
+          router.push('/products');
+        },
+      },
+    );
+  }
 
-    setUser({
-      id: existingUser?.id ?? `usr-${Date.now()}`,
-      name: existingUser?.name ?? 'User',
-      email: existingUser?.email ?? '',
-      role,
-      isOnboardingComplete: true,
-    });
-
-    router.push('/products');
+  if (onboarding.isError) {
+    return (
+      <div className="w-full max-w-md">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-sm text-red-700">
+            {onboarding.error?.message ?? 'Gagal menyelesaikan onboarding. Silakan coba lagi.'}
+          </p>
+        </div>
+        <Button
+          onClick={() => onboarding.reset()}
+          className="w-full bg-[#FFE788] text-[#133B79] hover:bg-[#f5dd6a]"
+        >
+          Coba Lagi
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -118,10 +162,10 @@ export function OnboardingForm() {
         <div className="pt-2">
           <Button
             type="submit"
-            disabled={!role || isSubmitting}
+            disabled={!canSubmit || onboarding.isPending}
             style={{
               fontFamily: "'Redzone', sans-serif",
-              ...(role
+              ...(canSubmit
                 ? {}
                 : {
                     backgroundColor: '#F9F6F3',
@@ -131,10 +175,17 @@ export function OnboardingForm() {
                   }),
             }}
             className={`w-full font-black transition-colors ${
-              role ? 'bg-[#FFE788] text-[#133B79] hover:bg-[#f5dd6a]' : 'cursor-not-allowed'
+              canSubmit ? 'bg-[#FFE788] text-[#133B79] hover:bg-[#f5dd6a]' : 'cursor-not-allowed'
             }`}
           >
-            Submit
+            {onboarding.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner className="size-4" />
+                Memproses...
+              </span>
+            ) : (
+              'Submit'
+            )}
           </Button>
         </div>
       </form>

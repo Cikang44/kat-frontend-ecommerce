@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowRightLinear } from 'vuesax-icon-pack';
@@ -44,7 +43,7 @@ function ItemImageBox({
   if (imageUrl) {
     return (
       <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-lg border border-[#996537] bg-[#FFF3B8] md:h-[96px] md:w-[96px] md:rounded-xl">
-        <Image src={imageUrl} alt={productName} className="h-full w-full object-cover" />
+        <img src={imageUrl} alt={productName} className="h-full w-full object-cover" />
       </div>
     );
   }

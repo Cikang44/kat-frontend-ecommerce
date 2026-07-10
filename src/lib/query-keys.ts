@@ -44,6 +44,11 @@ export const queryKeys = {
     fee: (method: string, amount: number) => ['payment', 'fee', method, amount] as const,
   },
 
+  /** Cart endpoints */
+  cart: {
+    all: ['cart'] as const,
+  },
+
   /** Admin dashboard endpoints */
   admin: {
     all: ['admin'] as const,

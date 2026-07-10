@@ -22,7 +22,7 @@ export function CartSummaryCard() {
   // reference on every snapshot and breaks useSyncExternalStore (infinite loop).
   const items = useCartStore((s) => s.items);
   const checkedItemIds = useMemo(
-    () => items.filter((i) => i.checked).map((i) => i.localId),
+    () => items.filter((i) => i.checked && i.serverId).map((i) => i.serverId!),
     [items],
   );
 
