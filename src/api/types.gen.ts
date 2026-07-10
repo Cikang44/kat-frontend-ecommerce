@@ -468,17 +468,17 @@ export type OrderDetailResponse = {
 export type OrderDetail = {
   id: string;
   status: 'draft' | 'belum_bayar' | 'lunas' | 'diterima' | 'expired';
-  deliveryMethod: 'pickup' | 'kurir';
-  deliveryAddress: string;
-  contactName: string;
-  contactPhone: string;
-  contactLineId: string;
-  paymentMethod: OrderPaymentMethod & unknown;
+  deliveryMethod: 'pickup' | 'kurir' | null;
+  deliveryAddress: string | null;
+  contactName: string | null;
+  contactPhone: string | null;
+  contactLineId: string | null;
+  paymentMethod: OrderPaymentMethod | null;
   totalAmount: number;
   gatewayFee: number;
   totalBilled: number;
-  paymentExpiredAt: string;
-  paidAt: string;
+  paymentExpiredAt: string | null;
+  paidAt: string | null;
   createdAt: string;
   items: Array<{
     id: string;
@@ -566,7 +566,7 @@ export type PaymentDetailResponse = {
       method: string;
       name: string;
       phone: string;
-      address: string;
+      address: string | null;
     };
     paymentDetail: {
       fee: number;
