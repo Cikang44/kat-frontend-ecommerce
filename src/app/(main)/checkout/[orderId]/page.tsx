@@ -4,29 +4,24 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { ConfirmPaymentDialog } from '@/components/checkout/confirm-payment-dialog';
 import { ContactInfoForm } from '@/components/checkout/contact-info-form';
-import { MockCartTable } from '@/components/checkout/mock-cart-table';
+import { OrderOverview } from '@/components/checkout/order-overview';
 import { PaymentSection } from '@/components/checkout/payment-section';
 import { ShippingOptions } from '@/components/checkout/shipping-options';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { formatPrice } from '@/lib/utils';
-import type { MockOrderReceiver } from '@/domains/order/order.api';
 import { useCheckoutData, useConfirmOrder } from '@/domains/order/order.hooks';
 import type {
   OrderDeliveryMethod,
   OrderPaymentMethod,
+  OrderReceiver,
 } from '@/domains/order/order.types';
 
-const EMPTY_RECEIVER: MockOrderReceiver = {
+const EMPTY_RECEIVER: OrderReceiver = {
   name: '',
-  faculty: '',
-  major: '',
   phone: '',
   line: '',
-  email: '',
   address: '',
-  pickup_location: '',
-  shipping_option: '',
 };
 
 export default function CheckoutPage() {
@@ -38,7 +33,7 @@ export default function CheckoutPage() {
 
   const [deliveryMethod, setDeliveryMethod] = useState<OrderDeliveryMethod | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod | null>(null);
-  const [receiver, setReceiver] = useState<MockOrderReceiver>(EMPTY_RECEIVER);
+  const [receiver, setReceiver] = useState<OrderReceiver>(EMPTY_RECEIVER);
   const [isDeliverySubmitted, setIsDeliverySubmitted] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -46,36 +41,23 @@ export default function CheckoutPage() {
     if (!data) return;
     setReceiver({
       name: data.user_prefill.name,
-      faculty: data.user_prefill.faculty,
-      major: data.user_prefill.major,
       phone: data.user_prefill.phone,
       line: data.user_prefill.line,
-      email: data.user_prefill.email,
       address: '',
-      pickup_location: '',
-      shipping_option: '',
     });
   }, [data]);
 
   const contactValid = useMemo(
     () =>
       receiver.name.trim() !== '' &&
-      receiver.faculty.trim() !== '' &&
-      receiver.major.trim() !== '' &&
       receiver.phone.trim() !== '' &&
-      receiver.line.trim() !== '' &&
-      receiver.email.trim() !== '',
+      receiver.line.trim() !== '' ,
     [receiver],
   );
 
   const deliveryValid = useMemo(() => {
-    if (deliveryMethod === 'pickup') {
-      return receiver.pickup_location.trim() !== '';
-    }
-    if (deliveryMethod === 'shipping') {
-      return receiver.address.trim() !== '' && receiver.shipping_option.trim() !== '';
-    }
-    return false;
+    if (!deliveryMethod) return false;
+    return receiver.address.trim() !== '';
   }, [deliveryMethod, receiver]);
 
   const canConfirm =
@@ -84,29 +66,32 @@ export default function CheckoutPage() {
     contactValid &&
     deliveryValid;
 
-  const handleReceiverChange = (nextReceiver: MockOrderReceiver) => {
+  const handleReceiverChange = (nextReceiver: OrderReceiver) => {
     setReceiver(nextReceiver);
     setIsDeliverySubmitted(false);
   };
 
   const handleDeliveryMethodChange = (method: OrderDeliveryMethod) => {
     setDeliveryMethod(method);
-    setReceiver({
-      ...receiver,
-      address: '',
-      pickup_location: '',
-      shipping_option: '',
-    });
+    setReceiver({ ...receiver, address: '' });
   };
 
   const handleConfirm = () => {
-    if (!canConfirm) return;
+    if (!canConfirm || !deliveryMethod || !paymentMethod) return;
+    // Q4: checkout UI uses 'shipping' but the backend order record uses 'kurir'
+    // for the delivered method. Map to the backend's canonical value on write.
+    const backendDeliveryMethod = (deliveryMethod === 'shipping' ? 'kurir' : deliveryMethod) as OrderDeliveryMethod;
     confirmOrder.mutate(
       {
         order_id: orderId,
-        delivery_method: deliveryMethod,
+        delivery_method: backendDeliveryMethod,
         payment_method: paymentMethod,
-        receiver,
+        receiver: {
+          name: receiver.name,
+          phone: receiver.phone,
+          line: receiver.line,
+          address: receiver.address,
+        },
       },
       {
         onSuccess: ({ redirect_url }) => {
@@ -154,9 +139,9 @@ export default function CheckoutPage() {
       </nav>
 
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:grid lg:grid-cols-[1.2fr_0.8fr]">
-        {/* Left column — MockCartTable */}
+        {/* Left column — real checkout items (W1: replaced MockCartTable) */}
         <div className="min-w-0">
-          <MockCartTable />
+          <OrderOverview orderItems={data.items} />
         </div>
 
         <div className="flex min-w-0 flex-col gap-4">
@@ -169,8 +154,6 @@ export default function CheckoutPage() {
           <ShippingOptions
             deliveryMethod={deliveryMethod}
             onDeliveryMethodChange={handleDeliveryMethodChange}
-            pickupLocations={data.pickup_locations}
-            shippingOptions={data.shipping_options}
             receiver={receiver}
             onReceiverChange={handleReceiverChange}
             submitted={isDeliverySubmitted}

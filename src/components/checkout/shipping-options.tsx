@@ -1,40 +1,37 @@
 'use client';
 import { ArrowDownLinear, ShoppingCartBroken } from 'vuesax-icon-pack';
 import { useState } from 'react';
-import type { MockOrderReceiver } from '@/domains/order/order.api';
-import type {
-  OrderDeliveryMethod,
-  OrderOption,
-} from '@/domains/order/order.types';
+import type { OrderDeliveryMethod, OrderReceiver } from '@/domains/order/order.types';
 import { cn } from '@/lib/utils';
 import { AccordionSection } from './accordion-section';
+
 interface ShippingOptionsProps {
   deliveryMethod: OrderDeliveryMethod | null;
   onDeliveryMethodChange: (method: OrderDeliveryMethod) => void;
-  pickupLocations: OrderOption[];
-  shippingOptions: OrderOption[];
-  receiver: MockOrderReceiver;
-  onReceiverChange: (receiver: MockOrderReceiver) => void;
+  receiver: OrderReceiver;
+  onReceiverChange: (receiver: OrderReceiver) => void;
   submitted?: boolean;
 }
+
 const deliveryLabels: Record<OrderDeliveryMethod, string> = {
   pickup: 'Ambil di ITB',
   shipping: 'Diantar',
 };
+
 const INPUT_CLASS =
   'w-full rounded-lg border bg-[#F1F7FC] px-3 py-2.5 text-sm text-[#022C3F] placeholder:text-[#022C3F]/40 outline-none focus:ring-2 focus:ring-[#FFF3B8]/60';
+
 export function ShippingOptions({
   deliveryMethod,
   onDeliveryMethodChange,
-  pickupLocations,
-  shippingOptions,
   receiver,
   onReceiverChange,
   submitted = false,
 }: ShippingOptionsProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const update = (patch: Partial<MockOrderReceiver>) =>
+  const update = (patch: Partial<OrderReceiver>) =>
     onReceiverChange({ ...receiver, ...patch });
+
   return (
     <AccordionSection icon={<ShoppingCartBroken size={18} />} title="Opsi Pengiriman">
       <div className="space-y-3">
@@ -47,9 +44,7 @@ export function ShippingOptions({
             }`}
           >
             <span className="font-[Geom]">
-              {deliveryMethod
-                ? deliveryLabels[deliveryMethod]
-                : 'Pilih metode pengiriman'}
+              {deliveryMethod ? deliveryLabels[deliveryMethod] : 'Pilih metode pengiriman'}
             </span>
             <ArrowDownLinear
               size={14}
@@ -85,94 +80,39 @@ export function ShippingOptions({
             ))}
           </div>
           {submitted && !deliveryMethod && (
-            <span className="font-[Geom] text-[10px] text-red-400">
-              Pilih metode pengiriman
-            </span>
+            <span className="font-[Geom] text-[10px] text-red-400">Pilih metode pengiriman</span>
           )}
         </div>
 
-        {deliveryMethod === 'pickup' && (
-          <div className="space-y-2">
-            <p className="font-[Geom] text-xs text-white/60">
-              Silakan pilih lokasi pengambilan:
-            </p>
-            {pickupLocations.map((loc) => (
-              <label
-                key={loc.value}
-                className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#FFF3B8]/30 bg-white/10 px-3 py-2.5 text-sm has-checked:border-[#FFF3B8] has-checked:bg-[#FFF3B8]/20"
-              >
-                <input
-                  type="radio"
-                  name="pickup_location"
-                  value={loc.value}
-                  checked={receiver.pickup_location === loc.value}
-                  onChange={(e) => update({ pickup_location: e.target.value })}
-                  className="size-4 accent-[#FFF3B8]"
-                />
-                <span className="font-[Geom] text-white">{loc.label}</span>
-              </label>
-            ))}
-            {submitted && deliveryMethod === 'pickup' && receiver.pickup_location.trim() === '' && (
-              <span className="font-[Geom] text-[10px] text-red-400">
-                Pilih lokasi pengambilan
-              </span>
-            )}
-          </div>
-        )}
-
-        {deliveryMethod === 'shipping' && (
-          <div className="space-y-3">
-            <label className="flex flex-col gap-1.5">
-              <span className="font-[Geom] text-xs font-semibold uppercase tracking-wide text-white">
-                Alamat: <span className="text-red-400">*</span>
-              </span>
-              <textarea
-                value={receiver.address}
-                onChange={(e) => update({ address: e.target.value })}
-                placeholder="Masukkan alamat lengkap..."
-                rows={3}
-                className={`${INPUT_CLASS} resize-none ${submitted && receiver.address.trim() === '' ? 'border-red-400' : 'border-[#FFF3B8]/50'}`}
-              />
-              {submitted && receiver.address.trim() === '' && (
-                <span className="font-[Geom] text-[10px] text-red-400">
-                  Alamat wajib diisi
-                </span>
-              )}
-              <span className="font-[Geom] text-[10px] leading-relaxed text-white/40">
-                *Note: beban ongkir akan diberitahukan oleh panitia via chat WhatsApp;
-              </span>
-            </label>
-
-            <p className="font-[Geom] text-xs text-white/60">
-              Silakan pilih opsi pengiriman:
-            </p>
-            {shippingOptions.map((opt) => (
-              <label
-                key={opt.value}
-                className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-sm bg-white/10 has-checked:border-[#FFF3B8] has-checked:bg-[#FFF3B8]/20 ${
-                  submitted && receiver.shipping_option.trim() === ''
-                    ? 'border-red-400'
-                    : 'border-[#FFF3B8]/30'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="shipping_option"
-                  value={opt.value}
-                  checked={receiver.shipping_option === opt.value}
-                  onChange={(e) => update({ shipping_option: e.target.value })}
-                  className="size-4 accent-[#FFF3B8]"
-                />
-                <span className="font-[Geom] text-white">{opt.label}</span>
-              </label>
-            ))}
-            {submitted && deliveryMethod === 'shipping' && receiver.shipping_option.trim() === '' && (
-              <span className="font-[Geom] text-[10px] text-red-400">
-                Pilih opsi pengiriman
-              </span>
-            )}
-          </div>
-        )}
+        <label className="flex flex-col gap-1.5">
+          <span className="font-[Geom] text-xs font-semibold uppercase tracking-wide text-white">
+            {deliveryMethod === 'pickup' ? 'Titik Ambil' : 'Alamat'}:{' '}
+            <span className="text-red-400">*</span>
+          </span>
+          <textarea
+            value={receiver.address}
+            onChange={(e) => update({ address: e.target.value })}
+            placeholder={
+              deliveryMethod === 'pickup'
+                ? 'Masukkan titik pengambilan...'
+                : 'Masukkan alamat lengkap...'
+            }
+            rows={3}
+            className={`${INPUT_CLASS} resize-none ${
+              submitted && receiver.address.trim() === '' ? 'border-red-400' : 'border-[#FFF3B8]/50'
+            }`}
+          />
+          {submitted && receiver.address.trim() === '' && (
+            <span className="font-[Geom] text-[10px] text-red-400">
+              {deliveryMethod === 'pickup' ? 'Titik ambil wajib diisi' : 'Alamat wajib diisi'}
+            </span>
+          )}
+          {deliveryMethod === 'shipping' && (
+            <span className="font-[Geom] text-[10px] leading-relaxed text-white/40">
+              *Note: beban ongkir akan diberitahukan oleh panitia via chat WhatsApp;
+            </span>
+          )}
+        </label>
       </div>
     </AccordionSection>
   );
