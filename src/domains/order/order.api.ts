@@ -53,11 +53,19 @@ export type GenerateQrResult = GenerateQrResponse['data'];
 
 type SdkResult = { data?: unknown; error?: unknown };
 
+/**
+ * Unwrap the backend's `{ success, data }` envelope into just the payload.
+ * The SDK's `response.data` is the full response body; the payload we return
+ * is nested under `.data`. On error, normalizes to ApiError.
+ */
 function unwrap<T>(response: SdkResult): T {
   const err = response.error;
-  if (err == null) return response.data as T;
-  // openapi-fetch returns the parsed error body on 4xx/5xx, but an Error
-  // instance on network failure. Normalize both into ApiError.
+  if (err == null) {
+    const body = response.data as { success: boolean; data: T };
+    return body.data;
+  }
+  // The SDK returns the parsed error body on 4xx/5xx, but an Error instance on
+  // network failure. Normalize both into ApiError.
   if (err instanceof Error) {
     throw new ApiError('NETWORK_ERROR', err.message);
   }
