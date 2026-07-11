@@ -9,12 +9,22 @@ import type {
   ProductListItem,
   ProductDetail,
   PaginationMeta,
+  BundleListItem,
+  BundleDetail,
 } from '@/api/types.gen';
 
 import {
   getApiV1Product,
   getApiV1ProductById,
+  getApiV1ProductBundles,
+  getApiV1ProductBundlesById,
 } from '@/api/sdk.gen';
+
+type BundleType =
+  | 'merchandise_bundle'
+  | 'kit_panitia_bundle'
+  | 'kit_panitia_add_on'
+  | 'kit_panitia_ala_carte';
 
 // ---------------------------------------------------------------------------
 // ApiError  —  mirrors the backend's ErrorResponse shape
@@ -36,6 +46,11 @@ export class ApiError extends Error {
 
 export interface ProductListResult {
   data: ProductListItem[];
+  meta: PaginationMeta;
+}
+
+export interface BundleListResult {
+  data: BundleListItem[];
   meta: PaginationMeta;
 }
 
@@ -132,6 +147,49 @@ export const api = {
 
     // Extract inner data from { success: true; data: ProductDetail }
     const body = response.data as { success: boolean; data: ProductDetail };
+    return body.data;
+  },
+
+  /**
+   * Bundle list — GET /api/v1/product/bundles.
+   *
+   * Role-aware: bundles targeted at panitia only appear with a panitia/admin token.
+   * Filters: type (comma-separated multi), search, page, limit.
+   */
+  async listBundles(filters?: {
+    type?: string;
+    search?: string;
+    page?: string;
+    limit?: string;
+  }): Promise<BundleListResult> {
+    const page = Math.max(1, Number(filters?.page) || 1);
+    const limit = Math.min(Math.max(1, Number(filters?.limit) || 20), 50);
+
+    const typeArray = filters?.type
+      ? (filters.type.split(',').map((t) => t.trim()) as BundleType[])
+      : undefined;
+
+    const response = await getApiV1ProductBundles({
+      query: {
+        page,
+        limit,
+        search: filters?.search || undefined,
+        type: typeArray,
+      },
+    });
+    const body = unwrap<{ success: boolean; data: BundleListItem[]; meta: PaginationMeta }>(
+      response,
+    );
+    return { data: body.data, meta: body.meta };
+  },
+
+  /**
+   * Bundle detail — GET /api/v1/product/bundles/{id}.
+   * Returns bundle composition (items + selectable variants per component).
+   */
+  async bundleDetail(id: string): Promise<BundleDetail> {
+    const response = await getApiV1ProductBundlesById({ path: { id } });
+    const body = unwrap<{ success: boolean; data: BundleDetail }>(response);
     return body.data;
   },
 };
