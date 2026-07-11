@@ -26,6 +26,9 @@ export const queryKeys = {
     detail: (id: string) => ['products', 'detail', id] as const,
     categories: (category?: string) =>
       ['products', 'categories', category].filter((v) => v !== undefined) as readonly unknown[],
+    bundleList: (filters?: Record<string, unknown>) =>
+      ['products', 'bundles', 'list', filters].filter((v) => v !== undefined) as readonly unknown[],
+    bundleDetail: (id: string) => ['products', 'bundles', 'detail', id] as const,
   },
 
   /** Order / transaction endpoints */

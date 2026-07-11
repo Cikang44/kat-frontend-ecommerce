@@ -21,8 +21,16 @@ export function clearStoredToken(): void {
   localStorage.removeItem(STORAGE_KEY);
 }
 
+// the browser must NEVER call the backend directly.
+// baseUrl is intentionally an empty string so every SDK request resolves to a
+// RELATIVE, same-origin URL (e.g. `/api/v1/auth/login`). Next.js rewrites
+// (next.config.ts) / vercel.json then proxy `/api/v1/*` to the real backend
+// server-side. Only the Next.js server ever knows the backend's real address.
+//
+// ⚠️ Do NOT change this to an absolute URL or `process.env.NEXT_PUBLIC_*` —
+// that would expose the backend origin to the browser and bypass the proxy.
 client.setConfig({
-  baseUrl: process.env.BACKEND_URL,
+  baseUrl: '',
 });
 
 client.interceptors.request.use((request) => {
