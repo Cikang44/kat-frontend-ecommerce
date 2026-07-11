@@ -28,8 +28,10 @@ export function OnboardingForm() {
   const onboardingToken = useAuthStore((s) => s.onboardingToken);
 
   const [role, setRole] = useState<Role | null>(null);
+  const [lineId, setLineId] = useState('');
+  const [phone, setPhone] = useState('');
   const [nim, setNim] = useState('');
-  const [divisionCode, setDivisionCode] = useState('');
+  const [kelompok, setKelompok] = useState('');
 
   // Redirect to login if no onboarding token
   useEffect(() => {
@@ -51,7 +53,10 @@ export function OnboardingForm() {
   }
 
   const isPanitia = role === 'panitia';
-  const canSubmit = role !== null && (!isPanitia || (nim.trim() && divisionCode.trim()));
+  // lineId + phone are required for every role; panitia additionally requires nim.
+  // divisionCode is no longer sent — a panitia's division comes from the seed.
+  const canSubmit =
+    role !== null && lineId.trim() !== '' && phone.trim() !== '' && (!isPanitia || nim.trim() !== '');
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -59,11 +64,11 @@ export function OnboardingForm() {
 
     onboarding.mutate(
       {
-        lineId: '', // Not collected in onboarding form
-        phone: '', // Not collected in onboarding form
+        lineId: lineId.trim(),
+        phone: phone.trim(),
         role,
-        nim: isPanitia ? nim : undefined,
-        divisionCode: isPanitia ? divisionCode : undefined,
+        nim: isPanitia ? nim.trim() : nim.trim() || undefined,
+        kelompok: !isPanitia ? kelompok.trim() || undefined : undefined,
       },
       {
         onSuccess: () => {
@@ -127,35 +132,64 @@ export function OnboardingForm() {
           </label>
         </div>
 
-        {/* Extra fields for panitia */}
-        {role === 'panitia' && (
+        {/* Contact info — required for every role */}
+        {role !== null && (
           <div className="space-y-4 pt-2">
             <div className="space-y-1.5">
               <label className="text-sm font-extrabold text-white">
-                NIM<span className="text-red-500">*</span>
+                ID LINE<span className="text-red-500">*</span>
               </label>
               <Input
                 type="text"
-                placeholder="NIM"
-                value={nim}
-                onChange={(e) => setNim(e.target.value)}
+                placeholder="ID LINE"
+                value={lineId}
+                onChange={(e) => setLineId(e.target.value)}
                 required
                 className="border-transparent bg-white text-gray-900 placeholder:text-gray-400 focus-visible:border-blue-300 focus-visible:ring-blue-200"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-extrabold text-white">
-                Kode Bidang<span className="text-red-500">*</span>
+                Nomor Telepon<span className="text-red-500">*</span>
               </label>
               <Input
-                type="text"
-                placeholder="Kode Bidang"
-                value={divisionCode}
-                onChange={(e) => setDivisionCode(e.target.value)}
+                type="tel"
+                placeholder="08xxxxxxxxxx"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 required
                 className="border-transparent bg-white text-gray-900 placeholder:text-gray-400 focus-visible:border-blue-300 focus-visible:ring-blue-200"
               />
             </div>
+
+            {isPanitia ? (
+              <div className="space-y-1.5">
+                <label className="text-sm font-extrabold text-white">
+                  NIM<span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="NIM"
+                  value={nim}
+                  onChange={(e) => setNim(e.target.value)}
+                  required
+                  className="border-transparent bg-white text-gray-900 placeholder:text-gray-400 focus-visible:border-blue-300 focus-visible:ring-blue-200"
+                />
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label className="text-sm font-extrabold text-white">
+                  Nomor Kelompok <span className="text-white/50">(opsional)</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Nomor kelompok MaBa"
+                  value={kelompok}
+                  onChange={(e) => setKelompok(e.target.value)}
+                  className="border-transparent bg-white text-gray-900 placeholder:text-gray-400 focus-visible:border-blue-300 focus-visible:ring-blue-200"
+                />
+              </div>
+            )}
           </div>
         )}
 

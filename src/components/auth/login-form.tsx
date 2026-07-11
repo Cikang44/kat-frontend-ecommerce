@@ -1,7 +1,6 @@
 'use client';
 
 import { Eye, EyeOff } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -157,10 +156,9 @@ export function LoginForm() {
         </form>
 
         <p className="mt-6 text-center text-sm text-white">
-          Belum punya akun?{' '}
-          <Link href="/signup" className="font-extrabold text-[#FFE788] hover:underline">
-            Sign Up
-          </Link>
+          Massa umum: masuk pakai <span className="font-extrabold text-[#FFE788]">Google</span>.
+          <br />
+          Panitia/admin: gunakan email &amp; password.
         </p>
       </div>
     </>
