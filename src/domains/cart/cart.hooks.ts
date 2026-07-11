@@ -1,56 +1,100 @@
-import { useCartStore } from '@/lib/providers';
+'use client';
 
-import type { CartItem } from './cart.types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-/** All items currently in the cart. */
-export function useCartItems(): CartItem[] {
-  return useCartStore((s) => s.items);
-}
+import { api, type SelectedVariant } from './cart.api';
+import { queryKeys } from '@/lib/query-keys';
 
-/** Total quantity across every entry (for the navbar badge). */
-export function useCartTotalQuantity(): number {
-  return useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
-}
+// ---------------------------------------------------------------------------
+// Queries — fetch cart from backend (single source of truth)
+// ---------------------------------------------------------------------------
 
-/** Items that are checked and ready for checkout. */
-export function useCheckedItems(): CartItem[] {
-  return useCartStore((s) => s.items.filter((i) => i.checked));
-}
-
-/** Number of checked items. */
-export function useCheckedCount(): number {
-  return useCartStore((s) => s.items.filter((i) => i.checked).length);
-}
-
-/** Total price of all checked items (unit × quantity). */
-export function useCheckedTotalPrice(): number {
-  return useCartStore((s) =>
-    s.items.filter((i) => i.checked).reduce((sum, i) => sum + i.unitPrice * i.quantity, 0),
-  );
-}
-
-/** Whether every item is checked (for "select all"). */
-export function useAllChecked(): boolean {
-  return useCartStore((s) => s.items.length > 0 && s.items.every((i) => i.checked));
+export function useCartQuery() {
+  return useQuery({
+    queryKey: queryKeys.cart.all,
+    queryFn: () => api.getCart(),
+  });
 }
 
 /**
- * Aggregate quantity of a specific product across all its variants.
- * Used by product cards on the Product List page to display the shortcut
- * counter that stays in sync with the cart.
+ * Total cart quantity for the navbar badge.
+ * `enabled` gates the request so it doesn't fire (and 401) for logged-out users.
  */
-export function useProductCartQuantity(productId: string): number {
-  return useCartStore((s) =>
-    s.items.filter((i) => i.productId === productId).reduce((sum, i) => sum + i.quantity, 0),
-  );
+export function useCartCount(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: [...queryKeys.cart.all, 'count'],
+    queryFn: () => api.getCartCount(),
+    enabled: options?.enabled ?? true,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Mutations
+// ---------------------------------------------------------------------------
+
+/**
+ * Add a single product variant to the backend cart.
+ * On success, invalidates the cart query so the UI refreshes.
+ */
+export function useAddToCart() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ variantId, quantity }: { variantId: string; quantity: number }) =>
+      api.addVariant(variantId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
+    },
+  });
 }
 
 /**
- * Aggregate quantity of a specific variant across all matching entries.
- * Useful on the product detail page.
+ * Add a bundle (with chosen component variants) to the backend cart.
  */
-export function useVariantCartQuantity(variantId: string): number {
-  return useCartStore((s) =>
-    s.items.filter((i) => i.variantId === variantId).reduce((sum, i) => sum + i.quantity, 0),
-  );
+export function useAddBundleToCart() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      bundleId,
+      selectedVariants,
+      quantity,
+    }: {
+      bundleId: string;
+      selectedVariants: SelectedVariant[];
+      quantity: number;
+    }) => api.addBundle(bundleId, selectedVariants, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
+    },
+  });
+}
+
+/**
+ * Update the quantity of a backend cart item.
+ */
+export function useUpdateCartItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
+      api.updateCartItem(itemId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
+    },
+  });
+}
+
+/**
+ * Remove a backend cart item.
+ */
+export function useRemoveCartItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (itemId: string) => api.removeCartItem(itemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
+    },
+  });
 }

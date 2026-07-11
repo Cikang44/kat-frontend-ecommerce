@@ -1,10 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+import { useOnboarding } from '@/domains/auth/auth.hooks';
 import { useAuthStore } from '@/lib/providers';
 
 type Role = 'umum' | 'panitia';
@@ -22,29 +24,76 @@ const radioUnselected: React.CSSProperties = {
 
 export function OnboardingForm() {
   const router = useRouter();
-  const existingUser = useAuthStore((s) => s.user);
-  const setUser = useAuthStore((s) => s.setUser);
+  const onboarding = useOnboarding();
+  const onboardingToken = useAuthStore((s) => s.onboardingToken);
 
   const [role, setRole] = useState<Role | null>(null);
+  const [lineId, setLineId] = useState('');
+  const [phone, setPhone] = useState('');
   const [nim, setNim] = useState('');
-  const [divisionCode, setDivisionCode] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [kelompok, setKelompok] = useState('');
+
+  // Redirect to login if no onboarding token
+  useEffect(() => {
+    if (onboardingToken === null) {
+      router.replace('/login');
+    }
+  }, [onboardingToken, router]);
+
+  // Show loading while redirecting
+  if (onboardingToken === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner />
+          <p className="text-sm text-white/60">Mengalihkan ke login...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isPanitia = role === 'panitia';
+  // lineId + phone are required for every role; panitia additionally requires nim.
+  // divisionCode is no longer sent — a panitia's division comes from the seed.
+  const canSubmit =
+    role !== null && lineId.trim() !== '' && phone.trim() !== '' && (!isPanitia || nim.trim() !== '');
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!role) return;
 
-    setIsSubmitting(true);
+    onboarding.mutate(
+      {
+        lineId: lineId.trim(),
+        phone: phone.trim(),
+        role,
+        nim: isPanitia ? nim.trim() : nim.trim() || undefined,
+        kelompok: !isPanitia ? kelompok.trim() || undefined : undefined,
+      },
+      {
+        onSuccess: () => {
+          router.push('/products');
+        },
+      },
+    );
+  }
 
-    setUser({
-      id: existingUser?.id ?? `usr-${Date.now()}`,
-      name: existingUser?.name ?? 'User',
-      email: existingUser?.email ?? '',
-      role,
-      isOnboardingComplete: true,
-    });
-
-    router.push('/products');
+  if (onboarding.isError) {
+    return (
+      <div className="w-full max-w-md">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-sm text-red-700">
+            {onboarding.error?.message ?? 'Gagal menyelesaikan onboarding. Silakan coba lagi.'}
+          </p>
+        </div>
+        <Button
+          onClick={() => onboarding.reset()}
+          className="w-full bg-[#FFE788] text-[#133B79] hover:bg-[#f5dd6a]"
+        >
+          Coba Lagi
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -83,45 +132,74 @@ export function OnboardingForm() {
           </label>
         </div>
 
-        {/* Extra fields for panitia */}
-        {role === 'panitia' && (
+        {/* Contact info — required for every role */}
+        {role !== null && (
           <div className="space-y-4 pt-2">
             <div className="space-y-1.5">
               <label className="text-sm font-extrabold text-white">
-                NIM<span className="text-red-500">*</span>
+                ID LINE<span className="text-red-500">*</span>
               </label>
               <Input
                 type="text"
-                placeholder="NIM"
-                value={nim}
-                onChange={(e) => setNim(e.target.value)}
+                placeholder="ID LINE"
+                value={lineId}
+                onChange={(e) => setLineId(e.target.value)}
                 required
                 className="border-transparent bg-white text-gray-900 placeholder:text-gray-400 focus-visible:border-blue-300 focus-visible:ring-blue-200"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-extrabold text-white">
-                Kode Bidang<span className="text-red-500">*</span>
+                Nomor Telepon<span className="text-red-500">*</span>
               </label>
               <Input
-                type="text"
-                placeholder="Kode Bidang"
-                value={divisionCode}
-                onChange={(e) => setDivisionCode(e.target.value)}
+                type="tel"
+                placeholder="08xxxxxxxxxx"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 required
                 className="border-transparent bg-white text-gray-900 placeholder:text-gray-400 focus-visible:border-blue-300 focus-visible:ring-blue-200"
               />
             </div>
+
+            {isPanitia ? (
+              <div className="space-y-1.5">
+                <label className="text-sm font-extrabold text-white">
+                  NIM<span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="NIM"
+                  value={nim}
+                  onChange={(e) => setNim(e.target.value)}
+                  required
+                  className="border-transparent bg-white text-gray-900 placeholder:text-gray-400 focus-visible:border-blue-300 focus-visible:ring-blue-200"
+                />
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label className="text-sm font-extrabold text-white">
+                  Nomor Kelompok <span className="text-white/50">(opsional)</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Nomor kelompok MaBa"
+                  value={kelompok}
+                  onChange={(e) => setKelompok(e.target.value)}
+                  className="border-transparent bg-white text-gray-900 placeholder:text-gray-400 focus-visible:border-blue-300 focus-visible:ring-blue-200"
+                />
+              </div>
+            )}
           </div>
         )}
 
         <div className="pt-2">
           <Button
             type="submit"
-            disabled={!role || isSubmitting}
+            disabled={!canSubmit || onboarding.isPending}
             style={{
               fontFamily: "'Redzone', sans-serif",
-              ...(role
+              ...(canSubmit
                 ? {}
                 : {
                     backgroundColor: '#F9F6F3',
@@ -131,10 +209,17 @@ export function OnboardingForm() {
                   }),
             }}
             className={`w-full font-black transition-colors ${
-              role ? 'bg-[#FFE788] text-[#133B79] hover:bg-[#f5dd6a]' : 'cursor-not-allowed'
+              canSubmit ? 'bg-[#FFE788] text-[#133B79] hover:bg-[#f5dd6a]' : 'cursor-not-allowed'
             }`}
           >
-            Submit
+            {onboarding.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner className="size-4" />
+                Memproses...
+              </span>
+            ) : (
+              'Submit'
+            )}
           </Button>
         </div>
       </form>

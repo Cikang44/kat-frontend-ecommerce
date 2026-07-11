@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useRef, useState } from 'react';
 import { ArrowLeftIcon1Linear, ArrowRightIcon1Linear } from 'vuesax-icon-pack';
 
@@ -50,13 +49,10 @@ export function ProductImageGallery({ images, productName, className }: ProductI
       {/* Main image */}
       <div className="group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-[20px] border border-[#996537] bg-[#fff3b8]">
         {selectedImage ? (
-          <Image
+          <img
             src={selectedImage.url}
             alt={productName}
-            fill
-            className="object-contain p-6"
-            sizes="(max-width: 768px) 100vw, 400px"
-            priority
+            className="absolute inset-0 h-full w-full object-contain p-6"
           />
         ) : (
           <div className="text-sm text-[#51446b]">No image</div>
@@ -100,12 +96,10 @@ export function ProductImageGallery({ images, productName, className }: ProductI
               selectedIndex === idx ? 'opacity-100' : 'opacity-70 hover:opacity-100',
             )}
           >
-            <Image
+            <img
               src={image.url}
               alt={`${productName} - ${idx + 1}`}
-              fill
-              className="object-contain p-2"
-              sizes="120px"
+              className="absolute inset-0 h-full w-full object-contain p-2"
             />
           </button>
         ))}

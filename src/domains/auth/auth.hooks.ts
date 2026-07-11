@@ -10,9 +10,6 @@ import {
 
 import type {
   LoginBody,
-  SignupBody,
-  VerifyOtpBody,
-  ResendOtpBody,
   OnboardingBody,
   ChangePasswordBody,
   PatchProfileBody,
@@ -23,7 +20,7 @@ import { setStoredToken, clearStoredToken } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/providers';
 import { queryKeys } from '@/lib/query-keys';
 
-import { api, type LoginResult, type SignupResult, type VerifyOtpResult } from './auth.api';
+import { api, type LoginResult, type LogoutResult, type ChangePasswordResult } from './auth.api';
 
 // ---------------------------------------------------------------------------
 // Mutations  —  write operations that change server-side auth state
@@ -49,48 +46,13 @@ export function useLogin(): UseMutationResult<LoginResult, Error, LoginBody> {
   });
 }
 
-/**
- * Signup — register a new user.
- * On success, the user is redirected to OTP verification.
- */
-export function useSignup(): UseMutationResult<SignupResult, Error, SignupBody> {
-  return useMutation({
-    mutationFn: (body) => api.signup(body),
-  });
-}
-
-/**
- * Verify OTP — confirm the 6-digit code sent during signup.
- * On success, persists the onboardingToken in the zustand store so it
- * survives page navigation to the onboarding page.
- */
-export function useVerifyOtp(): UseMutationResult<VerifyOtpResult, Error, VerifyOtpBody> {
-  const setOnboardingToken = useAuthStore((s) => s.setOnboardingToken);
-
-  return useMutation({
-    mutationFn: (body) => api.verifyOtp(body),
-    onSuccess: (result) => {
-      setOnboardingToken(result.onboardingToken);
-    },
-  });
-}
-
-/**
- * Resend OTP — request a new code if the previous one expired.
- */
-export function useResendOtp(): UseMutationResult<{ message: string }, Error, ResendOtpBody> {
-  return useMutation({
-    mutationFn: (body) => api.resendOtp(body),
-  });
-}
 
 /**
  * Onboarding — complete the profile after OTP verification.
  *
  * The real backend authenticates this request via the onboardingToken
- * Bearer header (set on the HTTP client before calling the SDK).
- * The mock API internally validates the session that was created when
- * verifyOtp succeeded, so no token needs to be passed here.
+ * Bearer header. We read the token from the zustand store and pass it
+ * to the API function which sets the Authorization header.
  *
  * On success, stores the access token, sets the user, and clears the
  * temporary onboardingToken from the zustand store.
@@ -102,9 +64,15 @@ export function useOnboarding(): UseMutationResult<
 > {
   const setUser = useAuthStore((s) => s.setUser);
   const clearOnboardingToken = useAuthStore((s) => s.clearOnboardingToken);
+  const onboardingToken = useAuthStore((s) => s.onboardingToken);
 
   return useMutation({
-    mutationFn: (body) => api.onboarding(body),
+    mutationFn: (body) => {
+      if (!onboardingToken) {
+        throw new Error('Token onboarding tidak valid');
+      }
+      return api.onboarding(body, onboardingToken);
+    },
     onSuccess: (result) => {
       setStoredToken(result.accessToken);
       setUser(result.user);
@@ -117,7 +85,7 @@ export function useOnboarding(): UseMutationResult<
  * Logout — end the current session.
  * On success, clears the token, zustand state, and all query caches.
  */
-export function useLogout(): UseMutationResult<{ message: string }, Error, void> {
+export function useLogout(): UseMutationResult<LogoutResult, Error, void> {
   const queryClient = useQueryClient();
   const clearAuth = useAuthStore((s) => s.clearAuth);
 
@@ -136,7 +104,7 @@ export function useLogout(): UseMutationResult<{ message: string }, Error, void>
  * On success, all other sessions are invalidated (backend-side).
  */
 export function useChangePassword(): UseMutationResult<
-  { message: string },
+  ChangePasswordResult,
   Error,
   ChangePasswordBody
 > {

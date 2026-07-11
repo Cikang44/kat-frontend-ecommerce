@@ -1,12 +1,13 @@
 'use client';
 
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { ShoppingBagBroken, TagIcon2Broken } from 'vuesax-icon-pack';
 
 import type { ProductDetail } from '@/api/types.gen';
 import { Button } from '@/components/ui/button';
-import { useCartStore } from '@/lib/providers';
+import { useAddToCart } from '@/domains/cart/cart.hooks';
+import { useInitiateOrder } from '@/domains/order/order.hooks';
 import { formatPrice } from '@/lib/utils';
 
 import { BackButton } from './back-button';
@@ -19,8 +20,9 @@ interface ProductDetailCardProps {
 }
 
 export function ProductDetailCard({ product }: ProductDetailCardProps) {
-  // const router = useRouter();
-  const addItem = useCartStore((s) => s.addItem);
+  const router = useRouter();
+  const addToCart = useAddToCart();
+  const initiateOrder = useInitiateOrder();
 
   const sizes = useMemo(
     () => Array.from(new Set(product.variants.map((v) => v.size).filter((s) => s !== 'none'))),
@@ -31,49 +33,46 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
     [product.variants],
   );
 
+  const hasSelectableVariants = sizes.length > 0 || colors.length > 0;
+
   const [selectedSize, setSelectedSize] = useState<string>(sizes[0] ?? '');
   const [selectedColor, setSelectedColor] = useState<string>(colors[0] ?? '');
   const [quantity, setQuantity] = useState(1);
 
   const selectedVariant = useMemo(() => {
+    // If there are no selectable sizes/colors, use the first variant directly
+    if (!hasSelectableVariants) {
+      return product.variants[0] ?? null;
+    }
     return product.variants.find((v) => v.size === selectedSize && v.color === selectedColor);
-  }, [product.variants, selectedSize, selectedColor]);
+  }, [product.variants, selectedSize, selectedColor, hasSelectableVariants]);
 
   const subtotal = (selectedVariant?.finalPrice ?? product.basePrice) * quantity;
-  const primaryImage = product.images.find((img) => img.isPrimary) ?? product.images[0];
-
-  const buildCartItem = () => {
-    if (!selectedVariant || !primaryImage) return null;
-
-    return {
-      productId: product.id,
-      productName: product.name,
-      productImage: primaryImage,
-      basePrice: product.basePrice,
-      productType: product.type,
-      variantId: selectedVariant.id,
-      sleeveType: selectedVariant.sleeveType,
-      color: selectedVariant.color || null,
-      size: selectedVariant.size,
-      priceModifier: selectedVariant.priceModifier,
-      stock: selectedVariant.stock,
-      unitPrice: selectedVariant.finalPrice,
-      quantity,
-    };
-  };
 
   const handleAddToCart = () => {
-    const item = buildCartItem();
-    if (!item) return;
-    addItem(item);
+    if (!selectedVariant) return;
+    addToCart.mutate({ variantId: selectedVariant.id, quantity });
   };
 
-  // const handleBuyNow = () => {
-  //   const item = buildCartItem();
-  //   if (!item) return;
-  //   addItem(item);
-  //   router.push('/checkout');
-  // };
+  const handleBuyNow = () => {
+    if (!selectedVariant) return;
+    addToCart.mutate(
+      { variantId: selectedVariant.id, quantity },
+      {
+        onSuccess: (result) => {
+          const serverId = result.item.id;
+          initiateOrder.mutate(
+            { cart_item_ids: [serverId] },
+            {
+              onSuccess: (orderResult) => {
+                router.push(`/checkout/${orderResult.order_id}`);
+              },
+            },
+          );
+        },
+      },
+    );
+  };
 
   return (
     <div className="mx-auto flex w-full flex-col gap-5">
@@ -95,13 +94,15 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
               <p className="text-ink font-['Geom'] text-sm leading-5">{product.description}</p>
             </div>
 
-            <VariantSelector
-              variants={product.variants}
-              selectedSize={selectedSize}
-              selectedColor={selectedColor}
-              onSelectSize={setSelectedSize}
-              onSelectColor={setSelectedColor}
-            />
+            {hasSelectableVariants && (
+              <VariantSelector
+                variants={product.variants}
+                selectedSize={selectedSize}
+                selectedColor={selectedColor}
+                onSelectSize={setSelectedSize}
+                onSelectColor={setSelectedColor}
+              />
+            )}
           </div>
         </div>
 
@@ -122,21 +123,20 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
               type="button"
               variant="outline"
               onClick={handleAddToCart}
-              disabled={!selectedVariant}
+              disabled={!selectedVariant || addToCart.isPending}
               className="border-gold text-gold hover:bg-gold/10 h-14 w-full gap-3 rounded-[15px] border-2 bg-transparent font-['Geom'] text-xl font-bold disabled:opacity-50"
             >
-              Tambah ke Keranjang
+              {addToCart.isPending ? 'Menambahkan...' : 'Tambah ke Keranjang'}
               <ShoppingBagBroken className="size-5" />
             </Button>
 
             <Button
               type="button"
-              disabled={true}
-              // onClick={handleBuyNow}
-              // disabled={!selectedVariant}
+              onClick={handleBuyNow}
+              disabled={!selectedVariant || addToCart.isPending || initiateOrder.isPending}
               className="border-gold bg-gold text-navy-deep hover:bg-gold/90 h-14 w-full gap-3 rounded-[15px] border-2 font-['Geom'] text-xl font-bold disabled:opacity-50"
             >
-              Beli Langsung
+              {initiateOrder.isPending ? 'Memproses...' : 'Beli Langsung'}
               <TagIcon2Broken className="size-5" />
             </Button>
           </div>
@@ -171,14 +171,16 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
                 </p>
               </div>
 
-              <VariantSelector
-                variants={product.variants}
-                selectedSize={selectedSize}
-                selectedColor={selectedColor}
-                onSelectSize={setSelectedSize}
-                onSelectColor={setSelectedColor}
-                className="text-2xl"
-              />
+              {hasSelectableVariants && (
+                <VariantSelector
+                  variants={product.variants}
+                  selectedSize={selectedSize}
+                  selectedColor={selectedColor}
+                  onSelectSize={setSelectedSize}
+                  onSelectColor={setSelectedColor}
+                  className="text-2xl"
+                />
+              )}
 
               <div className="bg-navy flex flex-col gap-8 rounded-[15px] border-4 border-white/50 p-6">
                 <div className="flex flex-col gap-4">
@@ -204,21 +206,20 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
                       type="button"
                       variant="outline"
                       onClick={handleAddToCart}
-                      disabled={!selectedVariant}
+                      disabled={!selectedVariant || addToCart.isPending}
                       className="border-gold text-gold hover:bg-gold/10 h-[76px] flex-1 gap-5 rounded-[15px] border-2 bg-transparent font-['Geom'] text-xl font-bold disabled:opacity-50"
                     >
-                      Tambah ke Keranjang
+                      {addToCart.isPending ? 'Menambahkan...' : 'Tambah ke Keranjang'}
                       <ShoppingBagBroken className="size-5" />
                     </Button>
 
                     <Button
                       type="button"
-                      disabled={true}
-                      // onClick={handleBuyNow}
-                      // disabled={!selectedVariant}
+                      onClick={handleBuyNow}
+                      disabled={!selectedVariant || addToCart.isPending || initiateOrder.isPending}
                       className="border-gold bg-gold text-navy-deep hover:bg-gold/90 h-[76px] flex-1 gap-5 rounded-[15px] border-2 font-['Geom'] text-xl font-bold disabled:opacity-50"
                     >
-                      Beli Langsung
+                      {initiateOrder.isPending ? 'Memproses...' : 'Beli Langsung'}
                       <TagIcon2Broken className="size-5" />
                     </Button>
                   </div>

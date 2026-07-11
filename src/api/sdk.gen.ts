@@ -2,81 +2,20 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type {
-  GetApiV1AdminProductsCategoriesData,
-  GetApiV1AdminProductsCategoriesErrors,
-  GetApiV1AdminProductsCategoriesResponses,
-  GetApiV1AdminProductsData,
-  GetApiV1AdminProductsErrors,
-  GetApiV1AdminProductsResponses,
-  GetApiV1HealthData,
-  GetApiV1HealthResponses,
-  GetApiV1ProductCategoriesData,
-  GetApiV1ProductCategoriesErrors,
-  GetApiV1ProductCategoriesResponses,
-  GetApiV1ProductCollabData,
-  GetApiV1ProductCollabErrors,
-  GetApiV1ProductCollabResponses,
-  GetApiV1ProductIdData,
-  GetApiV1ProductIdErrors,
-  GetApiV1ProductIdResponses,
-  GetApiV1ProductMerchData,
-  GetApiV1ProductMerchErrors,
-  GetApiV1ProductMerchResponses,
-  GetApiV1ProductPanitiaData,
-  GetApiV1ProductPanitiaErrors,
-  GetApiV1ProductPanitiaResponses,
-  GetApiV1UserProfileData,
-  GetApiV1UserProfileErrors,
-  GetApiV1UserProfileIsAdminData,
-  GetApiV1UserProfileIsAdminErrors,
-  GetApiV1UserProfileIsAdminResponses,
-  GetApiV1UserProfileResponses,
-  PatchApiV1UserProfileData,
-  PatchApiV1UserProfileErrors,
-  PatchApiV1UserProfileResponses,
-  PostApiV1AuthChangePasswordData,
-  PostApiV1AuthChangePasswordErrors,
-  PostApiV1AuthChangePasswordResponses,
-  PostApiV1AuthLoginData,
-  PostApiV1AuthLoginErrors,
-  PostApiV1AuthLoginResponses,
-  PostApiV1AuthLogoutData,
-  PostApiV1AuthLogoutErrors,
-  PostApiV1AuthLogoutResponses,
-  PostApiV1AuthOnboardingData,
-  PostApiV1AuthOnboardingErrors,
-  PostApiV1AuthOnboardingResponses,
-  PostApiV1AuthRefreshTokenData,
-  PostApiV1AuthRefreshTokenErrors,
-  PostApiV1AuthRefreshTokenResponses,
-  PostApiV1AuthResendOtpData,
-  PostApiV1AuthResendOtpErrors,
-  PostApiV1AuthResendOtpResponses,
-  PostApiV1AuthSignupData,
-  PostApiV1AuthSignupErrors,
-  PostApiV1AuthSignupResponses,
-  PostApiV1AuthVerifyOtpData,
-  PostApiV1AuthVerifyOtpErrors,
-  PostApiV1AuthVerifyOtpResponses,
-} from './types.gen';
+import type { DeleteApiV1CartByItemIdData, DeleteApiV1CartByItemIdErrors, DeleteApiV1CartByItemIdResponses, GetApiV1AdminDashboardItemsData, GetApiV1AdminDashboardItemsErrors, GetApiV1AdminDashboardItemsResponses, GetApiV1AdminDashboardTransactionsData, GetApiV1AdminDashboardTransactionsErrors, GetApiV1AdminDashboardTransactionsResponses, GetApiV1AdminProductsCategoriesData, GetApiV1AdminProductsCategoriesErrors, GetApiV1AdminProductsCategoriesResponses, GetApiV1AdminProductsData, GetApiV1AdminProductsErrors, GetApiV1AdminProductsResponses, GetApiV1AuthGoogleCallbackData, GetApiV1AuthGoogleCallbackErrors, GetApiV1AuthGoogleData, GetApiV1AuthGoogleErrors, GetApiV1CartCountData, GetApiV1CartCountErrors, GetApiV1CartCountResponses, GetApiV1CartData, GetApiV1CartErrors, GetApiV1CartResponses, GetApiV1HealthData, GetApiV1HealthResponses, GetApiV1OrderByOrderIdCheckoutData, GetApiV1OrderByOrderIdCheckoutErrors, GetApiV1OrderByOrderIdCheckoutResponses, GetApiV1OrderByOrderIdData, GetApiV1OrderByOrderIdErrors, GetApiV1OrderByOrderIdResponses, GetApiV1OrderHistoryData, GetApiV1OrderHistoryErrors, GetApiV1OrderHistoryResponses, GetApiV1PaymentByOrderIdData, GetApiV1PaymentByOrderIdErrors, GetApiV1PaymentByOrderIdResponses, GetApiV1PaymentByOrderIdStatusData, GetApiV1PaymentByOrderIdStatusErrors, GetApiV1PaymentByOrderIdStatusResponses, GetApiV1PaymentFeeData, GetApiV1PaymentFeeErrors, GetApiV1PaymentFeeResponses, GetApiV1PaymentMethodsData, GetApiV1PaymentMethodsErrors, GetApiV1PaymentMethodsResponses, GetApiV1ProductBundlesByIdData, GetApiV1ProductBundlesByIdErrors, GetApiV1ProductBundlesByIdResponses, GetApiV1ProductBundlesData, GetApiV1ProductBundlesResponses, GetApiV1ProductByIdData, GetApiV1ProductByIdErrors, GetApiV1ProductByIdResponses, GetApiV1ProductData, GetApiV1ProductResponses, GetApiV1UserProfileData, GetApiV1UserProfileErrors, GetApiV1UserProfileIsAdminData, GetApiV1UserProfileIsAdminErrors, GetApiV1UserProfileIsAdminResponses, GetApiV1UserProfileResponses, PatchApiV1AdminHandOverConfirmByTransactionIdData, PatchApiV1AdminHandOverConfirmByTransactionIdErrors, PatchApiV1AdminHandOverConfirmByTransactionIdResponses, PatchApiV1CartByItemIdData, PatchApiV1CartByItemIdErrors, PatchApiV1CartByItemIdResponses, PatchApiV1UserProfileData, PatchApiV1UserProfileErrors, PatchApiV1UserProfileResponses, PostApiV1AdminHandOverScanData, PostApiV1AdminHandOverScanErrors, PostApiV1AdminHandOverScanResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthLogoutData, PostApiV1AuthLogoutErrors, PostApiV1AuthLogoutResponses, PostApiV1AuthOnboardingData, PostApiV1AuthOnboardingErrors, PostApiV1AuthOnboardingResponses, PostApiV1AuthRefreshTokenData, PostApiV1AuthRefreshTokenErrors, PostApiV1AuthRefreshTokenResponses, PostApiV1AuthResendOtpData, PostApiV1AuthResendOtpErrors, PostApiV1AuthResendOtpResponses, PostApiV1AuthSignupData, PostApiV1AuthSignupErrors, PostApiV1AuthSignupResponses, PostApiV1AuthVerifyOtpData, PostApiV1AuthVerifyOtpErrors, PostApiV1AuthVerifyOtpResponses, PostApiV1CartData, PostApiV1CartErrors, PostApiV1CartResponses, PostApiV1OrderByOrderIdGenerateQrData, PostApiV1OrderByOrderIdGenerateQrErrors, PostApiV1OrderByOrderIdGenerateQrResponses, PostApiV1OrderConfirmData, PostApiV1OrderConfirmErrors, PostApiV1OrderConfirmResponses, PostApiV1OrderInitiateData, PostApiV1OrderInitiateErrors, PostApiV1OrderInitiateResponses, PostApiV1PaymentByOrderIdInitiateData, PostApiV1PaymentByOrderIdInitiateErrors, PostApiV1PaymentByOrderIdInitiateResponses, PostApiV1PaymentWebhookNotificationData, PostApiV1PaymentWebhookNotificationErrors, PostApiV1PaymentWebhookNotificationResponses } from './types.gen';
 
-export type Options<
-  TData extends TDataShape = TDataShape,
-  ThrowOnError extends boolean = boolean,
-  TResponse = unknown,
-> = Options2<TData, ThrowOnError, TResponse> & {
-  /**
-   * You can provide a client instance returned by `createClient()` instead of
-   * individual options. This might be also useful if you want to implement a
-   * custom client.
-   */
-  client?: Client;
-  /**
-   * You can pass arbitrary values through the `meta` object. This can be
-   * used to access values that aren't defined as part of the SDK function.
-   */
-  meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
+    /**
+     * You can provide a client instance returned by `createClient()` instead of
+     * individual options. This might be also useful if you want to implement a
+     * custom client.
+     */
+    client?: Client;
+    /**
+     * You can pass arbitrary values through the `meta` object. This can be
+     * used to access values that aren't defined as part of the SDK function.
+     */
+    meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
 /**
@@ -84,458 +23,577 @@ export type Options<
  *
  * Mendaftarkan akun baru dengan nama, email, dan password. Setelah berhasil, OTP 6 digit dikirim ke email yang didaftarkan. OTP berlaku 10 menit. Rate limit: 3 request per jam per IP.
  */
-export const postApiV1AuthSignup = <ThrowOnError extends boolean = false>(
-  options: Options<PostApiV1AuthSignupData, ThrowOnError>,
-): RequestResult<PostApiV1AuthSignupResponses, PostApiV1AuthSignupErrors, ThrowOnError> =>
-  (options.client ?? client).post<
-    PostApiV1AuthSignupResponses,
-    PostApiV1AuthSignupErrors,
-    ThrowOnError
-  >({
+export const postApiV1AuthSignup = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthSignupData, ThrowOnError>): RequestResult<PostApiV1AuthSignupResponses, PostApiV1AuthSignupErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1AuthSignupResponses, PostApiV1AuthSignupErrors, ThrowOnError>({
     url: '/api/v1/auth/signup',
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Login pengguna
  *
- * Autentikasi dengan email dan password. Mengembalikan access token (15 menit) di body dan refresh token (7 hari) via HTTP-only cookie (`refresh_token`). Pesan error sengaja dibuat generik untuk mencegah user enumeration. Rate limit: 5 percobaan per 15 menit per IP/akun.
+ * Autentikasi dengan email dan password. Mengembalikan access token (15 menit) di body dan refresh token (7 hari) via HTTP-only cookie (`refresh_token`). Akun yang belum onboarding tidak menerima access token reguler. Pesan error kredensial sengaja dibuat generik untuk mencegah user enumeration. Rate limit: 5 percobaan per 15 menit per IP/akun.
  */
-export const postApiV1AuthLogin = <ThrowOnError extends boolean = false>(
-  options: Options<PostApiV1AuthLoginData, ThrowOnError>,
-): RequestResult<PostApiV1AuthLoginResponses, PostApiV1AuthLoginErrors, ThrowOnError> =>
-  (options.client ?? client).post<
-    PostApiV1AuthLoginResponses,
-    PostApiV1AuthLoginErrors,
-    ThrowOnError
-  >({
+export const postApiV1AuthLogin = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthLoginData, ThrowOnError>): RequestResult<PostApiV1AuthLoginResponses, PostApiV1AuthLoginErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1AuthLoginResponses, PostApiV1AuthLoginErrors, ThrowOnError>({
     url: '/api/v1/auth/login',
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Mulai login Google
+ *
+ * Redirect user ke halaman Google OAuth. Dipakai frontend untuk login/register massa umum. Frontend cukup membuka endpoint ini di browser.
+ */
+export const getApiV1AuthGoogle = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AuthGoogleData, ThrowOnError>): RequestResult<unknown, GetApiV1AuthGoogleErrors, ThrowOnError> => (options?.client ?? client).get<unknown, GetApiV1AuthGoogleErrors, ThrowOnError>({ url: '/api/v1/auth/google', ...options });
+
+/**
+ * Callback Google OAuth
+ *
+ * Endpoint callback untuk Google OAuth. Google akan memanggil endpoint ini dengan query `code` dan `state`. Jika user umum belum onboarding, backend redirect ke halaman onboarding frontend dengan onboardingToken. Jika sudah onboarding, backend set refresh cookie dan redirect ke halaman success frontend dengan accessToken.
+ */
+export const getApiV1AuthGoogleCallback = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AuthGoogleCallbackData, ThrowOnError>): RequestResult<unknown, GetApiV1AuthGoogleCallbackErrors, ThrowOnError> => (options?.client ?? client).get<unknown, GetApiV1AuthGoogleCallbackErrors, ThrowOnError>({ url: '/api/v1/auth/google/callback', ...options });
 
 /**
  * Verifikasi OTP email
  *
  * Memverifikasi kode OTP 6 digit yang dikirim ke email saat signup. OTP berlaku 10 menit. Setelah berhasil, mengembalikan `onboardingToken` yang digunakan sebagai Bearer token di endpoint POST /auth/onboarding.
  */
-export const postApiV1AuthVerifyOtp = <ThrowOnError extends boolean = false>(
-  options: Options<PostApiV1AuthVerifyOtpData, ThrowOnError>,
-): RequestResult<PostApiV1AuthVerifyOtpResponses, PostApiV1AuthVerifyOtpErrors, ThrowOnError> =>
-  (options.client ?? client).post<
-    PostApiV1AuthVerifyOtpResponses,
-    PostApiV1AuthVerifyOtpErrors,
-    ThrowOnError
-  >({
+export const postApiV1AuthVerifyOtp = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthVerifyOtpData, ThrowOnError>): RequestResult<PostApiV1AuthVerifyOtpResponses, PostApiV1AuthVerifyOtpErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1AuthVerifyOtpResponses, PostApiV1AuthVerifyOtpErrors, ThrowOnError>({
     url: '/api/v1/auth/verify-otp',
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Kirim ulang OTP
  *
  * Mengirimkan ulang kode OTP ke email yang belum terverifikasi. OTP baru akan menonaktifkan OTP lama. Rate limit: 3 request per jam per IP.
  */
-export const postApiV1AuthResendOtp = <ThrowOnError extends boolean = false>(
-  options: Options<PostApiV1AuthResendOtpData, ThrowOnError>,
-): RequestResult<PostApiV1AuthResendOtpResponses, PostApiV1AuthResendOtpErrors, ThrowOnError> =>
-  (options.client ?? client).post<
-    PostApiV1AuthResendOtpResponses,
-    PostApiV1AuthResendOtpErrors,
-    ThrowOnError
-  >({
+export const postApiV1AuthResendOtp = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthResendOtpData, ThrowOnError>): RequestResult<PostApiV1AuthResendOtpResponses, PostApiV1AuthResendOtpErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1AuthResendOtpResponses, PostApiV1AuthResendOtpErrors, ThrowOnError>({
     url: '/api/v1/auth/resend-otp',
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Perbarui access token
  *
  * Menggunakan refresh token dari HTTP-only cookie `refresh_token` untuk mendapatkan access token baru. Refresh token di-rotate: cookie baru dengan token baru diset, token lama dinonaktifkan.
  */
-export const postApiV1AuthRefreshToken = <ThrowOnError extends boolean = false>(
-  options?: Options<PostApiV1AuthRefreshTokenData, ThrowOnError>,
-): RequestResult<
-  PostApiV1AuthRefreshTokenResponses,
-  PostApiV1AuthRefreshTokenErrors,
-  ThrowOnError
-> =>
-  (options?.client ?? client).post<
-    PostApiV1AuthRefreshTokenResponses,
-    PostApiV1AuthRefreshTokenErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        in: 'cookie',
-        name: 'refresh_token',
-        type: 'apiKey',
-      },
-    ],
+export const postApiV1AuthRefreshToken = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1AuthRefreshTokenData, ThrowOnError>): RequestResult<PostApiV1AuthRefreshTokenResponses, PostApiV1AuthRefreshTokenErrors, ThrowOnError> => (options?.client ?? client).post<PostApiV1AuthRefreshTokenResponses, PostApiV1AuthRefreshTokenErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'refresh_token',
+            type: 'apiKey'
+        }],
     url: '/api/v1/auth/refresh-token',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Logout pengguna
  *
- * Menginvalidasi refresh token di server dan menghapus cookie `refresh_token`. Access token tetap berlaku hingga kedaluwarsa (15 menit). Untuk keamanan tinggi (mis. setelah change password), gunakan endpoint change-password yang menginvalidasi semua sesi.
+ * Mencabut access token yang digunakan, menginvalidasi refresh token terkait di server, dan menghapus cookie `refresh_token`. Access token yang telah dicabut tidak dapat digunakan kembali.
  */
-export const postApiV1AuthLogout = <ThrowOnError extends boolean = false>(
-  options?: Options<PostApiV1AuthLogoutData, ThrowOnError>,
-): RequestResult<PostApiV1AuthLogoutResponses, PostApiV1AuthLogoutErrors, ThrowOnError> =>
-  (options?.client ?? client).post<
-    PostApiV1AuthLogoutResponses,
-    PostApiV1AuthLogoutErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+export const postApiV1AuthLogout = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1AuthLogoutData, ThrowOnError>): RequestResult<PostApiV1AuthLogoutResponses, PostApiV1AuthLogoutErrors, ThrowOnError> => (options?.client ?? client).post<PostApiV1AuthLogoutResponses, PostApiV1AuthLogoutErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
     url: '/api/v1/auth/logout',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Ganti password
  *
  * Memperbarui password pengguna yang sedang login. Memerlukan verifikasi password lama. Password baru harus memenuhi kriteria kekuatan (min 8 karakter, huruf besar, huruf kecil, angka). Setelah berhasil, seluruh refresh token aktif pengguna dinonaktifkan (force logout semua device).
  */
-export const postApiV1AuthChangePassword = <ThrowOnError extends boolean = false>(
-  options: Options<PostApiV1AuthChangePasswordData, ThrowOnError>,
-): RequestResult<
-  PostApiV1AuthChangePasswordResponses,
-  PostApiV1AuthChangePasswordErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).post<
-    PostApiV1AuthChangePasswordResponses,
-    PostApiV1AuthChangePasswordErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+export const postApiV1AuthChangePassword = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthChangePasswordData, ThrowOnError>): RequestResult<PostApiV1AuthChangePasswordResponses, PostApiV1AuthChangePasswordErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1AuthChangePasswordResponses, PostApiV1AuthChangePasswordErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
     url: '/api/v1/auth/change-password',
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Selesaikan onboarding akun
  *
- * Melengkapi data profil setelah OTP terverifikasi. Memerlukan `onboardingToken` dari endpoint POST /auth/verify-otp sebagai Bearer token. Jika `role = panitia`, `nim` dan `divisionCode` wajib diisi dan divalidasi terhadap database. Setelah berhasil, mengembalikan access token permanen dan refresh token (cookie).
+ * Melengkapi data profil setelah OTP/Google terverifikasi. Memerlukan `onboardingToken` sebagai Bearer token. Frontend boleh mengirim shape body yang sama untuk semua role. Jika `role = umum`, backend memakai `lineId`, `phone`, `nim` opsional, dan `kelompok` opsional; `divisionCode` diabaikan. Jika `role = panitia`, akun harus sudah terdaftar sebagai panitia dari seed, backend memakai `lineId`, `phone`, dan `nim`; division dari seed dipertahankan dan `divisionCode` diabaikan. Setelah berhasil, mengembalikan access token permanen dan refresh token (cookie).
  */
-export const postApiV1AuthOnboarding = <ThrowOnError extends boolean = false>(
-  options: Options<PostApiV1AuthOnboardingData, ThrowOnError>,
-): RequestResult<PostApiV1AuthOnboardingResponses, PostApiV1AuthOnboardingErrors, ThrowOnError> =>
-  (options.client ?? client).post<
-    PostApiV1AuthOnboardingResponses,
-    PostApiV1AuthOnboardingErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'onboardingAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+export const postApiV1AuthOnboarding = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthOnboardingData, ThrowOnError>): RequestResult<PostApiV1AuthOnboardingResponses, PostApiV1AuthOnboardingErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1AuthOnboardingResponses, PostApiV1AuthOnboardingErrors, ThrowOnError>({
+    security: [{
+            key: 'onboardingAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
     url: '/api/v1/auth/onboarding',
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Ambil profil pengguna yang sedang login
  *
  * Mengembalikan data lengkap profil pengguna berdasarkan access token. Untuk panitia, menyertakan data divisi. Endpoint ini aman digunakan untuk pre-fill form checkout.
  */
-export const getApiV1UserProfile = <ThrowOnError extends boolean = false>(
-  options?: Options<GetApiV1UserProfileData, ThrowOnError>,
-): RequestResult<GetApiV1UserProfileResponses, GetApiV1UserProfileErrors, ThrowOnError> =>
-  (options?.client ?? client).get<
-    GetApiV1UserProfileResponses,
-    GetApiV1UserProfileErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+export const getApiV1UserProfile = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserProfileData, ThrowOnError>): RequestResult<GetApiV1UserProfileResponses, GetApiV1UserProfileErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1UserProfileResponses, GetApiV1UserProfileErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
     url: '/api/v1/user/profile',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Perbarui data profil pengguna
  *
  * Memperbarui field profil yang dikirim (partial update - hanya field yang disertakan yang diubah). Field yang dapat diubah: name, lineId, phone. Email, role, kelompok, NIM, dan divisi panitia tidak dapat diubah mandiri.
  */
-export const patchApiV1UserProfile = <ThrowOnError extends boolean = false>(
-  options: Options<PatchApiV1UserProfileData, ThrowOnError>,
-): RequestResult<PatchApiV1UserProfileResponses, PatchApiV1UserProfileErrors, ThrowOnError> =>
-  (options.client ?? client).patch<
-    PatchApiV1UserProfileResponses,
-    PatchApiV1UserProfileErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+export const patchApiV1UserProfile = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UserProfileData, ThrowOnError>): RequestResult<PatchApiV1UserProfileResponses, PatchApiV1UserProfileErrors, ThrowOnError> => (options.client ?? client).patch<PatchApiV1UserProfileResponses, PatchApiV1UserProfileErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
     url: '/api/v1/user/profile',
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Cek apakah pengguna adalah admin
  *
  * Memeriksa apakah pengguna yang sedang login memiliki role admin. Berguna untuk kondisional rendering di frontend (menampilkan/menyembunyikan fitur admin).
  */
-export const getApiV1UserProfileIsAdmin = <ThrowOnError extends boolean = false>(
-  options?: Options<GetApiV1UserProfileIsAdminData, ThrowOnError>,
-): RequestResult<
-  GetApiV1UserProfileIsAdminResponses,
-  GetApiV1UserProfileIsAdminErrors,
-  ThrowOnError
-> =>
-  (options?.client ?? client).get<
-    GetApiV1UserProfileIsAdminResponses,
-    GetApiV1UserProfileIsAdminErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+export const getApiV1UserProfileIsAdmin = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserProfileIsAdminData, ThrowOnError>): RequestResult<GetApiV1UserProfileIsAdminResponses, GetApiV1UserProfileIsAdminErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1UserProfileIsAdminResponses, GetApiV1UserProfileIsAdminErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
     url: '/api/v1/user/profile/is-admin',
-    ...options,
-  });
+    ...options
+});
 
 /**
- * Daftar produk merchandise
+ * Daftar produk
  *
- * Mengambil daftar produk bertipe `merchandise`. Dapat diakses oleh semua pengguna (umum, panitia, admin). Mendukung paginasi, pencarian teks, dan filter kategori.
+ * Mengambil daftar produk dengan filter query `type`, `category`, `faculty`, dan `search`. Produk `kit_panitia` hanya dikembalikan untuk panitia/admin jika request menyertakan access token valid.
  */
-export const getApiV1ProductMerch = <ThrowOnError extends boolean = false>(
-  options?: Options<GetApiV1ProductMerchData, ThrowOnError>,
-): RequestResult<GetApiV1ProductMerchResponses, GetApiV1ProductMerchErrors, ThrowOnError> =>
-  (options?.client ?? client).get<
-    GetApiV1ProductMerchResponses,
-    GetApiV1ProductMerchErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
-    url: '/api/v1/product/merch',
-    ...options,
-  });
+export const getApiV1Product = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1ProductData, ThrowOnError>): RequestResult<GetApiV1ProductResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetApiV1ProductResponses, unknown, ThrowOnError>({ url: '/api/v1/product', ...options });
 
 /**
- * Daftar produk kit panitia
+ * Daftar bundle
  *
- * Mengambil daftar produk bertipe `kit_panitia`. **Hanya dapat diakses oleh pengguna dengan role `panitia` atau `admin`.** Pengguna dengan role `umum` akan mendapat error 403.
+ * Mengambil daftar bundle merch umum, kit panitia, add-on, dan ala carte. Bundle khusus panitia hanya terlihat jika request menyertakan token panitia/admin.
  */
-export const getApiV1ProductPanitia = <ThrowOnError extends boolean = false>(
-  options?: Options<GetApiV1ProductPanitiaData, ThrowOnError>,
-): RequestResult<GetApiV1ProductPanitiaResponses, GetApiV1ProductPanitiaErrors, ThrowOnError> =>
-  (options?.client ?? client).get<
-    GetApiV1ProductPanitiaResponses,
-    GetApiV1ProductPanitiaErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
-    url: '/api/v1/product/panitia',
-    ...options,
-  });
+export const getApiV1ProductBundles = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1ProductBundlesData, ThrowOnError>): RequestResult<GetApiV1ProductBundlesResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetApiV1ProductBundlesResponses, unknown, ThrowOnError>({ url: '/api/v1/product/bundles', ...options });
 
 /**
- * Daftar produk kolaborasi
+ * Detail bundle berdasarkan ID
  *
- * Mengambil daftar produk bertipe `collaboration`. Dapat diakses oleh umum, panitia, dan admin. Mendukung filter `faculty` untuk menyaring produk kolaborasi per fakultas.
+ * Mengambil detail bundle beserta komposisi produk dan varian yang dapat dipilih untuk setiap komponen.
  */
-export const getApiV1ProductCollab = <ThrowOnError extends boolean = false>(
-  options?: Options<GetApiV1ProductCollabData, ThrowOnError>,
-): RequestResult<GetApiV1ProductCollabResponses, GetApiV1ProductCollabErrors, ThrowOnError> =>
-  (options?.client ?? client).get<
-    GetApiV1ProductCollabResponses,
-    GetApiV1ProductCollabErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
-    url: '/api/v1/product/collab',
-    ...options,
-  });
-
-/**
- * Produk berdasarkan kategori
- *
- * Mengambil produk yang difilter berdasarkan kategori. Jika query `category` tidak disertakan, mengembalikan semua produk yang dapat diakses oleh role pengguna tersebut. Produk `kit_panitia` hanya dikembalikan untuk panitia/admin.
- */
-export const getApiV1ProductCategories = <ThrowOnError extends boolean = false>(
-  options?: Options<GetApiV1ProductCategoriesData, ThrowOnError>,
-): RequestResult<
-  GetApiV1ProductCategoriesResponses,
-  GetApiV1ProductCategoriesErrors,
-  ThrowOnError
-> =>
-  (options?.client ?? client).get<
-    GetApiV1ProductCategoriesResponses,
-    GetApiV1ProductCategoriesErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
-    url: '/api/v1/product/categories',
-    ...options,
-  });
+export const getApiV1ProductBundlesById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1ProductBundlesByIdData, ThrowOnError>): RequestResult<GetApiV1ProductBundlesByIdResponses, GetApiV1ProductBundlesByIdErrors, ThrowOnError> => (options.client ?? client).get<GetApiV1ProductBundlesByIdResponses, GetApiV1ProductBundlesByIdErrors, ThrowOnError>({ url: '/api/v1/product/bundles/{id}', ...options });
 
 /**
  * Detail produk berdasarkan ID
  *
- * Mengambil detail lengkap satu produk beserta semua gambar dan seluruh varian (sleeve type, warna, ukuran, harga final). Produk `kit_panitia` hanya dapat diakses oleh panitia/admin — pengguna umum mendapat error 403.
+ * Mengambil detail lengkap satu produk beserta semua gambar dan seluruh varian. Produk `kit_panitia` tidak terlihat oleh umum atau request tanpa token.
  */
-export const getApiV1ProductId = <ThrowOnError extends boolean = false>(
-  options: Options<GetApiV1ProductIdData, ThrowOnError>,
-): RequestResult<GetApiV1ProductIdResponses, GetApiV1ProductIdErrors, ThrowOnError> =>
-  (options.client ?? client).get<GetApiV1ProductIdResponses, GetApiV1ProductIdErrors, ThrowOnError>(
-    {
-      security: [
-        {
-          key: 'bearerAuth',
-          scheme: 'bearer',
-          type: 'http',
-        },
-      ],
-      url: '/api/v1/product/:id',
-      ...options,
-    },
-  );
+export const getApiV1ProductById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1ProductByIdData, ThrowOnError>): RequestResult<GetApiV1ProductByIdResponses, GetApiV1ProductByIdErrors, ThrowOnError> => (options.client ?? client).get<GetApiV1ProductByIdResponses, GetApiV1ProductByIdErrors, ThrowOnError>({ url: '/api/v1/product/{id}', ...options });
+
+/**
+ * Ambil total quantity item di cart
+ *
+ * Mengembalikan total quantity seluruh item cart milik user yang sedang login.
+ */
+export const getApiV1CartCount = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1CartCountData, ThrowOnError>): RequestResult<GetApiV1CartCountResponses, GetApiV1CartCountErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1CartCountResponses, GetApiV1CartCountErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/cart/count',
+    ...options
+});
+
+/**
+ * Ambil isi cart
+ *
+ * Mengambil seluruh isi cart milik user yang sedang login beserta summary total harga. Dipakai untuk halaman cart, badge navbar, dan sinkronisasi kuantitas.
+ */
+export const getApiV1Cart = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1CartData, ThrowOnError>): RequestResult<GetApiV1CartResponses, GetApiV1CartErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1CartResponses, GetApiV1CartErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/cart',
+    ...options
+});
+
+/**
+ * Tambah item ke cart
+ *
+ * Menambahkan item satuan berdasarkan variantId atau bundle berdasarkan bundleId. Untuk bundle yang berisi produk bervarian seperti kaos, kirim selectedVariants agar ukuran/varian komponen tersimpan. User umum tidak dapat menambahkan kit panitia.
+ */
+export const postApiV1Cart = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CartData, ThrowOnError>): RequestResult<PostApiV1CartResponses, PostApiV1CartErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1CartResponses, PostApiV1CartErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/cart',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Hapus item dari cart
+ *
+ * Menghapus satu item dari cart. Memastikan item milik user yang sedang login sebelum menghapus. Mengembalikan summary cart terbaru agar frontend dapat mengupdate total.
+ */
+export const deleteApiV1CartByItemId = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1CartByItemIdData, ThrowOnError>): RequestResult<DeleteApiV1CartByItemIdResponses, DeleteApiV1CartByItemIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteApiV1CartByItemIdResponses, DeleteApiV1CartByItemIdErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/cart/{itemId}',
+    ...options
+});
+
+/**
+ * Update quantity item di cart
+ *
+ * Mengubah quantity item yang sudah ada di cart. Quantity minimal 1. Untuk menghapus item, gunakan endpoint DELETE /cart/:itemId.
+ */
+export const patchApiV1CartByItemId = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1CartByItemIdData, ThrowOnError>): RequestResult<PatchApiV1CartByItemIdResponses, PatchApiV1CartByItemIdErrors, ThrowOnError> => (options.client ?? client).patch<PatchApiV1CartByItemIdResponses, PatchApiV1CartByItemIdErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/cart/{itemId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Buat draft checkout dari item cart terpilih
+ *
+ * Membuat draft order dari item cart yang dipilih tanpa menghapus item dari cart. Item dan harga disnapshot saat draft dibuat.
+ */
+export const postApiV1OrderInitiate = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderInitiateData, ThrowOnError>): RequestResult<PostApiV1OrderInitiateResponses, PostApiV1OrderInitiateErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1OrderInitiateResponses, PostApiV1OrderInitiateErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/order/initiate',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Ambil riwayat transaksi pengguna
+ *
+ * Mengembalikan seluruh order milik pengguna yang sedang login, diurutkan dari yang terbaru. Dipakai untuk halaman riwayat transaksi.
+ */
+export const getApiV1OrderHistory = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1OrderHistoryData, ThrowOnError>): RequestResult<GetApiV1OrderHistoryResponses, GetApiV1OrderHistoryErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1OrderHistoryResponses, GetApiV1OrderHistoryErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/order/history',
+    ...options
+});
+
+/**
+ * Ambil data draft checkout
+ *
+ * Mengambil data checkout draft untuk halaman checkout read-only sebelum user menekan tombol Bayar.
+ */
+export const getApiV1OrderByOrderIdCheckout = <ThrowOnError extends boolean = false>(options: Options<GetApiV1OrderByOrderIdCheckoutData, ThrowOnError>): RequestResult<GetApiV1OrderByOrderIdCheckoutResponses, GetApiV1OrderByOrderIdCheckoutErrors, ThrowOnError> => (options.client ?? client).get<GetApiV1OrderByOrderIdCheckoutResponses, GetApiV1OrderByOrderIdCheckoutErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/order/{orderId}/checkout',
+    ...options
+});
+
+/**
+ * Konfirmasi draft order menjadi order final
+ *
+ * Mengunci draft order menjadi order belum_bayar, menyimpan data penerima dan pembayaran, serta membuat expiry payment 24 jam dari waktu konfirmasi.
+ */
+export const postApiV1OrderConfirm = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderConfirmData, ThrowOnError>): RequestResult<PostApiV1OrderConfirmResponses, PostApiV1OrderConfirmErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1OrderConfirmResponses, PostApiV1OrderConfirmErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/order/confirm',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Ambil detail order
+ *
+ * Mengembalikan detail satu order beserta item-itemnya. Dipakai untuk halaman payment atau detail transaksi. Hanya pemilik order yang bisa mengakses.
+ */
+export const getApiV1OrderByOrderId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1OrderByOrderIdData, ThrowOnError>): RequestResult<GetApiV1OrderByOrderIdResponses, GetApiV1OrderByOrderIdErrors, ThrowOnError> => (options.client ?? client).get<GetApiV1OrderByOrderIdResponses, GetApiV1OrderByOrderIdErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/order/{orderId}',
+    ...options
+});
+
+/**
+ * Generate QR pickup untuk order yang sudah lunas
+ *
+ * Membuat QR code untuk pengambilan barang di lokasi. Hanya bisa dilakukan untuk order berstatus lunas. QR berlaku 1x24 jam; jika kadaluarsa, panggil endpoint ini lagi untuk generate ulang.
+ */
+export const postApiV1OrderByOrderIdGenerateQr = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderByOrderIdGenerateQrData, ThrowOnError>): RequestResult<PostApiV1OrderByOrderIdGenerateQrResponses, PostApiV1OrderByOrderIdGenerateQrErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1OrderByOrderIdGenerateQrResponses, PostApiV1OrderByOrderIdGenerateQrErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/order/{orderId}/generate-qr',
+    ...options
+});
+
+/**
+ * Hitung biaya payment gateway
+ *
+ * Menghitung biaya (fee) payment gateway berdasarkan metode pembayaran dan nominal. Fee bisa berupa nominal tetap (fixed) atau persentase.
+ */
+export const getApiV1PaymentFee = <ThrowOnError extends boolean = false>(options: Options<GetApiV1PaymentFeeData, ThrowOnError>): RequestResult<GetApiV1PaymentFeeResponses, GetApiV1PaymentFeeErrors, ThrowOnError> => (options.client ?? client).get<GetApiV1PaymentFeeResponses, GetApiV1PaymentFeeErrors, ThrowOnError>({ url: '/api/v1/payment/fee', ...options });
+
+/**
+ * Webhook notifikasi pembayaran
+ *
+ * Endpoint publik untuk menerima notifikasi dari Midtrans. Memverifikasi signature, lalu memperbarui status payment & order secara idempotent dalam satu transaksi.
+ */
+export const postApiV1PaymentWebhookNotification = <ThrowOnError extends boolean = false>(options: Options<PostApiV1PaymentWebhookNotificationData, ThrowOnError>): RequestResult<PostApiV1PaymentWebhookNotificationResponses, PostApiV1PaymentWebhookNotificationErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1PaymentWebhookNotificationResponses, PostApiV1PaymentWebhookNotificationErrors, ThrowOnError>({
+    url: '/api/v1/payment/webhook/notification',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Daftar metode pembayaran aktif
+ *
+ * Mengambil metode pembayaran aktif dari master data backend. Frontend memakai endpoint ini sebagai source of truth untuk opsi pembayaran.
+ */
+export const getApiV1PaymentMethods = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1PaymentMethodsData, ThrowOnError>): RequestResult<GetApiV1PaymentMethodsResponses, GetApiV1PaymentMethodsErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1PaymentMethodsResponses, GetApiV1PaymentMethodsErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/payment/methods',
+    ...options
+});
+
+/**
+ * Inisiasi pembayaran
+ *
+ * Membuat transaksi pembayaran ke gateway untuk sebuah order milik user. Jika sudah ada pembayaran yang belum dibayar, pembayaran tersebut dikembalikan tanpa membuat transaksi baru.
+ */
+export const postApiV1PaymentByOrderIdInitiate = <ThrowOnError extends boolean = false>(options: Options<PostApiV1PaymentByOrderIdInitiateData, ThrowOnError>): RequestResult<PostApiV1PaymentByOrderIdInitiateResponses, PostApiV1PaymentByOrderIdInitiateErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1PaymentByOrderIdInitiateResponses, PostApiV1PaymentByOrderIdInitiateErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/payment/{orderId}/initiate',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Polling status pembayaran
+ *
+ * Mengambil status pembayaran terkini sebuah order. Jika masih belum_bayar, sistem mengecek expiry lokal dan status terbaru dari payment gateway sebelum mengembalikan status ke frontend.
+ */
+export const getApiV1PaymentByOrderIdStatus = <ThrowOnError extends boolean = false>(options: Options<GetApiV1PaymentByOrderIdStatusData, ThrowOnError>): RequestResult<GetApiV1PaymentByOrderIdStatusResponses, GetApiV1PaymentByOrderIdStatusErrors, ThrowOnError> => (options.client ?? client).get<GetApiV1PaymentByOrderIdStatusResponses, GetApiV1PaymentByOrderIdStatusErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/payment/{orderId}/status',
+    ...options
+});
+
+/**
+ * Detail halaman pembayaran
+ *
+ * Menampilkan detail halaman pembayaran berdasarkan order id: ringkasan order, data pengiriman, dan detail latest payment (QRIS/transfer). Auto-expire jika sudah melewati batas waktu dan belum dibayar.
+ */
+export const getApiV1PaymentByOrderId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1PaymentByOrderIdData, ThrowOnError>): RequestResult<GetApiV1PaymentByOrderIdResponses, GetApiV1PaymentByOrderIdErrors, ThrowOnError> => (options.client ?? client).get<GetApiV1PaymentByOrderIdResponses, GetApiV1PaymentByOrderIdErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/payment/{orderId}',
+    ...options
+});
 
 /**
  * [Admin] Semua produk dengan statistik penjualan
  *
  * Mengambil daftar seluruh produk (termasuk `kit_panitia` dan produk nonaktif) beserta statistik penjualan per produk dan per varian. **Hanya dapat diakses oleh admin.** Data penjualan dihitung dari order dengan status `lunas` dan `diterima`. Mendukung filter tipe, kategori, pencarian teks, dan pengurutan berdasarkan metrik penjualan.
  */
-export const getApiV1AdminProducts = <ThrowOnError extends boolean = false>(
-  options?: Options<GetApiV1AdminProductsData, ThrowOnError>,
-): RequestResult<GetApiV1AdminProductsResponses, GetApiV1AdminProductsErrors, ThrowOnError> =>
-  (options?.client ?? client).get<
-    GetApiV1AdminProductsResponses,
-    GetApiV1AdminProductsErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+export const getApiV1AdminProducts = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AdminProductsData, ThrowOnError>): RequestResult<GetApiV1AdminProductsResponses, GetApiV1AdminProductsErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1AdminProductsResponses, GetApiV1AdminProductsErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
     url: '/api/v1/admin/products',
-    ...options,
-  });
+    ...options
+});
+
+/**
+ * [Admin] Dashboard item terjual per produk & varian
+ *
+ * Kontrak resmi sesuai PRD (`GET /admin/dashboard/items`): daftar produk beserta statistik penjualan (quantity sold, revenue) per produk dan per varian, mendukung filter tipe/kategori, pencarian teks, sorting, dan pagination. Endpoint ini memakai service dan response shape yang **sama persis** dengan `GET /admin/products` karena keduanya secara fungsional identik (statistik penjualan produk berdasarkan order berstatus `lunas`/`diterima`). Gunakan endpoint ini sebagai sumber kebenaran untuk kontrak frontend sesuai spec; `GET /admin/products` tetap tersedia untuk kompatibilitas mundur. **Hanya dapat diakses oleh admin.**
+ */
+export const getApiV1AdminDashboardItems = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AdminDashboardItemsData, ThrowOnError>): RequestResult<GetApiV1AdminDashboardItemsResponses, GetApiV1AdminDashboardItemsErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1AdminDashboardItemsResponses, GetApiV1AdminDashboardItemsErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/admin/dashboard/items',
+    ...options
+});
 
 /**
  * [Admin] Produk per kategori dengan statistik penjualan
  *
  * Mengambil produk yang difilter berdasarkan kategori, disertai statistik penjualan. Jika query `category` tidak disertakan, mengembalikan semua produk dari semua kategori. **Hanya dapat diakses oleh admin.** Berguna untuk analisis performa kategori produk di dashboard.
  */
-export const getApiV1AdminProductsCategories = <ThrowOnError extends boolean = false>(
-  options?: Options<GetApiV1AdminProductsCategoriesData, ThrowOnError>,
-): RequestResult<
-  GetApiV1AdminProductsCategoriesResponses,
-  GetApiV1AdminProductsCategoriesErrors,
-  ThrowOnError
-> =>
-  (options?.client ?? client).get<
-    GetApiV1AdminProductsCategoriesResponses,
-    GetApiV1AdminProductsCategoriesErrors,
-    ThrowOnError
-  >({
-    security: [
-      {
-        key: 'bearerAuth',
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+export const getApiV1AdminProductsCategories = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AdminProductsCategoriesData, ThrowOnError>): RequestResult<GetApiV1AdminProductsCategoriesResponses, GetApiV1AdminProductsCategoriesErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1AdminProductsCategoriesResponses, GetApiV1AdminProductsCategoriesErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
     url: '/api/v1/admin/products/categories',
+    ...options
+});
+
+/**
+ * [Admin] Dashboard transaksi
+ *
+ * Mengambil semua transaksi di platform untuk tabel dashboard admin. **Hanya dapat diakses oleh admin.** Mendukung pencarian buyer/item, filter multi-status, date range terhadap `created_at` atau `paid_at`, sorting stabil, dan pagination.
+ */
+export const getApiV1AdminDashboardTransactions = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AdminDashboardTransactionsData, ThrowOnError>): RequestResult<GetApiV1AdminDashboardTransactionsResponses, GetApiV1AdminDashboardTransactionsErrors, ThrowOnError> => (options?.client ?? client).get<GetApiV1AdminDashboardTransactionsResponses, GetApiV1AdminDashboardTransactionsErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/admin/dashboard/transactions',
+    ...options
+});
+
+/**
+ * [Admin] Scan QR pickup user
+ *
+ * Memvalidasi QR pickup yang ditunjukkan user saat pengambilan barang. Endpoint menerima raw payload dari scanner, memvalidasi QR belum expired/belum digunakan, memastikan order masih berstatus `lunas`, lalu mengembalikan detail transaksi untuk dikonfirmasi admin.
+ */
+export const postApiV1AdminHandOverScan = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AdminHandOverScanData, ThrowOnError>): RequestResult<PostApiV1AdminHandOverScanResponses, PostApiV1AdminHandOverScanErrors, ThrowOnError> => (options.client ?? client).post<PostApiV1AdminHandOverScanResponses, PostApiV1AdminHandOverScanErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/admin/hand-over/scan',
     ...options,
-  });
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * [Admin] Konfirmasi serah terima barang
+ *
+ * Mengonfirmasi hand-over setelah QR pickup berhasil divalidasi. Operasi ini mengubah status order dari `lunas` menjadi `diterima` dan menandai QR pickup terkait sebagai sudah digunakan secara atomik dalam satu DB transaction.
+ */
+export const patchApiV1AdminHandOverConfirmByTransactionId = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1AdminHandOverConfirmByTransactionIdData, ThrowOnError>): RequestResult<PatchApiV1AdminHandOverConfirmByTransactionIdResponses, PatchApiV1AdminHandOverConfirmByTransactionIdErrors, ThrowOnError> => (options.client ?? client).patch<PatchApiV1AdminHandOverConfirmByTransactionIdResponses, PatchApiV1AdminHandOverConfirmByTransactionIdErrors, ThrowOnError>({
+    security: [{
+            key: 'bearerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/api/v1/admin/hand-over/confirm/{transactionId}',
+    ...options
+});
 
 /**
  * Server health check
  */
-export const getApiV1Health = <ThrowOnError extends boolean = false>(
-  options?: Options<GetApiV1HealthData, ThrowOnError>,
-): RequestResult<GetApiV1HealthResponses, unknown, ThrowOnError> =>
-  (options?.client ?? client).get<GetApiV1HealthResponses, unknown, ThrowOnError>({
-    url: '/api/v1/health',
-    ...options,
-  });
+export const getApiV1Health = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1HealthData, ThrowOnError>): RequestResult<GetApiV1HealthResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetApiV1HealthResponses, unknown, ThrowOnError>({ url: '/api/v1/health', ...options });

@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { ShoppingCartLinear } from 'vuesax-icon-pack';
 
 import { useIsAdmin } from '@/domains/auth/auth.hooks';
-import { useCartTotalQuantity } from '@/domains/cart/cart.hooks';
+import { useCartCount } from '@/domains/cart/cart.hooks';
 import { useAuthStore } from '@/lib/providers';
 import { cn } from '@/lib/utils';
 
@@ -95,7 +95,7 @@ function MenuIcon({ open }: { open: boolean }) {
 }
 
 function AuthLinks({ isLoggedIn, onNavigate }: { isLoggedIn: boolean; onNavigate?: () => void }) {
-  const totalQuantity = useCartTotalQuantity();
+  const { data: totalQuantity } = useCartCount({ enabled: isLoggedIn });
   if (!isLoggedIn) {
     return (
       <Link
@@ -117,7 +117,7 @@ function AuthLinks({ isLoggedIn, onNavigate }: { isLoggedIn: boolean; onNavigate
         aria-label="Cart"
         className="flex items-center gap-2 text-[#fff3b8] hover:text-[#f7e8bd]"
       >
-        <span className="text-sm font-semibold">{totalQuantity}</span>
+        <span className="text-sm font-semibold">{totalQuantity ?? 0}</span>
         <CartIcon />
       </Link>
       <Link
