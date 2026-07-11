@@ -7,8 +7,18 @@ import type {
   AddToCartResponse,
   UpdateCartItemResponse,
   DeleteCartItemResponse,
+  AddToCartBody,
 } from '@/api/types.gen';
-import { getApiV1Cart, postApiV1Cart, patchApiV1CartByItemId, deleteApiV1CartByItemId } from '@/api/sdk.gen';
+import {
+  getApiV1Cart,
+  getApiV1CartCount,
+  postApiV1Cart,
+  patchApiV1CartByItemId,
+  deleteApiV1CartByItemId,
+} from '@/api/sdk.gen';
+
+/** A single bundle-component variant choice, per AddToCartBody.selectedVariants. */
+export type SelectedVariant = { productId: string; variantId: string; quantity: number };
 
 // ---------------------------------------------------------------------------
 // ApiError
@@ -30,9 +40,7 @@ export class ApiError extends Error {
 
 type SdkResult = { data?: unknown; error?: unknown };
 
-function unwrap<T>(response: SdkResult): T {
-  const err = response.error;
-  if (err == null) return response.data as T;
+function unwrapError(err: unknown): never {
   if (err instanceof Error) {
     throw new ApiError('NETWORK_ERROR', err.message);
   }
@@ -41,6 +49,17 @@ function unwrap<T>(response: SdkResult): T {
     e.error?.code ?? 'UNKNOWN_ERROR',
     e.error?.message ?? e.message ?? 'Terjadi kesalahan',
   );
+}
+
+/**
+ * Unwrap the backend's `{ success, data }` envelope.
+ * The SDK's `response.data` IS the full response body; the payload we want is
+ * nested one level deeper under `.data`.
+ */
+function unwrapEnvelope<T>(response: SdkResult): T {
+  if (response.error != null) unwrapError(response.error);
+  const body = response.data as { success: boolean; data: T };
+  return body.data;
 }
 
 // ---------------------------------------------------------------------------
@@ -59,26 +78,46 @@ export type DeleteCartItemResult = DeleteCartItemResponse['data'];
 export const api = {
   /** GET /cart — fetch the full cart for the current user. */
   async getCart(): Promise<GetCartResult> {
-    return unwrap<GetCartResult>(await getApiV1Cart());
+    return unwrapEnvelope<GetCartResult>(await getApiV1Cart());
   },
 
-  /** POST /cart — add an item (variant) to the cart. */
-  async addToCart(variantId: string, quantity: number): Promise<AddToCartResult> {
-    return unwrap<AddToCartResult>(
+  /** GET /cart/count — total quantity across the cart (navbar badge). */
+  async getCartCount(): Promise<number> {
+    const data = unwrapEnvelope<{ count: number }>(await getApiV1CartCount());
+    return data.count;
+  },
+
+  /** POST /cart — add a single product variant to the cart. */
+  async addVariant(variantId: string, quantity: number): Promise<AddToCartResult> {
+    return unwrapEnvelope<AddToCartResult>(
       await postApiV1Cart({ body: { variantId, quantity } }),
     );
   },
 
+  /**
+   * POST /cart — add a bundle to the cart.
+   * `selectedVariants` provides the chosen variant for each bundle component
+   * that requires one (and exactly-one choice for each `optionGroup`).
+   */
+  async addBundle(
+    bundleId: string,
+    selectedVariants: SelectedVariant[],
+    quantity: number,
+  ): Promise<AddToCartResult> {
+    const body: AddToCartBody = { bundleId, selectedVariants, quantity };
+    return unwrapEnvelope<AddToCartResult>(await postApiV1Cart({ body }));
+  },
+
   /** PATCH /cart/{itemId} — update the quantity of a cart item. */
   async updateCartItem(itemId: string, quantity: number): Promise<UpdateCartItemResult> {
-    return unwrap<UpdateCartItemResult>(
+    return unwrapEnvelope<UpdateCartItemResult>(
       await patchApiV1CartByItemId({ path: { itemId }, body: { quantity } }),
     );
   },
 
   /** DELETE /cart/{itemId} — remove a cart item. */
   async removeCartItem(itemId: string): Promise<DeleteCartItemResult> {
-    return unwrap<DeleteCartItemResult>(
+    return unwrapEnvelope<DeleteCartItemResult>(
       await deleteApiV1CartByItemId({ path: { itemId } }),
     );
   },
