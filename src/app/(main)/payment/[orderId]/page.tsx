@@ -1,9 +1,13 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useRef, useState } from 'react';
 
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { useOrderDetail, usePickupQr } from '@/domains/order/order.hooks';
+import { canLoadPaymentDetail, shouldInitiatePayment } from '@/domains/payment/payment-init';
 import {
   useInitiatePayment,
   usePaymentDetail,
@@ -22,22 +26,30 @@ function formatCountdown(seconds: number): string {
 export default function PaymentPage() {
   const { orderId } = useParams<{ orderId: string }>();
 
-  const detail = usePaymentDetail(orderId);
+  // 1) The order is the source of truth for status + chosen payment method.
+  const order = useOrderDetail(orderId);
+  const orderStatus = order.data?.status;
+
+  // 2) Create the payment record (idempotent) — but only while the order is
+  //    still awaiting payment. This is what makes the detail endpoint stop
+  //    returning 404 "Pembayaran tidak ditemukan".
+  const initiate = useInitiatePayment();
+  const initiated = useRef(false);
+  useEffect(() => {
+    if (!orderId || !order.data || initiated.current) return;
+    if (!shouldInitiatePayment(orderStatus) || !order.data.paymentMethod) return;
+    initiated.current = true;
+    initiate.mutate({ orderId, method: order.data.paymentMethod });
+  }, [orderId, order.data, orderStatus, initiate]);
+
+  // 3) Detail (QR/VA + summary) is only enabled once a payment row exists.
+  const detailEnabled = canLoadPaymentDetail(orderStatus, initiate.isSuccess);
+  const detail = usePaymentDetail(orderId, { enabled: detailEnabled });
+
+  // 4) Live status polling (independent — never 404s).
   const status = usePaymentStatus(orderId);
-  const initiatePayment = useInitiatePayment();
 
   const [countdown, setCountdown] = useState<number | null>(null);
-  const initiated = useRef(false);
-
-  // Create the gateway payment transaction once detail is available.
-  // Initiate is idempotent per the SDK doc, so calling it here is safe.
-  useEffect(() => {
-    if (!orderId || !detail.data || initiated.current) return;
-    initiated.current = true;
-    initiatePayment.mutate({ orderId, method: detail.data.method });
-  }, [orderId, detail.data, initiatePayment]);
-
-  // Live countdown from detail.countdown (seconds).
   useEffect(() => {
     if (detail.data?.countdown == null) {
       setCountdown(null);
@@ -56,34 +68,42 @@ export default function PaymentPage() {
     return () => clearInterval(timer);
   }, [detail.data?.countdown]);
 
-  if (detail.isPending) {
-    return (
-      <div className="flex items-center justify-center" style={{ minHeight: 'inherit' }}>
-        <Spinner />
-      </div>
-    );
+  // ── Loading / error gating ──────────────────────────────────────────────
+  if (order.isPending) {
+    return <CenteredSpinner />;
+  }
+  if (order.isError) {
+    return <CenteredError message={order.error?.message ?? 'Gagal memuat pesanan.'} />;
   }
 
+  // While we still need to create the payment (awaiting-payment order).
+  if (shouldInitiatePayment(orderStatus) && !initiate.isSuccess) {
+    if (initiate.isError) {
+      return (
+        <CenteredError message={initiate.error?.message ?? 'Gagal menyiapkan pembayaran.'} />
+      );
+    }
+    return <CenteredSpinner label="Menyiapkan pembayaran..." />;
+  }
+
+  if (detail.isPending) {
+    return <CenteredSpinner />;
+  }
   if (detail.isError) {
     return (
-      <div className="flex items-center justify-center" style={{ minHeight: 'inherit' }}>
-        <p className="font-[Geom] text-red-500">
-          {detail.error?.message ?? 'Gagal memuat detail pembayaran.'}
-        </p>
-      </div>
+      <CenteredError message={detail.error?.message ?? 'Gagal memuat detail pembayaran.'} />
     );
   }
 
   const data = detail.data;
   if (!data) return null;
 
-  // The status-poll query is the authoritative, live source of truth — it is the
-  // only response that can report 'diterima'. Fall back to the (stale) detail
-  // snapshot only while the poll hasn't resolved yet.
+  // Poll result is the authoritative live status; fall back to the snapshot.
   const pollStatus = status.data?.status;
-  const currentStatus: PaymentStatus = pollStatus ?? (data.status as PaymentStatus);
+  const currentStatus: PaymentStatus = (pollStatus ?? data.status) as PaymentStatus;
   const isPaid = currentStatus === 'lunas' || currentStatus === 'diterima';
   const isExpired = currentStatus === 'expired';
+  const isPickup = order.data?.deliveryMethod === 'pickup';
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-6">
@@ -100,26 +120,13 @@ export default function PaymentPage() {
         )}
       </div>
 
-      <section className="mb-4 rounded-xl border border-[#FFF3B8]/40 bg-[#1B2F53] p-4 text-white">
-        <h2 className="mb-3 font-[Redzone] text-lg font-bold">Metode Pembayaran</h2>
-        <p className="font-[Geom] text-sm">Metode: {data.method.toUpperCase()}</p>
-        {data.paymentDetail.qrImageUrl ? (
-          <div className="mt-3">
-            <p className="mb-2 font-[Geom] text-xs">Scan QRIS:</p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={data.paymentDetail.qrImageUrl}
-              alt="QRIS"
-              className="h-48 w-48 rounded bg-white p-2"
-            />
-          </div>
-        ) : (
-          <div className="mt-3 font-[Geom] text-sm">
-            <p>Bank: {data.paymentDetail.bank}</p>
-            <p>No. Virtual Account: {data.paymentDetail.accountNumber}</p>
-          </div>
-        )}
-      </section>
+      {!isPaid && !isExpired && (
+        <section className="mb-4 rounded-xl border border-[#FFF3B8]/40 bg-[#1B2F53] p-4 text-white">
+          <h2 className="mb-3 font-[Redzone] text-lg font-bold">Metode Pembayaran</h2>
+          <p className="font-[Geom] text-sm">Metode: {data.method.toUpperCase()}</p>
+          <QrisOrVa detail={data.paymentDetail} />
+        </section>
+      )}
 
       <section className="mb-4 rounded-xl border border-[#FFF3B8]/40 bg-[#1B2F53] p-4 text-white">
         <h2 className="mb-3 font-[Redzone] text-lg font-bold">Pengiriman</h2>
@@ -164,11 +171,108 @@ export default function PaymentPage() {
       </section>
 
       {isPaid ? (
-        <p className="font-[Geom] text-center text-[#FFF3B8]">Pembayaran lunas. Terima kasih!</p>
+        <PaidSection orderId={orderId} isPickup={isPickup} />
       ) : null}
       {isExpired ? (
         <p className="font-[Geom] text-center text-red-400">Pembayaran kedaluwarsa.</p>
       ) : null}
     </main>
+  );
+}
+
+/** After payment: thank-you + (for pickup orders) a pickup-QR generator. */
+function PaidSection({ orderId, isPickup }: { orderId: string; isPickup: boolean }) {
+  const pickup = usePickupQr(orderId);
+
+  return (
+    <section className="rounded-xl border border-[#FFF3B8]/40 bg-[#1B2F53] p-4 text-center text-white">
+      <p className="font-[Geom] text-[#FFF3B8]">Pembayaran lunas. Terima kasih!</p>
+
+      {isPickup && (
+        <div className="mt-4 flex flex-col items-center gap-3">
+          {pickup.qrDataUrl ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={pickup.qrDataUrl}
+                alt="QR Pengambilan"
+                className="h-48 w-48 rounded bg-white p-2"
+              />
+              <p className="font-[Geom] text-xs text-[#FFF3B8]">
+                Tunjukkan QR ini ke admin saat pengambilan. Berlaku {pickup.timeLeft || '1×24 jam'}.
+              </p>
+            </>
+          ) : (
+            <Button
+              onClick={pickup.generate}
+              disabled={pickup.isGenerating}
+              className="rounded-[12px] bg-[#FFE788] font-[Geom] font-bold text-[#022C3F] hover:bg-[#FFE788]/90"
+            >
+              {pickup.isGenerating ? 'Membuat QR...' : 'Buat QR Pengambilan'}
+            </Button>
+          )}
+          {pickup.error && (
+            <p className="font-[Geom] text-xs text-red-300">{pickup.error.message}</p>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/**
+ * Renders the payment instruction: a QRIS QR (image from the gateway, or one
+ * generated locally from the `qrString`), or a Virtual Account number.
+ */
+function QrisOrVa({
+  detail,
+}: {
+  detail: { qrString?: string; qrImageUrl?: string; bank?: string; accountNumber?: string };
+}) {
+  if (detail.qrImageUrl || detail.qrString) {
+    return (
+      <div className="mt-3">
+        <p className="mb-2 font-[Geom] text-xs">Scan QRIS:</p>
+        {detail.qrImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={detail.qrImageUrl}
+            alt="QRIS"
+            className="h-48 w-48 rounded bg-white p-2"
+          />
+        ) : (
+          // No image from the gateway (e.g. simulation mode) — render the QR
+          // locally from the qr_string, per the backend contract.
+          <QRCodeSVG value={detail.qrString!} size={192} className="rounded bg-white p-2" />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3 font-[Geom] text-sm">
+      <p>Bank: {detail.bank}</p>
+      <p>No. Virtual Account: {detail.accountNumber}</p>
+    </div>
+  );
+}
+
+function CenteredSpinner({ label }: { label?: string }) {
+  return (
+    <div
+      className="flex flex-col items-center justify-center gap-3"
+      style={{ minHeight: 'inherit' }}
+    >
+      <Spinner />
+      {label && <p className="font-[Geom] text-sm text-white/70">{label}</p>}
+    </div>
+  );
+}
+
+function CenteredError({ message }: { message: string }) {
+  return (
+    <div className="flex items-center justify-center" style={{ minHeight: 'inherit' }}>
+      <p className="font-[Geom] text-red-500">{message}</p>
+    </div>
   );
 }

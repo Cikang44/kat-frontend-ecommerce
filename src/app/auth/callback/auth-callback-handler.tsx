@@ -3,6 +3,8 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
+import type { UserProfile } from '@/api/types.gen';
+import { getApiV1UserProfile } from '@/api/sdk.gen';
 import { Spinner } from '@/components/ui/spinner';
 import { setStoredToken } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/providers';
@@ -29,22 +31,30 @@ export function AuthCallbackHandler() {
     }
 
     if (accessToken) {
-      // User is already onboarded — store token and fetch profile
+      // User is already onboarded — store token, then hydrate the auth store.
+      // The token is picked up by the SDK request interceptor (see api-client),
+      // which sends it through the same-origin `/api/v1/*` proxy.
       setStoredToken(accessToken);
 
-      // Fetch user profile to populate the auth store
-      fetch('/api/v1/user/me', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && data.data) {
-            setUser(data.data);
+      getApiV1UserProfile()
+        .then((res) => {
+          const body = res.data as { success: boolean; data: UserProfile } | undefined;
+          if (body?.success && body.data) {
+            const p = body.data;
+            setUser({
+              id: p.id,
+              name: p.name,
+              email: p.email,
+              role: p.role,
+              // Reaching this branch means the backend issued a full access
+              // token, which only happens after onboarding is complete.
+              isOnboardingComplete: true,
+            });
           }
           router.replace('/products');
         })
         .catch(() => {
-          // Even if profile fetch fails, redirect to products
+          // Even if profile hydration fails, the token is stored — proceed.
           router.replace('/products');
         });
       return;
