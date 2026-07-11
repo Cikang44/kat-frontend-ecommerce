@@ -11,9 +11,10 @@ interface AuthState {
   user: AuthUser | null;
   isLoggedIn: boolean;
   /**
-   * Temporary token returned from verify-otp, required as Bearer token for
-   * the onboarding endpoint.  Not persisted to localStorage — lives only for
-   * the browser session (survives page navigation, lost on tab close).
+   * Temporary token returned from the Google OAuth callback (new umum user) or
+   * a panitia's first login before onboarding. Required as Bearer token for the
+   * onboarding endpoint. Not persisted to localStorage — lives only for the
+   * browser session (survives page navigation, lost on tab close).
    */
   onboardingToken: string | null;
 }

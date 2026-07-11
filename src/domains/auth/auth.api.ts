@@ -8,9 +8,6 @@
 import type {
   AuthUser,
   LoginBody,
-  SignupBody,
-  VerifyOtpBody,
-  ResendOtpBody,
   OnboardingBody,
   ChangePasswordBody,
   PatchProfileBody,
@@ -18,10 +15,7 @@ import type {
 } from '@/api/types.gen';
 
 import {
-  postApiV1AuthSignup,
   postApiV1AuthLogin,
-  postApiV1AuthVerifyOtp,
-  postApiV1AuthResendOtp,
   postApiV1AuthRefreshToken,
   postApiV1AuthLogout,
   postApiV1AuthChangePassword,
@@ -50,9 +44,6 @@ export class ApiError extends Error {
 // ---------------------------------------------------------------------------
 
 export type LoginResult = { accessToken: string; user: AuthUser };
-export type SignupResult = { message: string; email: string };
-export type VerifyOtpResult = { onboardingToken: string; message: string };
-export type ResendOtpResult = { message: string };
 export type OnboardingResult = { accessToken: string; user: AuthUser };
 export type LogoutResult = { message: string };
 export type ChangePasswordResult = { message: string };
@@ -91,39 +82,16 @@ function unwrapEnvelope<T>(response: SdkResult): T {
 // ---------------------------------------------------------------------------
 
 export const api = {
-  /** POST /auth/signup — register a new user, send OTP */
-  async signup(body: SignupBody): Promise<SignupResult> {
-    return unwrapEnvelope<SignupResult>(
-      await postApiV1AuthSignup({ body }),
-    );
-  },
-
-  /** POST /auth/login — authenticate with email & password */
+  /** POST /auth/login — authenticate with email & password (panitia/admin) */
   async login(body: LoginBody): Promise<LoginResult> {
     return unwrapEnvelope<LoginResult>(
       await postApiV1AuthLogin({ body }),
     );
   },
 
-  /** POST /auth/verify-otp — verify the 6-digit OTP */
-  async verifyOtp(body: VerifyOtpBody): Promise<VerifyOtpResult> {
-    return unwrapEnvelope<VerifyOtpResult>(
-      await postApiV1AuthVerifyOtp({ body }),
-    );
-  },
-
-  /** POST /auth/resend-otp — resend OTP code */
-  async resendOtp(body: ResendOtpBody): Promise<ResendOtpResult> {
-    return unwrapEnvelope<ResendOtpResult>(
-      await postApiV1AuthResendOtp({ body }),
-    );
-  },
-
   /**
-   * POST /auth/onboarding — complete profile after OTP verification
-   *
-   * The backend authenticates this request via the onboardingToken
-   * Bearer header. We temporarily set the token on the client before calling.
+   * POST /auth/onboarding — complete profile after Google sign-in (umum) or
+   * first login (panitia). Authenticated via the onboardingToken Bearer header.
    */
   async onboarding(body: OnboardingBody, onboardingToken: string): Promise<OnboardingResult> {
     // The SDK's onboarding endpoint expects a Bearer token.

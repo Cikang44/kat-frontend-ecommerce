@@ -10,9 +10,6 @@ import {
 
 import type {
   LoginBody,
-  SignupBody,
-  VerifyOtpBody,
-  ResendOtpBody,
   OnboardingBody,
   ChangePasswordBody,
   PatchProfileBody,
@@ -23,7 +20,7 @@ import { setStoredToken, clearStoredToken } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/providers';
 import { queryKeys } from '@/lib/query-keys';
 
-import { api, type LoginResult, type SignupResult, type VerifyOtpResult, type ResendOtpResult, type LogoutResult, type ChangePasswordResult } from './auth.api';
+import { api, type LoginResult, type LogoutResult, type ChangePasswordResult } from './auth.api';
 
 // ---------------------------------------------------------------------------
 // Mutations  —  write operations that change server-side auth state
@@ -49,40 +46,6 @@ export function useLogin(): UseMutationResult<LoginResult, Error, LoginBody> {
   });
 }
 
-/**
- * Signup — register a new user.
- * On success, the user is redirected to OTP verification.
- */
-export function useSignup(): UseMutationResult<SignupResult, Error, SignupBody> {
-  return useMutation({
-    mutationFn: (body) => api.signup(body),
-  });
-}
-
-/**
- * Verify OTP — confirm the 6-digit code sent during signup.
- * On success, persists the onboardingToken in the zustand store so it
- * survives page navigation to the onboarding page.
- */
-export function useVerifyOtp(): UseMutationResult<VerifyOtpResult, Error, VerifyOtpBody> {
-  const setOnboardingToken = useAuthStore((s) => s.setOnboardingToken);
-
-  return useMutation({
-    mutationFn: (body) => api.verifyOtp(body),
-    onSuccess: (result) => {
-      setOnboardingToken(result.onboardingToken);
-    },
-  });
-}
-
-/**
- * Resend OTP — request a new code if the previous one expired.
- */
-export function useResendOtp(): UseMutationResult<ResendOtpResult, Error, ResendOtpBody> {
-  return useMutation({
-    mutationFn: (body) => api.resendOtp(body),
-  });
-}
 
 /**
  * Onboarding — complete the profile after OTP verification.
