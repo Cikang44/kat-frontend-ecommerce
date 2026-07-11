@@ -12,6 +12,14 @@ variables:
   SECRET_DETECTION_ENABLED: "true"
   NEXT_TELEMETRY_DISABLED: "1"
 
+# Runtime-specific job template (Bun) — lives here, not in .gitlab/ci/common.yml, since it's
+# specific to this app's runtime. A non-Bun app just defines its own equivalent instead.
+.bun-base:
+  image: $CI_BUN_IMAGE
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
 lint:
   extends: .bun-base
   stage: lint
