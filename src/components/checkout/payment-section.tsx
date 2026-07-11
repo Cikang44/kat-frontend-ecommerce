@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { ArrowDownLinear, WalletIcon2Linear } from 'vuesax-icon-pack';
 import { useState } from 'react';
 import type { OrderDeliveryMethod, OrderOption, OrderPaymentMethod } from '@/domains/order/order.types';
@@ -65,7 +66,7 @@ export function PaymentSection({
         >
           <span className="flex items-center gap-2 font-[Geom]">
             {paymentMethod === 'qris' && (
-              <img src="/qris.png" alt="QRIS" className="h-6 object-contain" />
+              <Image src="/qris.png" alt="QRIS" width={24} height={24} className="h-6 w-auto object-contain" />
             )}
             {selectedLabel}
           </span>
@@ -95,7 +96,13 @@ export function PaymentSection({
                 )}
               >
                 {opt.value === 'qris' && (
-                  <img src="/qris.png" alt="QRIS" className="mr-2 inline h-4 object-contain" />
+                  <Image
+                    src="/qris.png"
+                    alt="QRIS"
+                    width={16}
+                    height={16}
+                    className="mr-2 inline h-4 w-auto object-contain"
+                  />
                 )}
                 <span className="font-[Geom]">{opt.label}</span>
               </button>

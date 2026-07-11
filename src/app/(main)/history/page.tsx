@@ -43,6 +43,7 @@ function ItemImageBox({
   if (imageUrl) {
     return (
       <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-lg border border-[#996537] bg-[#FFF3B8] md:h-[96px] md:w-[96px] md:rounded-xl">
+        {/* eslint-disable-next-line @next/next/no-img-element -- dynamic backend host, not in next/image remotePatterns */}
         <img src={imageUrl} alt={productName} className="h-full w-full object-cover" />
       </div>
     );

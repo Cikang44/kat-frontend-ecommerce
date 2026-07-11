@@ -49,6 +49,7 @@ export function ProductImageGallery({ images, productName, className }: ProductI
       {/* Main image */}
       <div className="group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-[20px] border border-[#996537] bg-[#fff3b8]">
         {selectedImage ? (
+          // eslint-disable-next-line @next/next/no-img-element -- dynamic backend host, not in next/image remotePatterns
           <img
             src={selectedImage.url}
             alt={productName}
@@ -96,6 +97,7 @@ export function ProductImageGallery({ images, productName, className }: ProductI
               selectedIndex === idx ? 'opacity-100' : 'opacity-70 hover:opacity-100',
             )}
           >
+            {/* eslint-disable-next-line @next/next/no-img-element -- dynamic backend host, not in next/image remotePatterns */}
             <img
               src={image.url}
               alt={`${productName} - ${idx + 1}`}

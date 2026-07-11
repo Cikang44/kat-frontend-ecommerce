@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import { OrderItemSnapshot } from '@/domains/order/order.types';
 
 interface OrderOverviewProps {
@@ -20,7 +22,7 @@ export function OrderOverview({ orderItems }: OrderOverviewProps) {
   return (
     <div className="mx-auto flex w-full flex-col gap-[20px] rounded-[20px] border border-[5px] border-[#FFFFFF80] bg-[#133B79] p-[20px] font-sans text-white md:max-w-[859px] md:gap-[30px] md:rounded-[30px] md:p-[40px]">
       <div className="font-heading flex items-center gap-3 text-2xl font-black tracking-wide text-white md:text-3xl">
-        <img src="/icons/shopping-cart.svg" alt="Shopping Cart" width={32} height={32} />
+        <Image src="/icons/shopping-cart.svg" alt="Shopping Cart" width={32} height={32} />
         Shopping Cart
       </div>
 
@@ -43,6 +45,7 @@ export function OrderOverview({ orderItems }: OrderOverviewProps) {
             >
               <div className="flex w-full gap-2 md:hidden">
                 <div className="flex shrink-0 items-center justify-center rounded-lg bg-white/5 p-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- dynamic backend host, not in next/image remotePatterns */}
                   <img
                     src={item.image_url}
                     alt={item.product_name}
@@ -69,6 +72,7 @@ export function OrderOverview({ orderItems }: OrderOverviewProps) {
               </div>
 
               <div className="hidden flex-col items-center justify-center gap-3 md:flex">
+                {/* eslint-disable-next-line @next/next/no-img-element -- dynamic backend host, not in next/image remotePatterns */}
                 <img
                   src={item.image_url}
                   alt={item.product_name}
