@@ -73,11 +73,16 @@ export function usePaymentFee(
  */
 export function usePaymentDetail(
   orderId: string | undefined,
+  options?: { enabled?: boolean },
 ): UseQueryResult<PaymentDetailResult, Error> {
+  // Detail must only be fetched once a payment record is guaranteed to exist,
+  // otherwise the backend returns 404 "Pembayaran tidak ditemukan". The caller
+  // gates this via `options.enabled` (see canLoadPaymentDetail).
+  const enabled = !!orderId && (options?.enabled ?? true);
   return useQuery({
     queryKey: queryKeys.payment.detail(orderId ?? ''),
     queryFn: () => api.getPaymentDetail(orderId!),
-    enabled: !!orderId,
+    enabled,
     staleTime: 15 * 1000,
     refetchOnWindowFocus: true,
   });
