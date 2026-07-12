@@ -7,7 +7,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       {/* Background */}
-      <div className="absolute inset-0 w-screen overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
         <div className="fixed inset-0 top-0 left-0 flex h-screen shrink-0 items-center justify-center overflow-hidden md:hidden">
           <Image
             src="/warna-bg-mobile.webp"
@@ -26,7 +26,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Desktop: illustration left panel (hidden on mobile) */}
-        <div className="fixed inset-0 top-0 left-0 hidden h-full overflow-hidden md:flex md:w-screen">
+        <div className="fixed inset-0 top-0 left-0 hidden h-full overflow-hidden md:flex">
           <Image
             src="/warna-bg-desktop.webp"
             alt=""

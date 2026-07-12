@@ -42,7 +42,7 @@ function ItemImageBox({
 }) {
   if (imageUrl) {
     return (
-      <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-lg border border-[#996537] bg-[#FFF3B8] md:h-[96px] md:w-[96px] md:rounded-xl">
+      <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-lg border border-[#996537] bg-[#FFF3B8] lg:h-[96px] lg:w-[96px] lg:rounded-xl">
         {/* eslint-disable-next-line @next/next/no-img-element -- dynamic backend host, not in next/image remotePatterns */}
         <img src={imageUrl} alt={productName} className="h-full w-full object-cover" />
       </div>
@@ -50,8 +50,8 @@ function ItemImageBox({
   }
 
   return (
-    <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-lg border border-[#996537] bg-[#FFF3B8] md:h-[96px] md:w-[96px] md:rounded-xl">
-      <span className="text-xl font-bold text-[#996537]/60 md:text-4xl">
+    <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-lg border border-[#996537] bg-[#FFF3B8] lg:h-[96px] lg:w-[96px] lg:rounded-xl">
+      <span className="text-xl font-bold text-[#996537]/60 lg:text-4xl">
         {productName.charAt(0).toUpperCase()}
       </span>
     </div>
@@ -258,10 +258,10 @@ export default function HistoryPage() {
             return (
               <div
                 key={order.id}
-                className="flex flex-col gap-3 rounded-[10px] border border-[#022C3F] bg-[#E6EFF9] p-3 md:flex-row md:items-center md:gap-5"
+                className="flex flex-col gap-3 rounded-[10px] border border-[#022C3F] bg-[#E6EFF9] p-3 lg:flex-row lg:items-center lg:gap-5"
               >
                 {/* Image + info on same row for mobile */}
-                <div className="flex flex-row gap-3 md:items-center md:gap-5">
+                <div className="flex flex-row gap-3 lg:items-center lg:gap-5">
                   {/* Image box */}
                   {firstItem && (
                     <ItemImageBox
@@ -271,7 +271,7 @@ export default function HistoryPage() {
                   )}
 
                   {/* Product info — flexes on mobile, fixed on desktop */}
-                  <div className="flex min-w-0 flex-1 flex-col gap-1 md:w-[160px] md:flex-none">
+                  <div className="flex min-w-0 flex-1 flex-col gap-1 lg:w-[160px] lg:flex-none">
                     {/* Name + quantity + status badge (mobile) */}
                     <div className="flex items-center gap-2">
                       <p className="truncate font-bold text-[#133B79]">
@@ -281,7 +281,7 @@ export default function HistoryPage() {
                         x{firstItem?.quantity ?? order.itemCount}
                       </p>
                       {/* Status badge — mobile only */}
-                      <span className="ml-auto inline-flex min-w-[90px] shrink-0 items-center justify-center rounded-lg bg-[#133B79] px-3 py-1.5 text-xs font-bold text-white md:hidden">
+                      <span className="ml-auto inline-flex min-w-[90px] shrink-0 items-center justify-center rounded-lg bg-[#133B79] px-3 py-1.5 text-xs font-bold text-white lg:hidden">
                         {status?.label ?? order.status}
                       </span>
                     </div>
@@ -298,17 +298,17 @@ export default function HistoryPage() {
                   </div>
 
                   {/* Desktop: color column — fixed width */}
-                  <div className="hidden w-[80px] md:block">
+                  <div className="hidden w-[80px] lg:block">
                     <p className="text-sm font-medium text-[#022C3F]">{color}</p>
                   </div>
 
                   {/* Desktop: size column — fixed width */}
-                  <div className="hidden w-[60px] md:block">
+                  <div className="hidden w-[60px] lg:block">
                     <p className="text-sm font-medium text-[#022C3F]">{size}</p>
                   </div>
 
                   {/* Desktop: total column — fixed width */}
-                  <div className="hidden w-[120px] md:block">
+                  <div className="hidden w-[120px] lg:block">
                     <p className="text-xs text-[#022C3F]/60">Total Pesanan:</p>
                     <p className="text-sm font-bold text-[#022C3F]">
                       Rp{order.totalBilled.toLocaleString('id-ID')}
@@ -316,13 +316,13 @@ export default function HistoryPage() {
                   </div>
 
                   {/* Status badge — desktop only, fixed width */}
-                  <span className="hidden w-[100px] items-center justify-center rounded-lg bg-[#133B79] px-4 py-2.5 text-sm font-bold text-white md:inline-flex">
+                  <span className="hidden w-[100px] items-center justify-center rounded-lg bg-[#133B79] px-4 py-2.5 text-sm font-bold text-white lg:inline-flex">
                     {status?.label ?? order.status}
                   </span>
 
                   {/* Desktop action button — fixed width for consistent alignment */}
                   {status?.buttonLabel && (
-                    <div className="hidden w-[200px] md:block">
+                    <div className="hidden w-[200px] lg:block">
                       <ActionButton
                         status={order.status}
                         deliveryMethod={deliveryMethod}
@@ -334,7 +334,7 @@ export default function HistoryPage() {
 
                 {/* Mobile action button — full width below */}
                 {status?.buttonLabel && (
-                  <div className="w-full md:hidden">
+                  <div className="w-full lg:hidden">
                     <ActionButton
                       status={order.status}
                       deliveryMethod={deliveryMethod}
