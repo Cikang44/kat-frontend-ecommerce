@@ -22,7 +22,7 @@ function ArmDeco() {
         style={{ transform: 'rotate(340deg)' }}
       >
         <Image
-          src="/modal-deco-arm-mobile-v2.png"
+          src="/modal-deco-arm-mobile-v2.webp"
           alt=""
           width={100}
           height={100}
@@ -32,7 +32,7 @@ function ArmDeco() {
       {/* Desktop: arm lama (confirm/otp) di pojok kanan */}
       <div className="pointer-events-none absolute top-4 right-0 z-10 hidden md:block">
         <Image
-          src="/modal-deco-arm.png"
+          src="/modal-deco-arm.webp"
           alt=""
           width={180}
           height={100}
@@ -49,12 +49,12 @@ function MushroomDeco({ desktopPx = 110 }: { desktopPx?: number }) {
       {/* Mobile: gambar baru, bottom-right */}
       <div className="pointer-events-none absolute -right-4 -bottom-3 z-0 md:hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/modal-deco-mushroom-mobile.png" alt="" style={{ width: 168, height: 'auto' }} />
+        <img src="/modal-deco-mushroom-mobile.webp" alt="" style={{ width: 168, height: 'auto' }} />
       </div>
       {/* Desktop: gambar lama, bottom-left, z-0 supaya di belakang form content */}
       <div className="pointer-events-none absolute bottom-0 left-0 z-0 hidden md:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/modal-deco-mushroom.png" alt="" style={{ width: desktopPx, height: 'auto' }} />
+        <img src="/modal-deco-mushroom.webp" alt="" style={{ width: desktopPx, height: 'auto' }} />
       </div>
     </>
   );
@@ -117,7 +117,7 @@ export function ForgotPasswordModal({ email, onClose }: Props) {
               style={{ transform: 'rotate(32deg)' }}
             >
               <Image
-                src="/modal-deco-ranting-change-v2.png"
+                src="/modal-deco-ranting-change-v2.webp"
                 alt=""
                 width={180}
                 height={180}

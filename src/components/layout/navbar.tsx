@@ -137,7 +137,7 @@ type NavbarProps = {
   mobileMenuOverlayOpacity?: number;
 };
 
-function Navbar({ mobileMenuBgSrc = '/bg-footer.png', mobileMenuOverlayOpacity = 0 }: NavbarProps) {
+function Navbar({ mobileMenuBgSrc = '/bg-footer.webp', mobileMenuOverlayOpacity = 0 }: NavbarProps) {
   const pathname = usePathname() ?? '/';
   const [mobileOpen, setMobileOpen] = useState(false);
 

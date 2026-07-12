@@ -10,14 +10,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <div className="absolute inset-0 w-screen overflow-hidden">
         <div className="fixed inset-0 top-0 left-0 flex h-screen shrink-0 items-center justify-center overflow-hidden md:hidden">
           <Image
-            src="/warna-bg-mobile.png"
+            src="/warna-bg-mobile.webp"
             alt=""
             fill
             className="object-cover opacity-20"
             priority
           />
           <Image
-            src="/bg-mobile-main.png"
+            src="/bg-mobile-main.webp"
             alt=""
             fill
             className="object-cover object-left-top"
@@ -28,7 +28,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         {/* Desktop: illustration left panel (hidden on mobile) */}
         <div className="fixed inset-0 top-0 left-0 hidden h-full overflow-hidden md:flex md:w-screen">
           <Image
-            src="/warna-bg-desktop.png"
+            src="/warna-bg-desktop.webp"
             alt=""
             fill
             sizes="100vw"
@@ -36,7 +36,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             priority
           />
           <Image
-            src="/bg-desktop-main.png"
+            src="/bg-desktop-main.webp"
             alt=""
             fill
             sizes="100vw"

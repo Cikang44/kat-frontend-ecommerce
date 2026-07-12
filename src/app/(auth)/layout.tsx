@@ -7,8 +7,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="flex min-h-screen flex-col md:flex-row">
       {/* Mobile: illustration top panel (hidden on desktop) */}
       <div className="relative flex h-[40vh] shrink-0 items-center justify-center overflow-hidden md:hidden">
-        <Image src="/warna-bg-mobile.png" alt="" fill className="object-cover" priority />
-        <Image src="/bg-mobile.png" alt="" fill className="object-cover object-left-top" priority />
+        <Image src="/warna-bg-mobile.webp" alt="" fill className="object-cover" priority />
+        <Image src="/bg-mobile.webp" alt="" fill className="object-cover object-left-top" priority />
         <div className="relative z-10 text-center" style={redzoneStyle}>
           <div className="text-[18vw] leading-none font-black text-black">OSKM</div>
           <div className="text-[8.8vw] leading-tight font-black text-black">2026</div>
@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Desktop: illustration left panel (hidden on mobile) */}
       <div className="relative hidden overflow-hidden md:flex md:w-[35%]">
         <Image
-          src="/warna-bg-desktop.png"
+          src="/warna-bg-desktop.webp"
           alt=""
           fill
           sizes="35vw"
@@ -26,7 +26,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           priority
         />
         <Image
-          src="/bg-desktop.png"
+          src="/bg-desktop.webp"
           alt=""
           fill
           sizes="35vw"

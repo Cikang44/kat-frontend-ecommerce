@@ -66,7 +66,7 @@ export function PaymentSection({
         >
           <span className="flex items-center gap-2 font-[Geom]">
             {paymentMethod === 'qris' && (
-              <Image src="/qris.png" alt="QRIS" width={24} height={24} className="h-6 w-auto object-contain" />
+              <Image src="/qris.webp" alt="QRIS" width={24} height={24} className="h-6 w-auto object-contain" />
             )}
             {selectedLabel}
           </span>
@@ -97,7 +97,7 @@ export function PaymentSection({
               >
                 {opt.value === 'qris' && (
                   <Image
-                    src="/qris.png"
+                    src="/qris.webp"
                     alt="QRIS"
                     width={16}
                     height={16}

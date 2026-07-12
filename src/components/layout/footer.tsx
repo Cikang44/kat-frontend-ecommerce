@@ -29,7 +29,7 @@ type FooterProps = {
 };
 
 const Footer: React.FC<FooterProps> = ({
-  backgroundImageSrc = '/bg-footer.png',
+  backgroundImageSrc = '/bg-footer.webp',
   overlayOpacity = 30,
 }) => {
   return (

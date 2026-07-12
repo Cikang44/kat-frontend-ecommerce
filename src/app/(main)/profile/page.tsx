@@ -439,7 +439,7 @@ export default function Page() {
     <div
       className="relative min-h-screen pb-10"
       style={{
-        backgroundImage: "url('/bg-desktop-main.png'), url('/warna-bg-desktop.png')",
+        backgroundImage: "url('/bg-desktop-main.webp'), url('/warna-bg-desktop.webp')",
         backgroundSize: 'cover, cover',
         backgroundPosition: 'center, center',
         backgroundRepeat: 'no-repeat, no-repeat',

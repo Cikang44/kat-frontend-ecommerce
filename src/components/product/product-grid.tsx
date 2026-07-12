@@ -42,7 +42,7 @@ export function ProductGrid() {
       <div className="mt-16 flex w-full flex-col items-center justify-center text-center md:mt-24">
         <div className="relative h-[250px] w-[200px] md:h-[350px] md:w-[300px]">
           <Image
-            src="/search-empty.png"
+            src="/search-empty.webp"
             alt="No Result Found"
             fill
             className="ml-10 object-contain"
