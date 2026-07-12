@@ -1,8 +1,6 @@
 'use client';
 
 import { Search, ChevronDown } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 
