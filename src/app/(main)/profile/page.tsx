@@ -152,11 +152,11 @@ function CloseIcon() {
 function ModalDecorations() {
   return (
     <>
-      <div className="absolute -top-2 right-6 hidden aspect-square w-[18%] sm:block">
-        <Image src="/asset_branch.png" alt="" fill className="pointer-events-none object-contain" />
+      <div className="absolute -top-2 right-0 hidden aspect-square w-[48%] sm:block">
+        <Image src="/asset_branch.svg" alt="" fill className="pointer-events-none object-contain" />
       </div>
-      <div className="absolute -bottom-4 left-4 hidden aspect-square w-[18%] sm:block">
-        <Image src="/asset_root.png" alt="" fill className="pointer-events-none object-contain" />
+      <div className="absolute bottom-0 left-4 hidden aspect-square w-[38%] sm:block">
+        <Image src="/asset_root.svg" alt="" fill className="pointer-events-none object-contain" />
       </div>
     </>
   );

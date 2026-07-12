@@ -54,24 +54,6 @@ export function SearchFilterPanel() {
   return (
     <div className="z-10 mb-6 flex w-full flex-col gap-2 md:mb-8 md:flex-row md:gap-4">
       <div className="flex flex-1 flex-row gap-2 md:gap-4">
-        <Link href="/products">
-          <button
-            type="button"
-            className="flex flex-shrink-0 cursor-pointer items-center justify-center transition-transform active:scale-95"
-            style={{
-              width: 'clamp(40px, 10vw, 66px)',
-              height: 'clamp(40px, 10vw, 66px)',
-              borderRadius: '15px',
-              background: 'linear-gradient(140.48deg, #1D3F7F 31.13%, #5E68A3 90.15%)',
-              boxShadow: '0px 0px 11.19px 0px rgba(255, 255, 255, 0.5)',
-            }}
-          >
-            <div className="relative h-3/5 w-3/5">
-              <Image src="/gift.png" alt="Giveaway" fill className="object-contain" />
-            </div>
-          </button>
-        </Link>
-
         <div
           className="relative flex flex-1 items-center"
           style={{ height: 'clamp(40px, 10vw, 66px)' }}
