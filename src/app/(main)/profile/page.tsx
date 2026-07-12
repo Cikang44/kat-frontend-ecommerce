@@ -436,15 +436,7 @@ export default function Page() {
   };
 
   return (
-    <div
-      className="relative min-h-screen pb-10"
-      style={{
-        backgroundImage: "url('/bg-desktop-main.webp'), url('/warna-bg-desktop.webp')",
-        backgroundSize: 'cover, cover',
-        backgroundPosition: 'center, center',
-        backgroundRepeat: 'no-repeat, no-repeat',
-      }}
-    >
+    <div className="relative min-h-screen pb-10">
       <div className="mx-auto max-w-[1000px] px-4 py-6 sm:px-6 sm:py-10">
         {/* Page header: title (+ action buttons on desktop) */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
