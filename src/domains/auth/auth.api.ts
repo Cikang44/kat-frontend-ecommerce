@@ -143,6 +143,13 @@ export const api = {
 
   /** GET /user/profile/is-admin — check if current user is admin */
   async isAdmin(): Promise<IsAdminResult> {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      typeof window !== 'undefined' &&
+      localStorage.getItem('dev_mock_admin') === 'true'
+    ) {
+      return { isAdmin: true };
+    }
     return unwrapEnvelope<IsAdminResult>(
       await getApiV1UserProfileIsAdmin(),
     );
