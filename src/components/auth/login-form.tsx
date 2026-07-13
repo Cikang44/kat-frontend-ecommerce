@@ -24,10 +24,10 @@ export function LoginForm() {
       { email, password },
       {
         onSuccess: (result) => {
-          if (result.user.isOnboardingComplete) {
-            router.push('/products');
-          } else {
+          if (result.onboardingRequired) {
             router.push('/onboarding');
+          } else {
+            router.push('/products');
           }
         },
       },

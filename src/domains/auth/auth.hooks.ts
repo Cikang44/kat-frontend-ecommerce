@@ -33,10 +33,19 @@ import { api, type LoginResult, type LogoutResult, type ChangePasswordResult } f
 export function useLogin(): UseMutationResult<LoginResult, Error, LoginBody> {
   const queryClient = useQueryClient();
   const setUser = useAuthStore((s) => s.setUser);
+  const setOnboardingToken = useAuthStore((s) => s.setOnboardingToken);
 
   return useMutation({
     mutationFn: (body) => api.login(body),
     onSuccess: (result) => {
+      if (result.onboardingRequired) {
+        // Seeded panitia/admin's first login: no access token yet. Stash the
+        // temporary onboardingToken (Bearer for /auth/onboarding) and stay
+        // logged-out (don't setUser → isLoggedIn remains false).
+        setOnboardingToken(result.onboardingToken);
+        return;
+      }
+
       setStoredToken(result.accessToken);
       setUser(result.user);
 

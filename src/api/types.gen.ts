@@ -31,10 +31,17 @@ export type SignupBody = {
 
 export type LoginResponse = {
     success: true;
-    data: {
-        accessToken: string;
-        user: AuthUser;
-    };
+    data:
+        | {
+            onboardingRequired: false;
+            accessToken: string;
+            user: AuthUser;
+        }
+        | {
+            onboardingRequired: true;
+            onboardingToken: string;
+            user: AuthUser;
+        };
 };
 
 export type AuthUser = {
@@ -1896,6 +1903,10 @@ export type GetApiV1AdminProductsData = {
         type?: 'merchandise' | 'collaboration' | 'kit_panitia';
         category?: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris' | 'bundle';
         /**
+         * Filter berdasarkan fakultas (untuk produk collaboration). Bisa repeated query (?faculty=STEI&faculty=FTSL) atau comma-separated (?faculty=STEI,FTSL).
+         */
+        faculty?: Array<string> | null;
+        /**
          * Field untuk pengurutan (default: createdAt)
          */
         sortBy?: 'name' | 'totalSold' | 'totalRevenue' | 'createdAt';
@@ -1951,6 +1962,10 @@ export type GetApiV1AdminDashboardItemsData = {
          */
         type?: 'merchandise' | 'collaboration' | 'kit_panitia';
         category?: 'perhiasan' | 'baju' | 'peralatan_tulis' | 'aksesoris' | 'bundle';
+        /**
+         * Filter berdasarkan fakultas (untuk produk collaboration). Bisa repeated query (?faculty=STEI&faculty=FTSL) atau comma-separated (?faculty=STEI,FTSL).
+         */
+        faculty?: Array<string> | null;
         /**
          * Field untuk pengurutan (default: createdAt)
          */
@@ -2201,3 +2216,92 @@ export type GetApiV1HealthResponses = {
 };
 
 export type GetApiV1HealthResponse = GetApiV1HealthResponses[keyof GetApiV1HealthResponses];
+
+// ---------------------------------------------------------------------------
+// Admin additions (transaction detail + items summary + faculty filter).
+// Kept in sync with backend admin.schema.ts. Regenerate via openapi:generate
+// once the backend changes are deployed to the live OpenAPI.
+// ---------------------------------------------------------------------------
+
+export type AdminItemsSummaryResponse = {
+    success: true;
+    data: {
+        totalProduk: number;
+        totalItemTerjual: number;
+        totalPendapatan: number;
+    };
+};
+
+export type AdminOrderDetailItem = {
+    productName: string;
+    variantSnapshot: {
+        [key: string]: unknown;
+    };
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+};
+
+export type AdminOrderDetailResponse = {
+    success: true;
+    data: {
+        orderId: string;
+        buyerName: string;
+        buyerEmail: string;
+        buyerPhone: string | null;
+        buyerLineId: string | null;
+        deliveryMethod: 'pickup' | 'shipping' | null;
+        deliveryAddress: string | null;
+        paymentMethod: string | null;
+        items: Array<AdminOrderDetailItem>;
+        subtotal: number;
+        fee: number;
+        totalBilled: number;
+        status: 'belum_bayar' | 'lunas' | 'diterima' | 'expired';
+        paidAt: string | null;
+        createdAt: string;
+    };
+};
+
+export type GetApiV1AdminDashboardItemsSummaryData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/dashboard/items/summary';
+};
+
+export type GetApiV1AdminDashboardItemsSummaryErrors = {
+    401: ErrorResponse;
+    403: ErrorResponse;
+};
+
+export type GetApiV1AdminDashboardItemsSummaryError = GetApiV1AdminDashboardItemsSummaryErrors[keyof GetApiV1AdminDashboardItemsSummaryErrors];
+
+export type GetApiV1AdminDashboardItemsSummaryResponses = {
+    200: AdminItemsSummaryResponse;
+};
+
+export type GetApiV1AdminDashboardItemsSummaryResponse = GetApiV1AdminDashboardItemsSummaryResponses[keyof GetApiV1AdminDashboardItemsSummaryResponses];
+
+export type GetApiV1AdminDashboardTransactionsByOrderIdData = {
+    body?: never;
+    path: {
+        orderId: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/dashboard/transactions/{orderId}';
+};
+
+export type GetApiV1AdminDashboardTransactionsByOrderIdErrors = {
+    401: ErrorResponse;
+    403: ErrorResponse;
+    404: ErrorResponse;
+};
+
+export type GetApiV1AdminDashboardTransactionsByOrderIdError = GetApiV1AdminDashboardTransactionsByOrderIdErrors[keyof GetApiV1AdminDashboardTransactionsByOrderIdErrors];
+
+export type GetApiV1AdminDashboardTransactionsByOrderIdResponses = {
+    200: AdminOrderDetailResponse;
+};
+
+export type GetApiV1AdminDashboardTransactionsByOrderIdResponse = GetApiV1AdminDashboardTransactionsByOrderIdResponses[keyof GetApiV1AdminDashboardTransactionsByOrderIdResponses];
