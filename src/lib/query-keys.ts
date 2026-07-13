@@ -59,5 +59,12 @@ export const queryKeys = {
       ['admin', 'products', filters].filter((v) => v !== undefined) as readonly unknown[],
     categories: (category?: string) =>
       ['admin', 'categories', category].filter((v) => v !== undefined) as readonly unknown[],
+    items: (filters?: Record<string, unknown>) =>
+      ['admin', 'items', filters].filter((v) => v !== undefined) as readonly unknown[],
+    stats: ['admin', 'items', 'stats'] as const,
+    transactions: (filters?: Record<string, unknown>) =>
+      ['admin', 'transactions', filters].filter((v) => v !== undefined) as readonly unknown[],
+    transactionDetail: (id: string) => ['admin', 'transactions', 'detail', id] as const,
+    handOverScan: (token: string) => ['admin', 'hand-over', 'scan', token] as const,
   },
 } as const;
