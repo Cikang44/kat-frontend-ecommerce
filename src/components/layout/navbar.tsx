@@ -176,10 +176,8 @@ function Navbar({ mobileMenuBgSrc = '/bg-footer.webp', mobileMenuOverlayOpacity 
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    data-disabled={link.href !== '/products'}
                     className={cn(
                       active ? 'text-white/40' : 'text-white transition hover:text-white/70',
-                      'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:text-white/30',
                     )}
                   >
                     {link.label}
