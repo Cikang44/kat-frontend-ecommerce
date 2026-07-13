@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useOrderDetail, usePickupQr } from '@/domains/order/order.hooks';
+import { friendlyPaymentError } from '@/domains/payment/payment-errors';
 import { canLoadPaymentDetail, shouldInitiatePayment } from '@/domains/payment/payment-init';
 import {
   useInitiatePayment,
@@ -68,19 +69,25 @@ export default function PaymentPage() {
     return () => clearInterval(timer);
   }, [detail.data?.countdown]);
 
+  const handleRetryInitiate = () => {
+    if (!orderId || !order.data?.paymentMethod) return;
+    initiate.reset();
+    initiate.mutate({ orderId, method: order.data.paymentMethod });
+  };
+
   // ── Loading / error gating ──────────────────────────────────────────────
   if (order.isPending) {
     return <CenteredSpinner />;
   }
   if (order.isError) {
-    return <CenteredError message={order.error?.message ?? 'Gagal memuat pesanan.'} />;
+    return <CenteredError message={friendlyPaymentError(order.error, 'Gagal memuat pesanan.')} />;
   }
 
   // While we still need to create the payment (awaiting-payment order).
   if (shouldInitiatePayment(orderStatus) && !initiate.isSuccess) {
     if (initiate.isError) {
       return (
-        <CenteredError message={initiate.error?.message ?? 'Gagal menyiapkan pembayaran.'} />
+        <CenteredError message={friendlyPaymentError(initiate.error)} onRetry={handleRetryInitiate} />
       );
     }
     return <CenteredSpinner label="Menyiapkan pembayaran..." />;
@@ -91,7 +98,9 @@ export default function PaymentPage() {
   }
   if (detail.isError) {
     return (
-      <CenteredError message={detail.error?.message ?? 'Gagal memuat detail pembayaran.'} />
+      <CenteredError
+        message={friendlyPaymentError(detail.error, 'Gagal memuat detail pembayaran.')}
+      />
     );
   }
 
@@ -269,10 +278,21 @@ function CenteredSpinner({ label }: { label?: string }) {
   );
 }
 
-function CenteredError({ message }: { message: string }) {
+function CenteredError({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="flex items-center justify-center" style={{ minHeight: 'inherit' }}>
+    <div
+      className="flex flex-col items-center justify-center gap-4 px-6 text-center"
+      style={{ minHeight: 'inherit' }}
+    >
       <p className="font-[Geom] text-red-500">{message}</p>
+      {onRetry && (
+        <Button
+          onClick={onRetry}
+          className="rounded-[12px] bg-[#FFE788] font-[Geom] font-bold text-[#022C3F] hover:bg-[#FFE788]/90"
+        >
+          Coba Lagi
+        </Button>
+      )}
     </div>
   );
 }
