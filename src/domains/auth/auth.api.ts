@@ -8,6 +8,7 @@
 import type {
   AuthUser,
   LoginBody,
+  LoginResponse,
   OnboardingBody,
   ChangePasswordBody,
   PatchProfileBody,
@@ -43,8 +44,19 @@ export class ApiError extends Error {
 // Result types
 // ---------------------------------------------------------------------------
 
-export type LoginResult = { accessToken: string; user: AuthUser };
+/**
+ * Login can succeed in two shapes (discriminated by `onboardingRequired`):
+ *  - authenticated: carries a full `accessToken` (+ refresh cookie set by BE).
+ *  - onboarding required: carries a short-lived `onboardingToken` only.
+ * See docs/penyesuaian.md — seeded panitia/admin start with onboarding pending.
+ */
+export type LoginResult = LoginResponse['data'];
 export type OnboardingResult = { accessToken: string; user: AuthUser };
+
+/** Narrow a login result to a single branch decision (pure — unit tested). */
+export function resolveLoginOutcome(data: LoginResult): 'onboarding' | 'authenticated' {
+  return data.onboardingRequired ? 'onboarding' : 'authenticated';
+}
 export type LogoutResult = { message: string };
 export type ChangePasswordResult = { message: string };
 export type IsAdminResult = { isAdmin: boolean };
