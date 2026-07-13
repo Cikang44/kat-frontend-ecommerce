@@ -6,8 +6,8 @@ import { useState } from 'react';
 import { ArrowLeft, ChevronUp, ChevronDown, ShoppingCart, User } from 'lucide-react';
 
 import { Spinner } from '@/components/ui/spinner';
-import { useOrderDetail } from '@/domains/order/order.hooks';
-import type { OrderDetailResult } from '@/domains/order/order.api';
+import { useAdminTransactionDetail } from '@/domains/admin/admin.hooks';
+import type { AdminTransactionDetail } from '@/domains/admin/admin.api';
 
 const geom: React.CSSProperties = { fontFamily: "'Geom', sans-serif" };
 const redzone: React.CSSProperties = { fontFamily: "'Redzone', sans-serif" };
@@ -204,7 +204,7 @@ function SummaryFooter({
   totalQty,
   dateStr,
 }: {
-  order: OrderDetailResult;
+  order: AdminTransactionDetail;
   totalQty: number;
   dateStr: string;
 }) {
@@ -236,7 +236,7 @@ function ItemCardDesktop({
   totalQty,
   dateStr,
 }: {
-  order: OrderDetailResult;
+  order: AdminTransactionDetail;
   totalQty: number;
   dateStr: string;
 }) {
@@ -271,11 +271,11 @@ function ItemCardDesktop({
 
       {/* Item rows */}
       <div className="flex flex-col gap-3">
-        {order.items.map((item) => {
+        {order.items.map((item, index) => {
           const variant = variantLabel(item.variantSnapshot);
           return (
             <div
-              key={item.id}
+              key={index}
               className="grid items-center rounded-[10px] px-4 py-3"
               style={{
                 gridTemplateColumns: '1fr 120px 80px 120px',
@@ -322,7 +322,7 @@ function ItemCardMobile({
   totalQty,
   dateStr,
 }: {
-  order: OrderDetailResult;
+  order: AdminTransactionDetail;
   totalQty: number;
   dateStr: string;
 }) {
@@ -337,11 +337,11 @@ function ItemCardMobile({
       </div>
 
       <div className="flex flex-col gap-3">
-        {order.items.map((item) => {
+        {order.items.map((item, index) => {
           const variant = variantLabel(item.variantSnapshot);
           return (
             <div
-              key={item.id}
+              key={index}
               className="flex items-center gap-3 rounded-[10px] px-3 py-3"
               style={{
                 backgroundColor: '#133B79',
@@ -377,7 +377,7 @@ function ItemCardMobile({
 
 export default function TransactionDetailPage() {
   const { orderId } = useParams<{ orderId: string }>();
-  const { data: order, isLoading, error } = useOrderDetail(orderId);
+  const { data: order, isLoading, error } = useAdminTransactionDetail(orderId);
   const [profileOpen, setProfileOpen] = useState(false);
 
   if (isLoading) {
@@ -401,16 +401,12 @@ export default function TransactionDetailPage() {
 
   const kontakFields = (
     <div className="space-y-3">
-      <FieldBox label="Nama" value={order.contactName} required />
-      <div className="flex gap-2">
-        <FieldBox label="F/S" value="-" required className="w-20 shrink-0" />
-        <FieldBox label="Jurusan" value="-" required className="flex-1" />
-      </div>
+      <FieldBox label="Nama" value={order.buyerName} required />
       <div className="flex flex-col gap-3 md:flex-row md:gap-2">
-        <FieldBox label="No. HP" value={order.contactPhone} required className="flex-1" />
-        <FieldBox label="ID Line" value={order.contactLineId} required className="flex-1" />
+        <FieldBox label="No. HP" value={order.buyerPhone ?? '-'} required className="flex-1" />
+        <FieldBox label="ID Line" value={order.buyerLineId ?? '-'} required className="flex-1" />
       </div>
-      <FieldBox label="Email" value="-" required />
+      <FieldBox label="Email" value={order.buyerEmail} required />
     </div>
   );
 
