@@ -47,6 +47,21 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
     return product.variants.find((v) => v.size === selectedSize && v.color === selectedColor);
   }, [product.variants, selectedSize, selectedColor, hasSelectableVariants]);
 
+  // Prefer the selected variant's own images (e.g. character keychains, faculty
+  // stickers). Fall back to the product-level gallery when the variant has none
+  // — which is also the case before the backend has seeded any variant images.
+  const galleryImages = useMemo(() => {
+    const variantImages = selectedVariant?.images ?? [];
+    return variantImages.length > 0
+      ? variantImages.map((i) => ({
+          id: i.id,
+          url: i.url,
+          isPrimary: i.isPrimary,
+          sortOrder: i.sortOrder,
+        }))
+      : product.images;
+  }, [selectedVariant, product.images]);
+
   const subtotal = (selectedVariant?.finalPrice ?? product.basePrice) * quantity;
 
   const handleAddToCart = () => {
@@ -76,8 +91,10 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
 
   return (
     <div className="mx-auto flex w-full flex-col gap-5">
-      {/* Mobile: single column with blue card containing everything */}
-      <div className="flex flex-col gap-5 md:hidden">
+      {/* Mobile + tablet: single stacked column. The two-column layout needs
+          room for the fixed 550px gallery, so it only kicks in at lg (≥1024px);
+          at md (768px) it would overflow the viewport. */}
+      <div className="flex flex-col gap-5 lg:hidden">
         <div className="bg-powder rounded-[15px] px-5 py-3">
           <div className="flex flex-col gap-4">
             <h1 className="from-royal bg-gradient-to-r to-[#5e68a3] bg-clip-text font-['Redzone'] text-[30px] leading-none text-transparent">
@@ -87,7 +104,11 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
               {formatPrice(selectedVariant?.finalPrice ?? product.basePrice)} /pcs
             </p>
 
-            <ProductImageGallery images={product.images} productName={product.name} />
+            <ProductImageGallery
+              key={selectedVariant?.id ?? 'base'}
+              images={galleryImages}
+              productName={product.name}
+            />
 
             <div className="flex flex-col gap-2">
               <h2 className="text-royal font-['Redzone'] text-lg">Deskripsi</h2>
@@ -143,15 +164,19 @@ export function ProductDetailCard({ product }: ProductDetailCardProps) {
         </div>
       </div>
 
-      {/* Desktop: back button + two columns inside powder card */}
-      <div className="hidden md:flex md:flex-col">
+      {/* Desktop (lg+): back button + two columns inside powder card */}
+      <div className="hidden lg:flex lg:flex-col">
         <div className="bg-powder flex flex-col gap-6 rounded-[15px] p-6">
           <BackButton />
 
           <div className="flex w-full gap-6">
             {/* Left column: Gallery */}
             <div className="w-[550px] shrink-0">
-              <ProductImageGallery images={product.images} productName={product.name} />
+              <ProductImageGallery
+                key={selectedVariant?.id ?? 'base'}
+                images={galleryImages}
+                productName={product.name}
+              />
             </div>
 
             {/* Right column: Title, price, description, variants, actions */}
