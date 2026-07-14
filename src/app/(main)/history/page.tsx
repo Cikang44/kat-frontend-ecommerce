@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowRightLinear } from 'vuesax-icon-pack';
 
 import { Spinner } from '@/components/ui/spinner';
-import { useOrderHistoryWithDetails } from '@/domains/order/order.hooks';
+import { useOrderHistoryWithDetails, usePickupQr } from '@/domains/order/order.hooks';
 
 // ---------------------------------------------------------------------------
 // Status config
@@ -66,10 +66,12 @@ function ActionButton({
   status,
   deliveryMethod,
   orderId,
+  onShowQr,
 }: {
   status: string;
   deliveryMethod: string | undefined;
   orderId: string;
+  onShowQr: (orderId: string) => void;
 }) {
   if (status === 'draft') {
     return (
@@ -109,15 +111,23 @@ function ActionButton({
 
   if (status === 'lunas') {
     const isKurir = deliveryMethod === 'kurir' || deliveryMethod === 'shipping';
+    // Kurir/shipping orders are delivered — no pickup QR. Show an informational,
+    // non-actionable label instead.
+    if (isKurir) {
+      return (
+        <span className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-[#1B2F53] bg-[#1B2F53] px-5 py-2.5 text-sm font-bold text-white md:inline-flex md:w-full">
+          Barang Diantar
+        </span>
+      );
+    }
+    // Pickup orders: show the pickup QR for hand-over.
     return (
       <button
         type="button"
-        onClick={() => {
-          console.log(`${isKurir ? 'Barang Diantar' : 'Ambil Barang'} — order`, orderId);
-        }}
+        onClick={() => onShowQr(orderId)}
         className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-[#1B2F53] bg-[#1B2F53] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1B2F53]/90 md:inline-flex md:w-full"
       >
-        {isKurir ? 'Barang Diantar' : 'Ambil Barang'}
+        Ambil Barang
         <ArrowRightLinear className="h-4 w-4" />
       </button>
     );
@@ -135,6 +145,77 @@ function ActionButton({
 }
 
 // ---------------------------------------------------------------------------
+// Pickup QR modal — generates + shows the pickup QR for a paid pickup order
+// ---------------------------------------------------------------------------
+
+function PickupQrModal({ orderId, onClose }: { orderId: string; onClose: () => void }) {
+  const { qrDataUrl, generate, isGenerating, error } = usePickupQr(orderId);
+
+  // Generate on open (generate is stable per orderId).
+  useEffect(() => {
+    generate();
+  }, [generate]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="QR Pengambilan"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-sm rounded-2xl bg-[#1B2F53] px-6 py-7 text-center text-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Tutup"
+          className="absolute top-3 right-4 text-white/70 hover:text-white"
+        >
+          ✕
+        </button>
+
+        <h2 className="mb-4 font-['Redzone',sans-serif] text-xl font-black text-[#FFF3B8]">
+          QR Pengambilan
+        </h2>
+
+        <div className="flex min-h-[220px] flex-col items-center justify-center gap-4">
+          {isGenerating && !qrDataUrl ? (
+            <>
+              <Spinner />
+              <p className="text-sm text-white/70">Membuat QR...</p>
+            </>
+          ) : error ? (
+            <>
+              <p className="text-sm text-red-300">
+                {error.message ?? 'Gagal membuat QR. Coba lagi.'}
+              </p>
+              <button
+                type="button"
+                onClick={generate}
+                className="rounded-lg bg-[#FFF3B8] px-4 py-2 text-sm font-bold text-[#1B2F53] hover:brightness-95"
+              >
+                Coba Lagi
+              </button>
+            </>
+          ) : qrDataUrl ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element -- data: URL QR image */}
+              <img src={qrDataUrl} alt="QR Pengambilan" className="h-48 w-48 rounded-lg bg-white p-2" />
+              <p className="text-xs text-[#FFF3B8]">
+                Tunjukkan QR ini ke admin saat pengambilan. Berlaku sampai barang diambil.
+              </p>
+            </>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
 
@@ -142,6 +223,7 @@ export default function HistoryPage() {
   const { data: orders, isLoading, error } = useOrderHistoryWithDetails();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
+  const [qrOrderId, setQrOrderId] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -327,6 +409,7 @@ export default function HistoryPage() {
                         status={order.status}
                         deliveryMethod={deliveryMethod}
                         orderId={order.id}
+                        onShowQr={setQrOrderId}
                       />
                     </div>
                   )}
@@ -339,6 +422,7 @@ export default function HistoryPage() {
                       status={order.status}
                       deliveryMethod={deliveryMethod}
                       orderId={order.id}
+                      onShowQr={setQrOrderId}
                     />
                   </div>
                 )}
@@ -356,6 +440,10 @@ export default function HistoryPage() {
             Mulai Belanja
           </Link>
         </div>
+      )}
+
+      {qrOrderId && (
+        <PickupQrModal orderId={qrOrderId} onClose={() => setQrOrderId(null)} />
       )}
     </div>
   );
