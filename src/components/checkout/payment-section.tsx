@@ -115,6 +115,20 @@ export function PaymentSection({
         )}
       </div>
 
+      {/* Payment-gateway fee awareness — these are charged on top at payment
+          time (via Midtrans), not included in the Total Tagihan below. */}
+      <div className="mt-3 rounded-lg border border-[#FFF3B8]/30 bg-white/5 p-3">
+        <p className="font-[Geom] text-[11px] font-semibold text-[#FFF3B8]">
+          Catatan: setiap metode pembayaran dikenakan biaya tambahan dari payment gateway:
+        </p>
+        <ul className="mt-1 space-y-0.5 font-[Geom] text-[11px] text-white/70">
+          <li>• Transfer Bank: Rp4.000</li>
+          <li>• QRIS: 0,7%</li>
+          <li>• GoPay &amp; ShopeePay: 2%</li>
+          <li>• DANA &amp; OVO: 1,5%</li>
+        </ul>
+      </div>
+
       <div className="my-4 " />
 
       <h3 className="font-[Geom] mb-3 text-base font-semibold">Ringkasan Transaksi</h3>

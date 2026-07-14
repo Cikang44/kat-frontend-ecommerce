@@ -16,11 +16,15 @@ import type {
   OrderReceiver,
 } from '@/domains/order/order.types';
 
+// Shipping ("Diantar") is temporarily disabled — every order is pickup at a
+// fixed point. Keep this centralized so it's easy to re-enable later.
+const DEFAULT_PICKUP_ADDRESS = 'Kampus ITB';
+
 const EMPTY_RECEIVER: OrderReceiver = {
   name: '',
   phone: '',
   line: '',
-  address: '',
+  address: DEFAULT_PICKUP_ADDRESS,
 };
 
 export default function CheckoutPage() {
@@ -30,7 +34,8 @@ export default function CheckoutPage() {
   const { data, isPending, isError, error } = useCheckoutData(orderId);
   const confirmOrder = useConfirmOrder();
 
-  const [deliveryMethod, setDeliveryMethod] = useState<OrderDeliveryMethod | null>(null);
+  // Shipping is disabled for now → delivery is always pickup.
+  const [deliveryMethod] = useState<OrderDeliveryMethod>('pickup');
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod | null>(null);
   const [receiver, setReceiver] = useState<OrderReceiver>(EMPTY_RECEIVER);
   const [isDeliverySubmitted, setIsDeliverySubmitted] = useState(false);
@@ -42,7 +47,7 @@ export default function CheckoutPage() {
       name: data.user_prefill.name,
       phone: data.user_prefill.phone,
       line: data.user_prefill.line,
-      address: '',
+      address: DEFAULT_PICKUP_ADDRESS,
     });
   }, [data]);
 
@@ -70,11 +75,6 @@ export default function CheckoutPage() {
   const handleReceiverChange = (nextReceiver: OrderReceiver) => {
     setReceiver(nextReceiver);
     setIsDeliverySubmitted(false);
-  };
-
-  const handleDeliveryMethodChange = (method: OrderDeliveryMethod) => {
-    setDeliveryMethod(method);
-    setReceiver({ ...receiver, address: '' });
   };
 
   const handleConfirm = () => {
@@ -150,13 +150,7 @@ export default function CheckoutPage() {
             submitted={isDeliverySubmitted}
             prefill={data.user_prefill}
           />
-          <ShippingOptions
-            deliveryMethod={deliveryMethod}
-            onDeliveryMethodChange={handleDeliveryMethodChange}
-            receiver={receiver}
-            onReceiverChange={handleReceiverChange}
-            submitted={isDeliverySubmitted}
-          />
+          <ShippingOptions pickupAddress={DEFAULT_PICKUP_ADDRESS} />
           <PaymentSection
             paymentMethods={data.payment_methods}
             paymentMethod={paymentMethod}
