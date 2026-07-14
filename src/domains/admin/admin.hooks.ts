@@ -112,7 +112,7 @@ export function useDashboardItems({
 
   return {
     items: (query.data?.data ?? []).map(mapAdminProductToDashboardItem),
-    totalRows: query.data?.meta.total ?? 0,
+    totalRows: query.data?.meta?.total ?? 0,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     isError: query.isError,

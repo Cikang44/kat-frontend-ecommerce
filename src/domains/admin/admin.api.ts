@@ -85,13 +85,13 @@ export type AdminHandOverConfirmResult = AdminHandOverConfirmResponse['data'];
 // ---------------------------------------------------------------------------
 
 type SdkResult = { data?: unknown; error?: unknown };
+type Envelope = { success: boolean; data: unknown; meta?: PaginationMeta };
 
-/** Unwrap the backend's `{ success, data }` envelope into just the payload. */
-function unwrap<T>(response: SdkResult): T {
+/** Return the raw `{ success, data, meta? }` envelope, or throw ApiError. */
+function unwrapEnvelope(response: SdkResult): Envelope {
   const err = response.error;
   if (err == null) {
-    const body = response.data as { success: boolean; data: T };
-    return body.data;
+    return response.data as Envelope;
   }
   if (err instanceof Error) {
     throw new ApiError('NETWORK_ERROR', err.message);
@@ -101,6 +101,20 @@ function unwrap<T>(response: SdkResult): T {
     e.error?.code ?? 'UNKNOWN_ERROR',
     e.error?.message ?? e.message ?? 'Terjadi kesalahan',
   );
+}
+
+/** Unwrap the `{ success, data }` envelope into just the payload. */
+function unwrap<T>(response: SdkResult): T {
+  return unwrapEnvelope(response).data as T;
+}
+
+/**
+ * Unwrap a paginated `{ success, data, meta }` envelope, preserving BOTH the
+ * rows and the pagination meta (plain `unwrap` would drop `meta`).
+ */
+function unwrapList<T>(response: SdkResult): { data: T[]; meta: PaginationMeta } {
+  const body = unwrapEnvelope(response);
+  return { data: (body.data as T[]) ?? [], meta: body.meta as PaginationMeta };
 }
 
 // ---------------------------------------------------------------------------
@@ -122,7 +136,7 @@ export const api = {
     if (params.sort_by) query.sort_by = params.sort_by;
     if (params.sort_order) query.sort_order = params.sort_order;
 
-    return unwrap<AdminTransactionListResult>(
+    return unwrapList<AdminTransaction>(
       await getApiV1AdminDashboardTransactions({ query }),
     );
   },
@@ -146,7 +160,7 @@ export const api = {
     if (params.sortBy) query.sortBy = params.sortBy;
     if (params.sortOrder) query.sortOrder = params.sortOrder;
 
-    return unwrap<AdminItemListResult>(
+    return unwrapList<AdminProduct>(
       await getApiV1AdminDashboardItems({ query }),
     );
   },

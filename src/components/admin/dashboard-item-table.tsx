@@ -143,12 +143,12 @@ export function DashboardItemTable({
                             <div className="flex items-start gap-3">
                               <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-[#0B1F3A]">
                                 {item.imageUrl && (
-                                  <Image
+                                  // eslint-disable-next-line @next/next/no-img-element -- dynamic backend host, not in next/image remotePatterns
+                                  <img
                                     src={item.imageUrl}
                                     alt={item.name}
-                                    fill
-                                    sizes="44px"
-                                    className="object-cover"
+                                    loading="lazy"
+                                    className="h-full w-full object-cover"
                                   />
                                 )}
                               </div>
@@ -202,7 +202,8 @@ export function DashboardItemTable({
               <div className="flex items-start gap-3 bg-[#D2E1F3] px-4 py-3">
                 <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-[#0B1F3A]">
                   {item.imageUrl && (
-                    <Image src={item.imageUrl} alt={item.name} fill sizes="44px" className="object-cover" />
+                    // eslint-disable-next-line @next/next/no-img-element -- dynamic backend host, not in next/image remotePatterns
+                    <img src={item.imageUrl} alt={item.name} loading="lazy" className="h-full w-full object-cover" />
                   )}
                 </div>
                 <div>
