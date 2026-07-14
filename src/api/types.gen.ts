@@ -276,6 +276,18 @@ export type BundleDetail = BundleListItem & {
     }>;
 };
 
+export type ProductVariantImage = {
+    id: string;
+    url: string;
+    altText: string | null;
+    /**
+     * Peran asset, misalnya primary, design, mockup, gallery
+     */
+    role: string;
+    isPrimary: boolean;
+    sortOrder: number;
+};
+
 export type ProductVariant = {
     id: string;
     sleeveType: 'lengan_panjang' | 'lengan_pendek' | 'none';
@@ -291,6 +303,10 @@ export type ProductVariant = {
      * Harga akhir = base_price + price_modifier
      */
     finalPrice: number;
+    /**
+     * Gambar spesifik varian. Kosong jika varian memakai gambar produk utama.
+     */
+    images: Array<ProductVariantImage>;
 };
 
 export type ProductDetailResponse = {
