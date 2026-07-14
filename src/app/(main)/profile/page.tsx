@@ -4,12 +4,17 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { useProfile, useLogout, useChangePassword } from '@/domains/auth/auth.hooks';
+import { useProfile, useLogout, useChangePassword, useUpdateProfile } from '@/domains/auth/auth.hooks';
 import {
   PASSWORD_RULE_HINT,
   passwordChangeReady,
   validateNewPassword,
 } from '@/domains/auth/password-policy';
+import {
+  profileEditReady,
+  validateLineId,
+  validatePhone,
+} from '@/domains/auth/profile-edit';
 import type { UserProfile } from '@/api/types.gen';
 
 type ProfileField = {
@@ -130,6 +135,24 @@ function ClockIcon() {
 }
 function LogoutIcon() {
   return <Image src="/logout.svg" alt="" width={16} height={16} className="shrink-0" />;
+}
+function EditIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="shrink-0"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  );
 }
 function CloseIcon() {
   return (
@@ -328,6 +351,139 @@ function ChangePasswordModal({
   );
 }
 
+/**
+ * Edit-profile modal. Only No. HP and ID Line are editable (per product scope);
+ * name/email/NIM/division stay read-only. Calls PATCH /user/profile with just
+ * those two fields.
+ */
+function EditProfileModal({
+  isOpen,
+  initialPhone,
+  initialLineId,
+  isSubmitting,
+  errorMessage,
+  onClose,
+  onSubmit,
+}: {
+  isOpen: boolean;
+  initialPhone: string;
+  initialLineId: string;
+  isSubmitting: boolean;
+  errorMessage?: string | null;
+  onClose: () => void;
+  onSubmit: (phone: string, lineId: string) => void;
+}) {
+  const [phone, setPhone] = useState(initialPhone);
+  const [lineId, setLineId] = useState(initialLineId);
+
+  useEffect(() => {
+    if (isOpen) {
+      setPhone(initialPhone);
+      setLineId(initialLineId);
+    }
+  }, [isOpen, initialPhone, initialLineId]);
+
+  if (!isOpen) return null;
+
+  const phoneCheck = validatePhone(phone);
+  const lineIdCheck = validateLineId(lineId);
+  const canSubmit = profileEditReady({ phone, lineId });
+
+  const inputClass =
+    'w-full rounded-md border border-[#1a3a6b]/30 bg-[#f4fbec] px-2.5 py-1.5 text-sm text-[#1a3a6b] transition outline-none focus:border-[#1a3a6b] focus:ring-2 focus:ring-[#1a3a6b]/30';
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="edit-profile-title"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md overflow-hidden rounded-md bg-[#dbe6f5] px-6 py-8 shadow-xl sm:px-10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Tutup"
+          className="absolute top-4 right-4 text-[#1a3a6b]/70 hover:text-[#1a3a6b]"
+        >
+          <CloseIcon />
+        </button>
+
+        <ModalDecorations />
+
+        <div className="relative text-center">
+          <h2
+            id="edit-profile-title"
+            className="mb-3 font-['Redzone',sans-serif] text-xl font-black text-[#1a3a6b]"
+          >
+            Edit Profil
+          </h2>
+          <p className="mb-5 text-sm leading-relaxed text-[#1a3a6b]/90">
+            Perbarui No. HP dan ID Line kamu.
+          </p>
+
+          <div className="space-y-3 text-left">
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-[#1a3a6b]">No. HP</label>
+              <input
+                type="tel"
+                inputMode="numeric"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                autoComplete="tel"
+                placeholder="08xxxxxxxxxx"
+                className={inputClass}
+              />
+              {phone.length > 0 && !phoneCheck.ok && (
+                <p className="mt-1 text-xs font-medium text-red-700">{phoneCheck.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-[#1a3a6b]">ID Line</label>
+              <input
+                type="text"
+                value={lineId}
+                onChange={(e) => setLineId(e.target.value)}
+                placeholder="ID Line"
+                className={inputClass}
+              />
+              {lineId.length > 0 && !lineIdCheck.ok && (
+                <p className="mt-1 text-xs font-medium text-red-700">{lineIdCheck.message}</p>
+              )}
+            </div>
+
+            {errorMessage && <p className="text-sm font-medium text-red-700">{errorMessage}</p>}
+          </div>
+
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="rounded-md bg-[#f4fbec] px-6 py-2.5 text-sm font-normal text-[#1b2f53] transition hover:brightness-95 disabled:opacity-60"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              onClick={() => onSubmit(phone.trim(), lineId.trim())}
+              disabled={!canSubmit || isSubmitting}
+              className="rounded-md bg-[#1a3a6b] px-6 py-2.5 text-sm font-normal text-white transition hover:bg-[#122a50] disabled:opacity-60"
+            >
+              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function buildMemberSections(profile: UserProfile): ProfileSection[] {
   return [
     {
@@ -381,9 +537,12 @@ export default function Page() {
   const { data: profile, isLoading, isError, error } = useProfile();
   const logout = useLogout();
   const changePassword = useChangePassword();
+  const updateProfile = useUpdateProfile();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [changePasswordError, setChangePasswordError] = useState<string | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   // panitia/admin authenticate with a password; umum sign in via Google and
   // have no password to change, so the action is hidden for them.
@@ -399,6 +558,22 @@ export default function Page() {
     logout.mutate(undefined, {
       onSuccess: () => router.push('/login'),
     });
+  };
+
+  const openEditProfile = () => {
+    setEditError(null);
+    setIsEditOpen(true);
+  };
+
+  const handleUpdateProfile = (phone: string, lineId: string) => {
+    setEditError(null);
+    updateProfile.mutate(
+      { phone, lineId },
+      {
+        onSuccess: () => setIsEditOpen(false),
+        onError: (err) => setEditError(err?.message ?? 'Gagal memperbarui profil'),
+      },
+    );
   };
 
   const openChangePassword = () => {
@@ -444,6 +619,12 @@ export default function Page() {
             Profile
           </h1>
           <div className="hidden flex-wrap gap-2 sm:flex">
+            <ActionButton
+              icon={<EditIcon />}
+              label="Edit Profil"
+              onClick={openEditProfile}
+              disabled={!profile}
+            />
             {canChangePassword && (
               <ActionButton icon={<KeyIcon />} label="Ubah Password" onClick={openChangePassword} />
             )}
@@ -471,6 +652,12 @@ export default function Page() {
         {/* Action buttons: mobile layout */}
         <div className="mt-6 flex flex-col gap-3 sm:hidden">
           <div className="grid grid-cols-2 gap-3">
+            <ActionButton
+              icon={<EditIcon />}
+              label="Edit Profil"
+              onClick={openEditProfile}
+              disabled={!profile}
+            />
             {canChangePassword && (
               <ActionButton icon={<KeyIcon />} label="Ubah Password" onClick={openChangePassword} />
             )}
@@ -492,6 +679,16 @@ export default function Page() {
         errorMessage={changePasswordError}
         onClose={closeChangePassword}
         onSubmit={handleChangePassword}
+      />
+
+      <EditProfileModal
+        isOpen={isEditOpen}
+        initialPhone={profile?.phone ?? ''}
+        initialLineId={profile?.lineId ?? ''}
+        isSubmitting={updateProfile.isPending}
+        errorMessage={editError}
+        onClose={() => setIsEditOpen(false)}
+        onSubmit={handleUpdateProfile}
       />
     </div>
   );
