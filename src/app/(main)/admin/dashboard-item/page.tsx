@@ -43,14 +43,7 @@ export default function Page() {
   };
 
   return (
-    <div
-      style={{
-        backgroundImage: `url('/bg-desktop-main.webp'), url('/warna-bg-mobile.webp')`,
-        backgroundSize: "contain, cover",
-        backgroundPosition: "top center, center",
-        backgroundRepeat: "no-repeat, no-repeat",
-      }}
-    >
+    <div>
       <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
         <div className="mb-6 flex items-center justify-between gap-4">
           <h1 className="font-['Redzone',sans-serif] text-3xl text-[#022C3F] sm:text-[#7A1E2B] sm:text-4xl">Item</h1>
