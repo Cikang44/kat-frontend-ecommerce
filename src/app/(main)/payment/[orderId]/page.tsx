@@ -208,7 +208,7 @@ function PaidSection({ orderId, isPickup }: { orderId: string; isPickup: boolean
                 className="h-48 w-48 rounded bg-white p-2"
               />
               <p className="font-[Geom] text-xs text-[#FFF3B8]">
-                Tunjukkan QR ini ke admin saat pengambilan. Berlaku {pickup.timeLeft || '1×24 jam'}.
+                Tunjukkan QR ini ke admin saat pengambilan. Berlaku sampai barang diambil.
               </p>
             </>
           ) : (

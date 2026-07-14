@@ -34,17 +34,6 @@ export type OrderWithDetails = OrderHistoryResult[number] & {
 };
 
 // ---------------------------------------------------------------------------
-// Types for usePickupQr
-// ---------------------------------------------------------------------------
-
-export interface PickupQrState {
-  qrDataUrl: string | null;
-  expiresAt: Date | null;
-  timeLeft: string;
-  isExpired: boolean;
-}
-
-// ---------------------------------------------------------------------------
 // Mutations
 // ---------------------------------------------------------------------------
 
@@ -220,55 +209,23 @@ export function useOrderHistoryWithDetails(): {
 // ---------------------------------------------------------------------------
 
 /**
- * Manages QR generation and countdown for pickup orders.
+ * Manages pickup-QR generation for a paid pickup order.
+ *
+ * Pickup QRs no longer expire by time — a QR stays valid until the item is
+ * handed over (backend marks it used). So there's no countdown; we just hold
+ * the generated `qrDataUrl`.
  *
  * Usage:
- *   const { qrDataUrl, timeLeft, isExpired, generate } = usePickupQr(orderId);
+ *   const { qrDataUrl, generate, isGenerating, error } = usePickupQr(orderId);
  */
 export function usePickupQr(orderId: string | undefined) {
   const generateQr = useGenerateOrderQr();
-  const [state, setState] = useState<PickupQrState>({
-    qrDataUrl: null,
-    expiresAt: null,
-    timeLeft: '',
-    isExpired: false,
-  });
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
-  // Reset state when orderId changes
+  // Reset when the order changes so we never show a stale QR.
   useEffect(() => {
-    setState({
-      qrDataUrl: null,
-      expiresAt: null,
-      timeLeft: '',
-      isExpired: false,
-    });
+    setQrDataUrl(null);
   }, [orderId]);
-
-  // Countdown timer
-  useEffect(() => {
-    if (!state.expiresAt || state.isExpired) return;
-
-    const timer = setInterval(() => {
-      const now = new Date();
-      const diff = state.expiresAt!.getTime() - now.getTime();
-
-      if (diff <= 0) {
-        setState((prev) => ({ ...prev, timeLeft: 'expired', isExpired: true }));
-        clearInterval(timer);
-        return;
-      }
-
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      setState((prev) => ({
-        ...prev,
-        timeLeft: `${hours}j ${minutes}m ${seconds}s`,
-      }));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [state.expiresAt, state.isExpired]);
 
   const generate = useCallback(() => {
     if (!orderId) {
@@ -276,19 +233,12 @@ export function usePickupQr(orderId: string | undefined) {
       return;
     }
     generateQr.mutate(orderId, {
-      onSuccess: (data) => {
-        setState({
-          qrDataUrl: data.qrDataUrl,
-          expiresAt: new Date(data.expiresAt),
-          timeLeft: '',
-          isExpired: false,
-        });
-      },
+      onSuccess: (data) => setQrDataUrl(data.qrDataUrl),
     });
   }, [orderId, generateQr.mutate]);
 
   return {
-    ...state,
+    qrDataUrl,
     generate,
     isGenerating: generateQr.isPending,
     error: generateQr.error,
