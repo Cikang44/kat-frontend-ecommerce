@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 
 const geom: React.CSSProperties = { fontFamily: "'Geom', sans-serif" };
 const redzone: React.CSSProperties = { fontFamily: "'Redzone', sans-serif" };
@@ -81,7 +82,7 @@ export function MaintenanceModal() {
             </p>
           </div>
 
-          <div className="relative z-10 flex flex-col items-center justify-center gap-3 pb-12 md:flex-row md:pb-6">
+          <div className="relative z-10 flex flex-col items-center justify-center gap-3 pb-8 md:flex-row md:pb-4">
             <a
               href={PO_FORM_URL}
               target="_blank"
@@ -101,6 +102,16 @@ export function MaintenanceModal() {
               Form Pengajuan Cicilan
             </a>
           </div>
+
+          <p
+            style={{ ...geom, fontWeight: 400, color: '#774C26' }}
+            className="relative z-10 pb-6 text-center text-[13px] leading-5 md:pb-4"
+          >
+            If you are a Midtrans business reviewer, kindly login by{' '}
+            <Link href="/midtrans-review" className="underline hover:opacity-70">
+              this page
+            </Link>
+          </p>
         </div>
       </div>
     </div>
