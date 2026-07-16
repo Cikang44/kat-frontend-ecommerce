@@ -245,6 +245,18 @@ export type BundleListResponse = {
     meta: PaginationMeta;
 };
 
+export type BundleImage = {
+    id: string;
+    url: string;
+    altText: string | null;
+    /**
+     * Kode divisi untuk artwork khusus divisi; null untuk gambar umum bundle.
+     */
+    variantKey: string | null;
+    isPrimary: boolean;
+    sortOrder: number;
+};
+
 export type BundleListItem = {
     id: string;
     name: string;
@@ -252,7 +264,11 @@ export type BundleListItem = {
     price: number;
     type: 'merchandise_bundle' | 'kit_panitia_bundle' | 'kit_panitia_add_on' | 'kit_panitia_ala_carte';
     targetRoles: Array<'umum' | 'panitia' | 'admin'>;
-    targetDivisions: Array<string>;
+    targetDivisions: Array<string> | null;
+    /**
+     * Gambar utama bundle, atau null jika gambar belum diunggah.
+     */
+    primaryImage: BundleImage | null;
     itemCount: number;
     isActive: boolean;
 };
@@ -274,6 +290,14 @@ export type BundleDetail = BundleListItem & {
         optionGroup: string;
         variants: Array<ProductVariant>;
     }>;
+    /**
+     * Semua gambar bundle. Untuk panitia, pilih yang variantKey == kode divisi.
+     */
+    images: Array<BundleImage>;
+    /**
+     * Add-on panitia (hanya pada bundle kit_panitia_bundle).
+     */
+    addOns?: Array<BundleListItem>;
 };
 
 export type ProductVariantImage = {

@@ -1,16 +1,20 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ShoppingBagBroken, TagIcon2Broken } from 'vuesax-icon-pack';
 
-import type { BundleDetail, ProductVariant } from '@/api/types.gen';
+import type { BundleDetail, BundleListItem, ProductVariant } from '@/api/types.gen';
 import { BackButton } from '@/components/product/back-button';
+import { ProductImageGallery } from '@/components/product/product-image-gallery';
 import { QuantityControl } from '@/components/product/quantity-control';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { useProfile } from '@/domains/auth/auth.hooks';
 import { useAddBundleToCart } from '@/domains/cart/cart.hooks';
 import { useInitiateOrder } from '@/domains/order/order.hooks';
+import { selectBundleGalleryImages } from '@/domains/product/bundle-images';
 import {
   buildGroups,
   buildSelectedVariants,
@@ -68,8 +72,16 @@ function BundleDetailCard({ bundle }: { bundle: BundleDetail }) {
   const router = useRouter();
   const addBundle = useAddBundleToCart();
   const initiateOrder = useInitiateOrder();
+  const { data: profile } = useProfile();
 
   const [quantity, setQuantity] = useState(1);
+
+  // Panitia see the artwork for their division first (variantKey === division
+  // code); everyone else falls back to the primary/first image.
+  const galleryImages = useMemo(
+    () => selectBundleGalleryImages(bundle.images ?? [], profile?.division?.code),
+    [bundle.images, profile?.division?.code],
+  );
 
   // Mandatory components: everything that isn't part of a choose-one group.
   const mandatory = getMandatoryItems(bundle.items);
@@ -142,6 +154,20 @@ function BundleDetailCard({ bundle }: { bundle: BundleDetail }) {
             <p className="text-ink font-['Geom'] text-sm leading-5">{bundle.description}</p>
           )}
         </div>
+
+        {/* Gallery — division artwork for panitia, else primary/first. Falls
+            back to a placeholder while images aren't seeded yet. */}
+        {galleryImages.length > 0 ? (
+          <div className="w-full max-w-[480px]">
+            <ProductImageGallery images={galleryImages} productName={bundle.name} />
+          </div>
+        ) : (
+          <div className="flex aspect-square w-full max-w-[480px] items-center justify-center rounded-[20px] border border-[#996537] bg-[#fff3b8]">
+            <span className="font-['Redzone'] text-4xl text-[#996537]/60">
+              {bundle.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
 
         {/* Mandatory components */}
         <div className="flex flex-col gap-4">
@@ -229,6 +255,52 @@ function BundleDetailCard({ bundle }: { bundle: BundleDetail }) {
             <p className="font-['Geom'] text-sm text-red-300">{addBundle.error?.message}</p>
           )}
         </div>
+      </div>
+
+      {bundle.addOns && bundle.addOns.length > 0 && <AddOnsSection addOns={bundle.addOns} />}
+    </div>
+  );
+}
+
+/** "Tambahkan juga" — panitia add-ons recommended from a kit panitia detail. */
+function AddOnsSection({ addOns }: { addOns: BundleListItem[] }) {
+  return (
+    <div className="bg-powder flex flex-col gap-4 rounded-[15px] p-5 md:p-6">
+      <h2 className="text-royal font-['Redzone'] text-xl">Tambahkan juga</h2>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+        {addOns.map((addOn) => (
+          <Link
+            key={addOn.id}
+            href={`/products/${addOn.id}?kind=bundle`}
+            className="flex flex-col overflow-hidden rounded-[10px] border border-[#996537]/40 bg-white/70 transition-transform hover:scale-[1.02]"
+          >
+            <div className="relative aspect-square w-full bg-[#fff3b8]">
+              {addOn.primaryImage?.url ? (
+                // eslint-disable-next-line @next/next/no-img-element -- dynamic backend host, not in next/image remotePatterns
+                <img
+                  src={addOn.primaryImage.url}
+                  alt={addOn.name}
+                  loading="lazy"
+                  className="h-full w-full object-contain p-2"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <span className="font-['Redzone'] text-2xl text-[#996537]/60">
+                    {addOn.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-0.5 p-2">
+              <span className="line-clamp-2 font-['Geom'] text-xs font-bold text-[#133B79]">
+                {addOn.name}
+              </span>
+              <span className="font-['Geom'] text-xs text-[#774c26]">
+                {formatPrice(addOn.price)}
+              </span>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );

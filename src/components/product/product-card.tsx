@@ -19,8 +19,10 @@ export function ProductCard({ item }: ProductCardProps) {
   const href = isBundle ? `/products/${item.bundle.id}?kind=bundle` : `/products/${item.product.id}`;
   const name = isBundle ? item.bundle.name : item.product.name;
   const price = isBundle ? item.bundle.price : item.product.basePrice;
-  // Bundles carry no image; a product may still have a null primaryImage.
-  const imageUrl = isBundle ? null : (item.product.primaryImage?.url ?? null);
+  // Both products and bundles now expose a nullable primaryImage.
+  const imageUrl = isBundle
+    ? (item.bundle.primaryImage?.url ?? null)
+    : (item.product.primaryImage?.url ?? null);
   const typeLabel = isBundle
     ? (BUNDLE_TYPE_LABEL[item.bundle.type] ?? 'Paket')
     : item.product.type.replace('_', ' ');
